@@ -12,6 +12,7 @@ library("plyr")
 library("readr")             
 library("Rmisc")
 library("ggplot2")
+library("lubridate")
 ```
 
 ```{r}
@@ -33,11 +34,26 @@ write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_
  
 ```
 
+
+## Need to figure out how to fix the date !!!!
+```{r}
+str(data_all)
+
+# convert date info in format 'mm/dd/yyyy'
+data.frame$date <- ymd("2023-04-23")
+
+str(data.frame)
+
+```
+
+
 # Summary of all data 
 ```{r}
 st_height <- summarySE(data_all, measurevar="height_mm", groupvars=c("date_collected", "site"))
 st_height 
 
+```
+```{r}
 ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
@@ -55,6 +71,12 @@ df_ASHC<- data_all%>%
 st_height_ASHC <- summarySE(df_ASHC, measurevar="height_mm", groupvars=c("date_collected"))
 st_height_ASHC
 
+
+ggplot(data=df_ASHC, aes(x=date_collected, y=height_mm, fill=site)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
 ```
 # Fence Creek Summary
 ```{r}
