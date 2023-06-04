@@ -1,0 +1,96 @@
+---
+title: "LIS Oyster Lab Tissue Processing"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+
+```{r, echo=FALSE}
+library("dplyr")                                    
+library("plyr")                                     
+library("readr")             
+library("Rmisc")
+library("ggplot2")
+```
+
+```{r}
+#Set Path
+setwd("C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
+```
+
+### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+```{r}
+data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows                                         # Combine data sets into one data set 
+data_all                                            # Print data to RStudio console
+
+as.data.frame(data_all)                            # Convert tibble to data.frame
+
+write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
+ 
+```
+
+# Summary of all data 
+```{r}
+st_height <- summarySE(data_all, measurevar="height_mm", groupvars=c("date_collected", "site"))
+st_height 
+
+ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="site", y = "Mean Shell Height (mm)")
+```
+
+
+# Ash Creek Summary
+```{r}
+df_ASHC<- data_all%>%
+  filter(site=="ASHC")
+
+
+st_height_ASHC <- summarySE(df_ASHC, measurevar="height_mm", groupvars=c("date_collected"))
+st_height_ASHC
+
+```
+# Fence Creek Summary
+```{r}
+df_FENC<- data_all%>%
+  filter(site=="FENC")
+
+
+st_height_FENC <- summarySE(df_FENC, measurevar="height_mm", groupvars=c("date_collected"))
+st_height_FENC 
+
+```
+
+# Laurel Hollow Summary
+```{r}
+df_LAUR<- data_all%>%
+  filter(site=="LAUR")
+
+
+st_height_LAUR <- summarySE(df_LAUR, measurevar="height_mm", groupvars=c("date_collected"))
+st_height_LAUR 
+
+```
+
+# Gold Star Beach Summary
+```{r}
+df_GOLD<- data_all%>%
+  filter(site=="GOLD")
+
+
+st_height_GOLD <- summarySE(df_GOLD, measurevar="height_mm", groupvars=c("date_collected"))
+st_height_GOLD 
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

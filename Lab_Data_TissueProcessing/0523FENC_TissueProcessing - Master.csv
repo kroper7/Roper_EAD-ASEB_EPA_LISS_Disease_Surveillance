@@ -1,0 +1,37 @@
+lab_id,date_collected,site,lab_sample,oyster_zone,light_regime,date_processed,ww_total_g,height_mm,length_mm,width_mm,condition,dissection_notes,mantle_rftm,ggr_etoh,ggr_etoh,adductor_etoh,cross_histology,date_davidsons,date_etoh
+0523FENC_01,2023-05-15,FENC,1,upper,sunlight,2023-05-16,109.72,144.15,51.41,24.6,medium,mud blisters; brittle ,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_02,2023-05-15,FENC,2,upper,sunlight,2023-05-16,103.74,153.88,62,27.67,medium,pea crab; mud blisters; brittle,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_03,2023-05-15,FENC,3,upper,sunlight,2023-05-16,136.47,138.81,71.85,24.49,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_04,2023-05-15,FENC,4,upper,sunlight,2023-05-16,130.22,122.45,64.75,34.47,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_05,2023-05-15,FENC,5,upper,sunlight,2023-05-16,94.03,144.08,59.37,21.83,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_06,2023-05-15,FENC,6,upper,sunlight,2023-05-16,126.42,146.65,54.44,24.34,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_07,2023-05-15,FENC,7,upper,sunlight,2023-05-16,96.21,126.21,64.18,25.07,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_08,2023-05-15,FENC,8,upper,sunlight,2023-05-16,96.38,109.76,61.83,25.09,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_09,2023-05-15,FENC,9,upper,sunlight,2023-05-16,68.14,111.63,52.44,22.96,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_10,2023-05-15,FENC,10,upper,sunlight,2023-05-16,70.3,137.77,52.25,23.97,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_11,2023-05-15,FENC,11,lower,sunlight,2023-05-16,103.43,121.59,68.84,22.81,medium,"mud blisters, brittle",TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_12,2023-05-15,FENC,12,lower,sunlight,2023-05-16,80.6,105.41,54.22,22.41,medium,mud blisters; brittle,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_13,2023-05-15,FENC,13,lower,sunlight,2023-05-16,70.17,111.17,53.45,24.45,medium,mud blisters; brittle ,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_14,2023-05-15,FENC,14,lower,sunlight,2023-05-16,83.41,111.88,52.88,27.48,medium,mud blisters; brittle ; pea crab,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_15,2023-05-15,FENC,15,lower,sunlight,2023-05-16,131.93,121.01,58.53,36.88,fat,mud blisters; brittle ; boring sponge?,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_16,2023-05-15,FENC,16,lower,sunlight,2023-05-16,70.27,107.82,58.21,22.83,medium,mud blisters; brittle ,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_17,2023-05-15,FENC,17,lower,sunlight,2023-05-16,90.44,135.36,56.7,18.28,watery,mud blisters; brittle ,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_18,2023-05-15,FENC,18,lower,sunlight,2023-05-16,56.28,121.55,42.57,13.63,medium,mud blisters; brittle ,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_19,2023-05-15,FENC,19,lower,sunlight,2023-05-16,156.01,121.04,66.33,30.49,medium,mud blisters; brittle ; pea crab,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_20,2023-05-15,FENC,20,lower,sunlight,2023-05-16,112.02,127.64,63.4,25.16,medium,mud blisters; brittle ,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_21,2023-05-15,FENC,21,upper,under_bridge,2023-05-16,123.44,143.09,48.54,25.68,medium,mud blisters ; brittle ; pea crab,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_22,2023-05-15,FENC,22,upper,under_bridge,2023-05-16,118.32,119.86,58.33,25.99,medium,mud blisters; brittle,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_23,2023-05-15,FENC,23,upper,under_bridge,2023-05-16,62.04,102.57,48.02,20.77,medium,mud blisters ; brittle ,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_24,2023-05-15,FENC,24,upper,under_bridge,2023-05-16,147.62,102.17,63.43,42.34,medium,mud blisters; brittle; pea crab,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_25,2023-05-15,FENC,25,upper,under_bridge,2023-05-16,125.7,117.01,57.56,26.14,fat,mud blisters; brittle,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_26,2023-05-15,FENC,26,upper,under_bridge,2023-05-16,147.96,133.73,72.44,29.47,medium,mud blisters; brittle,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_27,2023-05-15,FENC,27,lower,under_bridge,2023-05-16,147.98,153.88,66.85,24.45,medium,mud blisters; brittle,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_28,2023-05-15,FENC,28,lower,under_bridge,2023-05-16,146.92,125.19,57.25,34.7,watery,mud blisters; brittle; pea crab,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_29,2023-05-15,FENC,29,lower,under_bridge,2023-05-16,261.38,153.88,67.7,41.54,fat,mud blisters; brittle; polychaete?,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+0523FENC_30,2023-05-15,FENC,30,lower,under_bridge,2023-05-16,139.86,120.94,63.77,30.52,medium,mud blisters; brittle,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-16,2023-05-17
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,                                                                                                                     ,,,,,,,,,,,,,
