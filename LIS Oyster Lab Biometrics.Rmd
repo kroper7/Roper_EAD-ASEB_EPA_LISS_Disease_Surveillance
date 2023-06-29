@@ -20,9 +20,27 @@ library("lubridate")
 setwd("C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
 ```
 
-### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+#Reading in google sheets from the good drive
+
 ```{r}
-data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing",                           # Identify all CSV files
+#Install the required package
+#install.packages('googlesheets4')
+
+library(googlesheets4)
+```
+
+```{r}
+ASHC_0423 <- read_sheet("https://docs.google.com/spreadsheets/d/1FTIfau5DBKxqmWdYpQB--2qYXgYGwsqRw3Qxy7Zi7Wk/edit?usp=drive_link")
+```
+
+```{r}
+head(ASHC_0423)
+```
+
+### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+# reading in .csv files from local folder
+```{r}
+data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>%                              # Store all files in list
   bind_rows                                         # Combine data sets into one data set 
@@ -36,6 +54,7 @@ write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_
 
 
 ## Need to figure out how to fix the date !!!!
+ https://lubridate.tidyverse.org/
 ```{r}
 str(data_all)
 
@@ -49,9 +68,15 @@ str(data.frame)
 
 # Summary of all data 
 ```{r}
-st_height <- summarySE(data_all, measurevar="height_mm", groupvars=c("date_collected", "site"))
+st_height <- summarySE(data_all, measurevar="height_mm", groupvars=c("site", "date_collected"))
 st_height 
 
+#Calculate completeness for QC
+st_height$Completeness <- st_height$N /30
+
+st_height
+
+write.csv(st_height, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\Completeness_tissue_processing_data.csv", row.names=FALSE)
 ```
 ```{r}
 ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
@@ -67,11 +92,12 @@ ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
 df_ASHC<- data_all%>%
   filter(site=="ASHC")
 
-
 st_height_ASHC <- summarySE(df_ASHC, measurevar="height_mm", groupvars=c("date_collected"))
 st_height_ASHC
+```
 
 
+```{r}
 ggplot(data=df_ASHC, aes(x=date_collected, y=height_mm, fill=site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
@@ -110,6 +136,11 @@ st_height_GOLD <- summarySE(df_GOLD, measurevar="height_mm", groupvars=c("date_c
 st_height_GOLD 
 
 ```
+
+```{r}
+sessionInfo()
+```
+
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
