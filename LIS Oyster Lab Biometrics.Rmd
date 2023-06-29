@@ -21,6 +21,23 @@ setwd("C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_S
 ```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+
+#Reading in google sheets from the good drive
+
+```{r}
+#Install the required package
+#install.packages('googlesheets4')
+
+library(googlesheets4)
+```
+
+```{r}
+ASHC_0423 <- read_sheet("https://docs.google.com/spreadsheets/d/1FTIfau5DBKxqmWdYpQB--2qYXgYGwsqRw3Qxy7Zi7Wk/edit?usp=drive_link")
+```
+
+
+
+# reading in .csv files from local folder
 ```{r}
 data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
@@ -110,6 +127,11 @@ st_height_GOLD <- summarySE(df_GOLD, measurevar="height_mm", groupvars=c("date_c
 st_height_GOLD 
 
 ```
+
+```{r}
+sessionInfo()
+```
+
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
