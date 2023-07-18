@@ -1,0 +1,113 @@
+---
+title: "QAQC_PopulationSurveyMetrics"
+author: "Meghana Parikh"
+date: "2023-06-29"
+output: html_document
+---
+
+```{r, setup, include=FALSE}
+
+knitr::opts_knit$set(root.dir = 'C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
+
+
+install.packages("tidyverse")
+install.packages("gtools")
+install.packages("Rmisc")
+library(gtools)
+library(readxl)
+library(dplyr)
+library(lubridate)
+
+```
+
+```{r}
+
+#### need to work on this chunk to read in all files at once 
+data_all <- list.files(path = "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
+  pattern = "*.xlsx", full.names = TRUE) %>%         # Identify all xlsx files
+  lapply(read_excel) %>%                            # Store all files in list
+data_all                                            # Print data to RStudio console
+
+as.data.frame(data_all)                            # Convert tibble to data.frame
+
+
+
+
+
+```
+
+```{r}
+
+#read in all population survey sheets 
+
+
+#June 2023
+shellsize <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_ShellSize.xlsx",
+                     sheet = 1, col_names = TRUE) 
+
+quadratdensity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
+                     sheet = 1, col_names = TRUE) 
+
+rugosity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
+                     sheet = 1, col_names = TRUE) 
+
+BedHeight <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
+                     sheet = 1, col_names = TRUE) 
+```
+
+```{r}
+#oyster density metrics 
+
+st_density_final <- summarySE(quadratdensity, measurevar="LiveCount_total", groupvars=c("Site_Name"))
+
+st_height 
+
+#Calculate completeness for QC
+st_rftm_final$Completeness <- st_rftm_final$N /30
+
+st_rftm_final
+
+write.csv(st_rftm_final, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
+
+
+qd_all <- quadratdensity %>% group_by(Site_Name) %>%
+  mutate(
+      totalcount=sum(BoxCount_Total,LiveCount_Total,GaperCount_Total), 
+  )
+
+qd_summary <- qd_all %>% 
+  
+  group_by(Site_Name) %>%
+    summarise(
+        avgcount_total = mean(totalcount), 
+        avgcount_box = mean(BoxCount_Total),
+        avgcount_live = mean(LiveCount_Total), 
+        avgcount_gaper = mean(GaperCount_Total)) %>%
+    ungroup() %>%
+      
+  group_by(Site_Name)
+        
+        SEcount_total = sd(totalcount)/sqrt(avgcount_total),
+        SEcount_box = sd(BoxCount_Total)/sqrt(avgcount_box),
+        SEcount_live = sd(LiveCount_Total)/sqrt(avgcount_live),
+        SEcount_gaper = sd(GaperCount_Total)/sqrt(avgcount_gaper), 
+        PSE_total = ((SEcount_total/avgcount_total)*100),
+        PSE_box = ((SEcount_box/avgcount_box)*100), 
+        PSE_live = ((SEcount_live/avgcount_live)*100), 
+        PSE_gaper = ((SEcount_gaper/avgcount_gaper)*100))
+    
+```
+
+
+```{r}
+shellsize %>% group_by(Site_Name) %>% 
+  mutate(
+    avgheight=mean(Height_mm), 
+    minheight=min(Height_mm), 
+    maxheight=max(Height_mm), 
+    PSE=sd(Height_mm))
+
+```
+
+
+
