@@ -53,7 +53,7 @@ str(data_all)
 # Summary of all data and Completeness Check
 ```{r}
 st_rftm_final <- summarySE(data_all, measurevar="rftm_final", groupvars=c("site", "date_collected"))
-st_height 
+st_rftm_final
 
 #Calculate completeness for QC
 st_rftm_final$Completeness <- st_rftm_final$N /30
@@ -65,26 +65,38 @@ write.csv(st_rftm_final, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB
 
 # Comparied reader 1 and reader 2
   --- THis is not currently working properly -- Currently calling everything with two reads to be TRUE
+  
 ```{r}
-data_all$results = ifelse(data_all$rftm_reader1 < data_all$rftm_reader1, 'FALSE',
-  ifelse(data_all$rftm_reader1 < data_all$rftm_reader1, 'FALSE',
-  ifelse(data_all$rftm_reader1 == data_all$rftm_reader1, 'TRUE')))
+data_all$results = ifelse(data_all$rftm_intensity_read1 < data_all$rftm_intensity_read2, 'FALSE',
+  ifelse(data_all$rftm_intensity_read1 < data_all$rftm_intensity_read2, 'FALSE',
+  ifelse(data_all$rftm_intensity_read1 == data_all$rftm_intensity_read2, 'TRUE', NA)))
   
 data_all
 ```
+
+
 
 ```{r}
 Data_Accuracy = data.frame(data_all$lab_id,data_all$date_collected, data_all$site, data_all$rftm_intensity_read1, data_all$rftm_intensity_read2, data_all$results)
 
 Data_Accuracy <- na.omit(Data_Accuracy)
 Data_Accuracy
+```
 
-
+```{r}
 #count TRUE values in vector
-sum(Data_Accuracy$results, na.rm=TRUE)
-sum(Data_Accuracy$results, na.rm=FALSE)
+x <- Data_Accuracy %>% 
+  dplyr::group_by(data_all.site, data_all.date_collected, data_all.results) %>% 
+  dplyr::summarise(count = n())
+x2 <- x %>% 
+  dplyr::group_by()
 
+T <- nrow(Data_Accuracy %>% filter(data_all.results == 'TRUE'))
+F <- nrow(Data_Accuracy %>% filter(data_all.results == 'FALSE'))
 
-write.csv(Data_Accuracy, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Accuracy_RFTM_intenisty_data.csv", row.names=FALSE)
+Accuracy <- T/(T+F)
+Accuracy
+
+#write.csv(Data_Accuracy, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Accuracy_RFTM_intenisty_data.csv", row.names=FALSE)
 ```
 
