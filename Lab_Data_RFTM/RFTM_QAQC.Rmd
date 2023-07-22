@@ -5,6 +5,10 @@ date: "6/29/2023"
 output: html_document
 ---
 
+Last updated 7/22/2023 by K. McFarland
+RFTM accuracy score = 88.2%
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -20,13 +24,13 @@ library("lubridate")
 
 ```{r}
 #Set Path
-setwd("C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM")
+setwd("C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM")
 ```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
-data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM/Files_by_Month",                           # Identify all CSV files
+data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>%                              # Store all files in list
   bind_rows                                         # Combine data sets into one data set 
@@ -34,7 +38,7 @@ data_all                                            # Print data to RStudio cons
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
-write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\All_RFTM_data.csv", row.names=FALSE)
+write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\All_RFTM_data.csv", row.names=FALSE)
 ```
 
 
@@ -45,6 +49,7 @@ str(data_all)
 
 # convert date info in format 'mm/dd/yyyy'
 data_all$date <- ymd("2023-04-23")
+data_all$site=as.factor(data_all$site)
 
 str(data_all)
 
@@ -60,7 +65,7 @@ st_rftm_final$Completeness <- st_rftm_final$N /30
 
 st_rftm_final
 
-write.csv(st_rftm_final, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
+write.csv(st_rftm_final, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
 ```
 
 # Comparied reader 1 and reader 2
@@ -83,6 +88,7 @@ Data_Accuracy <- na.omit(Data_Accuracy)
 Data_Accuracy
 ```
 
+# Accuracy Output
 ```{r}
 #count TRUE values in vector
 x <- Data_Accuracy %>% 
@@ -97,6 +103,33 @@ F <- nrow(Data_Accuracy %>% filter(data_all.results == 'FALSE'))
 Accuracy <- T/(T+F)
 Accuracy
 
-#write.csv(Data_Accuracy, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Accuracy_RFTM_intenisty_data.csv", row.names=FALSE)
+#write.csv(Data_Accuracy, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Accuracy_RFTM_intenisty_data.csv", row.names=FALSE)
+```
+
+
+
+```{r, echo=FALSE}
+ggplot(data=data_all, aes(x=date_collected, y=rftm_final, fill=site)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Date", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+  facet_wrap(~site)
+
+```
+
+
+
+
+
+
+
+
+
+
+Version
+```{r}
+sessionInfo()
 ```
 
