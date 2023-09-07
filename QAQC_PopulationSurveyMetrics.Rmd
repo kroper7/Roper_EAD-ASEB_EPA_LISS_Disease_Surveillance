@@ -15,14 +15,16 @@ install.packages("gtools")
 install.packages("Rmisc")
 library(gtools)
 library(readxl)
+library(plyr)
 library(dplyr)
 library(lubridate)
+library(Rmisc)
 
 ```
 
 ```{r}
 
-#### need to work on this chunk to read in all files at once 
+#### need to work on this chunk to read in all files at once - not ready to use
 data_all <- list.files(path = "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
   pattern = "*.xlsx", full.names = TRUE) %>%         # Identify all xlsx files
   lapply(read_excel) %>%                            # Store all files in list
@@ -58,56 +60,108 @@ BedHeight <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_
 ```{r}
 #oyster density metrics 
 
-st_density_final <- summarySE(quadratdensity, measurevar="LiveCount_total", groupvars=c("Site_Name"))
 
-st_height 
+#sum total number of oysters counted per quadrat
+quadratdensity$AllCount_Total <- rowSums(quadratdensity[, c("LiveCount_Total", "BoxCount_Total", "GaperCount_Total")])
 
-#Calculate completeness for QC
-st_rftm_final$Completeness <- st_rftm_final$N /30
+#summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
+all_density_SE <-summarySE(data = quadratdensity, measurevar = "AllCount_Total", groupvars=c("Site_Name"))
+live_density_SE <- summarySE(data = quadratdensity, measurevar = "LiveCount_Total", groupvars=c("Site_Name"))
+box_density_SE <-summarySE(data = quadratdensity, measurevar = "BoxCount_Total", groupvars=c("Site_Name"))
+gaper_density_SE <-summarySE(data = quadratdensity, measurevar = "GaperCount_Total", groupvars=c("Site_Name"))
 
-st_rftm_final
+#calculate percent standard error as 100*se/mean
+all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$AllCount_Total)
+live_density_SE$PSE_live <- 100*(live_density_SE$se/live_density_SE$LiveCount_Total)
+box_density_SE$PSE_box <- 100*(box_density_SE$se/box_density_SE$BoxCount_Total)
+gaper_density_SE$PSE_gaper <- 100*(gaper_density_SE$se/gaper_density_SE$GaperCount_Total)
 
-write.csv(st_rftm_final, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
 
+#join into 1 table 
+densitysummary <- subset(all_density_SE, select = -c(sd,se,ci)) %>%
+    left_join(subset(live_density_SE, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
+    left_join(subset(box_density_SE, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
+    left_join(subset(gaper_density_SE, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
 
-qd_all <- quadratdensity %>% group_by(Site_Name) %>%
-  mutate(
-      totalcount=sum(BoxCount_Total,LiveCount_Total,GaperCount_Total), 
-  )
-
-qd_summary <- qd_all %>% 
+#renaming for clarity. need to use dplyr:: because another package is overriding the function
+#densitysummary <- densitysummary %>%
+    dplyr::rename(
+      AllCount_Mean = AllCount_Total,
+      LiveCount_Mean = LiveCount_Total,
+      BoxCount_Mean = BoxCount_Total, 
+      GaperCount_Mean = GaperCount_Total, 
+      NumQuad = N) %>%
   
-  group_by(Site_Name) %>%
-    summarise(
-        avgcount_total = mean(totalcount), 
-        avgcount_box = mean(BoxCount_Total),
-        avgcount_live = mean(LiveCount_Total), 
-        avgcount_gaper = mean(GaperCount_Total)) %>%
-    ungroup() %>%
+#calculate completeness as 100*N/12, where 12 is the desired number of quadrats per site 
+  mutate(PercentComplete_Quad = ((NumQuad/12)*100) )
+
+
+write.csv(densitysummary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological\\populationdensity_summary.csv", row.names=FALSE)
+#note that PSE is >20 percent at Ash Creek, and at Fence creek in box and gaper categories. This is due to the different levels of sampling. Need to redo with categories 
+
+
+```
+
+
+
+```{r}
+
+#oyster size distribution
+
+#finding the empty values - these are oyster samples collected for lab use I think?
+emptyvalues <- shellsize %>% filter(is.na(Height_mm))
       
-  group_by(Site_Name)
-        
-        SEcount_total = sd(totalcount)/sqrt(avgcount_total),
-        SEcount_box = sd(BoxCount_Total)/sqrt(avgcount_box),
-        SEcount_live = sd(LiveCount_Total)/sqrt(avgcount_live),
-        SEcount_gaper = sd(GaperCount_Total)/sqrt(avgcount_gaper), 
-        PSE_total = ((SEcount_total/avgcount_total)*100),
-        PSE_box = ((SEcount_box/avgcount_box)*100), 
-        PSE_live = ((SEcount_live/avgcount_live)*100), 
-        PSE_gaper = ((SEcount_gaper/avgcount_gaper)*100))
-    
+shellsize_all <- 
+  shellsize %>% group_by(Site_Name) %>%
+  summarise(
+    median_height=median(Height_mm, na.rm = TRUE), 
+    min_height=min(Height_mm, na.rm = TRUE), 
+    max_height=max(Height_mm, na.rm = TRUE), 
+    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
+    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
+  mutate(SpecimenType = "All")
+
+shellsize_live <- 
+  shellsize %>% filter(SpecimenType=="Live") %>%
+   summarise(
+    median_height=median(Height_mm, na.rm = TRUE), 
+    min_height=min(Height_mm, na.rm = TRUE), 
+    max_height=max(Height_mm, na.rm = TRUE), 
+    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
+    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
+  mutate(SpecimenType = "Live")
+
+shellsize_box <- 
+  shellsize %>% filter(SpecimenType=="Box") %>%
+   summarise(
+    median_height=median(Height_mm, na.rm = TRUE), 
+    min_height=min(Height_mm, na.rm = TRUE), 
+    max_height=max(Height_mm, na.rm = TRUE), 
+    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
+    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
+  mutate(SpecimenType = "Box")
+
+shellsize_gaper <- 
+  shellsize %>% filter(SpecimenType=="Gaping") %>%
+   summarise(
+    median_height=median(Height_mm, na.rm = TRUE), 
+    min_height=min(Height_mm, na.rm = TRUE), 
+    max_height=max(Height_mm, na.rm = TRUE), 
+    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
+    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
+  mutate(SpecimenType = "Gaper")
+
+#rbind together 
+
+shellsize_summary <- rbind(shellsize_all, shellsize_live, shellsize_box, shellsize_gaper)
+
+#size distribution summary
+#note that calculating PSE and accuracy do not make sense for size distributions. Will need to figure out new metrics for the QAPP
+write.csv(shellsize_summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological\\shellsize_summary.csv", row.names=FALSE)
+
+  
 ```
 
 
 ```{r}
-shellsize %>% group_by(Site_Name) %>% 
-  mutate(
-    avgheight=mean(Height_mm), 
-    minheight=min(Height_mm), 
-    maxheight=max(Height_mm), 
-    PSE=sd(Height_mm))
-
 ```
-
-
-
