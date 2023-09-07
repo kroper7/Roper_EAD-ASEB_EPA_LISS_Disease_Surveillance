@@ -17,7 +17,7 @@ library("lubridate")
 
 ```{r}
 #Set Path
-setwd("C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
+setwd("C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
 ```
 
 #Reading in google sheets from the good drive
@@ -30,11 +30,11 @@ library(googlesheets4)
 ```
 
 ```{r}
-ASHC_0423 <- read_sheet("https://docs.google.com/spreadsheets/d/1FTIfau5DBKxqmWdYpQB--2qYXgYGwsqRw3Qxy7Zi7Wk/edit?usp=drive_link")
+#ASHC_0423 <- read_sheet("https://docs.google.com/spreadsheets/d/1FTIfau5DBKxqmWdYpQB--2qYXgYGwsqRw3Qxy7Zi7Wk/edit?usp=drive_link")
 ```
 
 ```{r}
-head(ASHC_0423)
+#head(ASHC_0423)
 ```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
@@ -48,7 +48,7 @@ data_all                                            # Print data to RStudio cons
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
-write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
+write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
  
 ```
 
@@ -59,9 +59,9 @@ write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_
 str(data_all)
 
 # convert date info in format 'mm/dd/yyyy'
-data.frame$date <- ymd("2023-04-23")
+#data.frame$date <- ymd("2023-04-23")
 
-str(data.frame)
+str(data_all)
 
 ```
 

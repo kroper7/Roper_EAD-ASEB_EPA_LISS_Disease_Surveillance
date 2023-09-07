@@ -6,7 +6,8 @@ output: html_document
 ---
 
 Last updated 7/22/2023 by K. McFarland
-RFTM accuracy score = 88.2%
+RFTM accuracy score = 88.2% (only through June)
+  - Need to fix the code calling the files, something is wrong here
 
 
 ```{r setup, include=FALSE}
@@ -38,6 +39,8 @@ data_all                                            # Print data to RStudio cons
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
+tail(data_all)
+
 write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\All_RFTM_data.csv", row.names=FALSE)
 ```
 
@@ -48,7 +51,7 @@ write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_E
 str(data_all)
 
 # convert date info in format 'mm/dd/yyyy'
-data_all$date <- ymd("2023-04-23")
+#data_all$date <- ymd("2023-04-23")
 data_all$site=as.factor(data_all$site)
 
 str(data_all)
