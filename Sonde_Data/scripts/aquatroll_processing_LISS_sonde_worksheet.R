@@ -41,12 +41,8 @@ aquatroll_fields_LISS <- function(){ # LISS Sonde data; updated 2023/09/08
 }
 input <- raw_Sonde_rootdir
 
-###--------- summary_aquatroll
-# summary_aquatroll <- function(input, # htm or csv file that contains the raw aquatroll output
-#                               ignore.marked = T, # TRUE will ignore the marked column from being exported in the output
-#                               flds_req = aquatroll_fields_v2() # fields required for exporting raw data; default to newer set (2022/11/18)
-# )
-# input <- 'C:/Users/samjg/Documents/Github_repositories/LISS_sonde_data/data/csv/0723ASHC_Sonde.csv'
+# input <- "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/082023_GOLD_Sonde.csv"
+
 summary_aquatroll <- function(input, # htm or csv file that contains the raw aquatroll output
                               ignore.marked = T, # TRUE will ignore the marked column from being exported in the output
                               flds_req = aquatroll_fields_LISS()) # fields required for exporting raw data; default to newer set (2022/11/18)
@@ -121,19 +117,18 @@ summary_aquatroll <- function(input, # htm or csv file that contains the raw aqu
   # names(D)[grep('Depth',names(D))] <- 'Depth'
   
   ### missing fields, ny fields they mean columns, lets not get crazy here
-  flds_miss <- setdiff(flds_req, names(D_df)) # flds_req is in the original summary_aquatoll call - we call the preexisting LISS version
+  flds_miss <- setdiff(aquatroll_fields_LISS(), names(D_df)) # flds_req is in the original summary_aquatoll call - we call the preexisting LISS version
   
   ### datetime - We can do this
-  if(gsub(".*/","",input) !='0723ASHC_Sonde.csv') {
-    D_df[,1] <- with_tz(force_tz(ymd_hms(D_df[,1]),tz='America/New_York'),'UTC')
-     } else ( D_df[,1] <- with_tz(force_tz(mdy_hm(D_df[,1]),tz='America/New_York'),'UTC') # final rows as 'Log notes, Started, Paused, etc. when taking down are now NAs
+  if(gsub(".*/","",input) %in% c('0723ASHC_Sonde.csv', '082023_ASHC_Sonde.csv', '082023_LAUR_Sonde.csv', '092023_ASHC_Sonde.csv')) { # data files that have date formated as mdy_hm
+    D_df[,1] <- with_tz(force_tz(mdy_hm(D_df[,1]),tz='America/New_York'),'UTC')
+     } else (D_df[,1] <- with_tz(force_tz(ymd_hms(D_df[,1]),tz='America/New_York'),'UTC') # all other data files that are formatted as ymd_hm
               )
   
-  D_om     <- D_df %>% dplyr::filter(!`Date Time` %in% NA) # ommit htese final rows to computer the whole run time, otherwise  error hits an NA
+  D_om     <- D_df %>% dplyr::filter(!`Date Time` %in% NA) %>% dplyr::filter(!`Actual Conductivity (µS/cm)` %in% NA) # ommit htese final rows to computer the whole run time, otherwise  error hits an NA
   # total duration
   dtime <- D_om[1,1] ### start time
   etime <-D_om[nrow(D_om)-1,1]
-  tail(D_om)
   duration_total_secs <- as.numeric(D_om[nrow(D_om),1]-D_om[1,1],units='secs')+1
   duration_total_hrs  <- duration_total_secs/3600
   duration_total_days <- duration_total_hrs/24
@@ -144,7 +139,9 @@ summary_aquatroll <- function(input, # htm or csv file that contains the raw aqu
   n_outlier                 <- nrow(sal_outliers)
   outlier_timestamps        <- list((D_om %>% dplyr::filter(`Salinity (PSU)` %in%  sal_outliers$`Salinity (PSU)`))$`Date Time`)
   outlier_timestamps_nested <- paste(as.character(interaction(outlier_timestamps,sep=",")))
-
+  if(length(outlier_timestamps_nested) == 0) {
+    outlier_timestamps_nested = 0 #list(sal_outlier_timestamps), # list of timestamps where sal is < 1
+  } else {}
 
 
   ### lat/lon - DOES NOT APPLY TO LISS SONDE DATA 
@@ -188,7 +185,7 @@ summary_aquatroll <- function(input, # htm or csv file that contains the raw aqu
                     #z_max_m=z_max,
                     Oxygen_min=do_min,
                     PSU_under_1=n_outlier, # based on salinity < 1
-                    PSU_outlier_timestamps=outlier_timestamps_nested,#list(sal_outlier_timestamps), # list of timestamps where sal is < 1
+                    PSU_outlier_timestamps = outlier_timestamps_nested,
                     #dz_dt=dz_dt,
                     #lon_dd=lon_avg,
                     #lat_dd=lat_avg,
@@ -216,8 +213,8 @@ colnames(df.loop)        <- c('Input',
                               'PSU_outlier_timestamps',
                               'flds_miss') # names in the for loop
 
-path.p              <- "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/" #the location of all your respirometry files 
-file.names.table    <- data.frame(txt.files = (basename(list.files(path = paste(path.p,'/',sep=''), pattern = "csv$", recursive = TRUE)))) 
+path.p              <- "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data" #the location of all your respirometry files 
+file.names.table    <- data.frame(txt.files = (basename(list.files(path = paste(path.p,'/',sep=''), pattern = "csv$", recursive = FALSE)))) 
 
 for (m in 1:nrow(file.names.table)) {
   raw_Sonde_rootdir        <- paste(path.p,'/',file.names.table[m,1], sep='') #reads in the data files
