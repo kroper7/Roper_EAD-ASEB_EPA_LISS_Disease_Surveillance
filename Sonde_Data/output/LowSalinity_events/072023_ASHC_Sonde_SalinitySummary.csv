@@ -1,0 +1,6 @@
+"type","threshold","numberFound","avgDurMinutes","avgAvgSalinity"
+"Severe",0.99,0,NA,NA
+"Moderately Severe",4.99,1,230.000000000388,3.38013145833333
+"Moderate",9.99,3,183.333333330665,5.23335647997836
+"Marginal",14.99,3,219.999999996799,6.69955566888889
+"Sub-Optimal",19.99,6,208.333333331547,12.9306211661871

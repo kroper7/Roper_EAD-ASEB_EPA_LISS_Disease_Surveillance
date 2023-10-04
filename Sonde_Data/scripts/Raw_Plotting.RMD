@@ -1,0 +1,204 @@
+---
+title: "Sonde_raw_plots"
+author: "Samuel Gurr"
+date: "2023-10-03"
+output: html_document
+---
+
+
+## Setup: 
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      cache = TRUE)
+
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+
+
+```
+
+#### Load libraries
+
+```{r load_libraries, include = TRUE}
+# load libraries - notes show the install command needed to install (pre installed)
+# Plotting
+library(ggplot2)
+library(dplyr)
+library(gplots)
+library(RColorBrewer)
+library(ggpubr)
+library(stringr)
+library(lubridate)
+library(readr)
+```
+
+#### Set path
+
+```{r set the path out, include = TRUE}
+path_out = 'C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output'
+```
+
+
+
+
+```{r}
+path.p                   <- "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data" 
+file.names.table         <- data.frame(txt.files = 
+                                         (basename(list.files(path = paste(path.p,'/',sep=''), 
+                                                              pattern = "csv$", 
+                                                              recursive = FALSE)))) 
+Master_Table             <- data.frame() 
+
+# for loop to merge all csv files to one dataframe
+for (m in 1:nrow(file.names.table)) {
+  # call the dir of the csv file in loop
+  raw_Sonde_rootdir        <- paste(path.p,'/',file.names.table[m,1], sep='') #reads in the data files
+  
+  # read it and fix dates and whatnot yay
+  D        <- readLines(raw_Sonde_rootdir) 
+  ind      <- grep('Date Time',D) # the line where the data stars (theres a lot of junk beforehand)
+  # raw      <- read.csv(paste(path.p,'/',file.names.table[m,1], sep=''),skip=ind-1)
+  raw      <- read_csv(raw_Sonde_rootdir,skip=ind-1,col_types = cols())
+  columns  <- names(raw) # what are the column names?  - youll see why
+  raw_df   <- as.data.frame(raw) # ocnvert the dataframe now that you skipped the crappola 
+  raw_df[2:(ncol(raw_df))] <- lapply(raw_df[2:(ncol(raw_df))],as.numeric) # convert all data  to numeric
+  # ommit all numeric data, also the format of the units does not pair between datasets, cannot rbind later
+  names(raw_df) <- sapply(strsplit(names(raw_df), '\\s*[()]'), `[`, 1) 
+
+
+  # now for the dates - for some reason the sondes have diff format -  fix it up!
+  if(gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in% 
+     c('082023_ASHC_Sonde.csv', '082023_LAUR_Sonde.csv', '092023_ASHC_Sonde.csv')) { # date formatted as mdy_hm
+    raw_df[,1] <- mdy_hm(raw_df[,1]) # reformat as date using lubridate 
+    } else if (gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in% '072023_ASHC_Sonde.csv') {
+      raw_df[,1] <- mdy_hms(raw_df[,1]) # reformat as date using lubridate
+    } else (raw_df[,1] <- ymd_hms(raw_df[,1]) # reformat as date using lubridate
+  )
+  
+  # add a column for the site 
+  filename      <- file.names.table[m,1]
+  raw_df        <- raw_df %>% 
+                    dplyr::mutate(Site = sub(".*_(.*)_.*","\\1",filename),
+                    Date = gsub("_.*","",filename))
+  
+  Master_Table <- rbind(raw_df,Master_Table) #bind to a cumulative list dataframe
+}
+
+unique(Master_Table$Site)
+```
+
+# Visualize data 
+
+
+### Raw visual (ready. set. blobs!)
+
+* lets look at an example of raw data 
+
+```{r}
+# melt is akin to pivot_longer, but I like that its called melt so I prefer it
+# Im melting Im melting
+Master_Table_LONG <- Master_Table %>%  
+                      dplyr::select(-c("External Voltage", "Battery Capacity", "Barometric Pressure", "Date")) %>% 
+                      melt(id.vars = c("Date Time", "Site"),
+                                    measure.vars = c("Actual Conductivity", "Salinity", "Resistivity", 
+                                                     "Total Dissolved Solids" ,"RDO Concentration", "RDO Saturation",
+                                                     "Oxygen Partial Pressure", "Chlorophyll-a Fluorescence", "pH", "pH mV", 
+                                                     "Temperature"))
+# View the blobs! 
+ggplot(Master_Table_LONG,
+         aes(x=`Date Time`,
+             y=value,
+             fill=Site)) +
+  geom_point() +
+  theme_classic() + 
+  facet_wrap(~variable, scales = "free_y")
+
+```
+
+* As suspected this visual is horrible.. we have TONS of data, every 10 seconds to be exact! 
+
+* if we want to view trends, we need to narrow down 
+
+### Hourly means
+
+
+```{r}
+Master_Table_LONG_means <- Master_Table %>%  
+                      dplyr::select(-c("External Voltage", "Battery Capacity", "Barometric Pressure", "Date")) %>% 
+                      dplyr::mutate(`Date Time` = as.factor(substr(`Date Time`,1,13))) %>% # remove minutes and seconds
+                      melt(id.vars = c("Date Time", "Site"),
+                                    measure.vars = c("Actual Conductivity", "Salinity", "Resistivity", 
+                                                     "Total Dissolved Solids" ,"RDO Concentration", "RDO Saturation",
+                                                     "Oxygen Partial Pressure", "Chlorophyll-a Fluorescence", "pH", "pH mV", 
+                                                     "Temperature")) %>% 
+                      dplyr::group_by(`Date Time`, Site, variable) %>% 
+                      summarise_each(funs(mean, sd, se=sd(.)/sqrt(n())), value) %>% 
+                      dplyr::mutate(`Date Time` = ymd_h(`Date Time`)) # reformat back to date 
+
+vars <- as.data.frame(
+          list(
+            as.character(
+              unique(
+                Master_Table_LONG_means$variable)))) %>% 
+        dplyr::rename(dat = 1)
+
+for(i in 1:nrow(vars)) {
+  
+  # filter table for each variable
+  Table_by_var <- Master_Table_LONG_means %>% 
+                    dplyr::filter(variable %in% vars[i,])
+  
+  # plot each
+  plot <- Table_by_var %>% 
+              ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site), scales = "free_y") +
+              ggtitle(vars[i,]) +
+              theme_bw()
+  
+  # print plots and name them as the var    
+  pdf(paste0(path_out,"/raw_plots/",gsub(" ", "_", vars[i,]),".pdf"), height = 12, width = 15)
+  print(plot) 
+  dev.off()
+
+  } # close the loop
+
+
+# an example 
+ Table_by_var %>% 
+    dplyr::filter(variable %in% vars[11,]) %>% 
+              ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site), scales = "free_y") +
+              ggtitle(vars[11,]) +
+              theme_bw()
+```
+
