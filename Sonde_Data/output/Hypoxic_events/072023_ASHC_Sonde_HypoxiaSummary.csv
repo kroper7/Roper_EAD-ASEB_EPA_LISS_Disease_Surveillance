@@ -1,0 +1,6 @@
+"type","threshold","numberFound","avgDurMinutes","avgAvgDO"
+"Severe",0.99,0,NA,NA
+"Moderately Severe",1.99,0,NA,NA
+"Moderate",2.99,3,93.3333333307303,2.50113913029101
+"Marginal",3.49,3,123.333333334028,2.68950900297619
+"Sub-Optimal",4.79,16,134.374999999678,3.89510440492911
