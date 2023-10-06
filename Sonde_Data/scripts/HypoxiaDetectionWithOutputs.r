@@ -4,9 +4,15 @@
 #and character of hypoxic events and offer a series of options for
 #analysis and reporting of these events.
 
+# Use this script for your field data? **Please cite to credit intellectual contributors and origin use**: 
+# Gurr, S. J., Dwyer, I. P., Goleski, J., Lima, F. P., Seabra, R., Gobler, C. J., & Volkenborn, N. (2021).
+# Acclimatization in the bay scallop Argopecten irradians along a eutrophication gradient: 
+# Insights from heartbeat rate measurements during a simulated hypoxic event. Marine and 
+# Freshwater Behaviour and Physiology, 54(1), 23-49.
+
 require(lubridate)
 require(dplyr)
-
+library(readr)
 #User-defined variables:
 
 Thresholds<-c(.99,1.99,2.99,3.49,4.79); #Choose any number of thresholds for hypoxia (DO<=Threshold)
@@ -30,6 +36,8 @@ timeDigits<-5; #specifies the number of decimal places to which the time data ar
 #Imports the data.
 #Note that the following functions expect the columns to be 
 #TIME, TIME_NUM_FORMAT, and DO in that order.
+getwd()
+setwd("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 filename <- as.character(file.choose())
 D        <- readLines(filename)
 ind      <- grep('Date Time',D)
@@ -39,11 +47,15 @@ raw_df   <- as.data.frame(raw)
 raw_df[2:(ncol(raw_df))] <- lapply(raw_df[2:(ncol(raw_df))],as.numeric)
 names(raw_df) <- gsub(" \\([0-9]+\\)", "", columns) # ommit the numeric information from all column names 
 
-if(gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% c('082023_ASHC_Sonde.csv', '082023_LAUR_Sonde.csv', '092023_ASHC_Sonde.csv')) { # data files that have date formated as mdy_hm
-  raw_df[,1] <- with_tz(force_tz(mdy_hm(raw_df[,1]),tz='America/New_York'),'UTC')
-  } else if (gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% '072023_ASHC_Sonde.csv') {
-    raw_df[,1] <- with_tz(force_tz(mdy_hms(raw_df[,1]),tz='America/New_York'),'UTC')
-  } else (raw_df[,1] <- with_tz(force_tz(ymd_hms(raw_df[,1]),tz='America/New_York'),'UTC') # all other data files that are formatted as ymd_hm
+if(gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% c('082023_ASHC_Sonde.csv', 
+                                                             '082023_LAUR_Sonde.csv', 
+                                                             '092023_ASHC_Sonde.csv',
+                                                             '102023_ASHC_Sonde.csv',
+                                                             '102023_FENC_Sonde.csv')) { # data files that have date formated as mdy_hm
+  raw_df[,1] <- mdy_hm(raw_df[,1]) # with_tz(force_tz(mdy_hm(raw_df[,1]),tz='America/New_York'),'UTC')
+} else if (gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% '072023_ASHC_Sonde.csv') {
+  raw_df[,1] <- mdy_hms(raw_df[,1]) # with_tz(force_tz(mdy_hms(raw_df[,1]),tz='America/New_York'),'UTC')
+} else (raw_df[,1] <- ymd_hms(raw_df[,1])  #with_tz(force_tz(ymd_hms(raw_df[,1]),tz='America/New_York'),'UTC') # all other data files that are formatted as ymd_hm
 )
 
 data <- as.data.frame(raw_df[!is.na(raw_df$`Date Time`),] %>% 

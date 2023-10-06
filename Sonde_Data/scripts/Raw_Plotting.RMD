@@ -70,9 +70,14 @@ for (m in 1:nrow(file.names.table)) {
 
   # now for the dates - for some reason the sondes have diff format -  fix it up!
   if(gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in% 
-     c('082023_ASHC_Sonde.csv', '082023_LAUR_Sonde.csv', '092023_ASHC_Sonde.csv')) { # date formatted as mdy_hm
+     c('082023_ASHC_Sonde.csv', 
+       '082023_LAUR_Sonde.csv', 
+       '092023_ASHC_Sonde.csv',
+       '102023_ASHC_Sonde.csv',
+       '102023_FENC_Sonde.csv'))  { # date formatted as mdy_hm
     raw_df[,1] <- mdy_hm(raw_df[,1]) # reformat as date using lubridate 
-    } else if (gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in% '072023_ASHC_Sonde.csv') {
+    } else if (gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in% 
+               '072023_ASHC_Sonde.csv') {
       raw_df[,1] <- mdy_hms(raw_df[,1]) # reformat as date using lubridate
     } else (raw_df[,1] <- ymd_hms(raw_df[,1]) # reformat as date using lubridate
   )
@@ -99,6 +104,7 @@ unique(Master_Table$Site)
 ```{r}
 # melt is akin to pivot_longer, but I like that its called melt so I prefer it
 # Im melting Im melting
+library(reshape2)
 Master_Table_LONG <- Master_Table %>%  
                       dplyr::select(-c("External Voltage", "Battery Capacity", "Barometric Pressure", "Date")) %>% 
                       melt(id.vars = c("Date Time", "Site"),
