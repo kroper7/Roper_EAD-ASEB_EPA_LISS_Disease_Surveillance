@@ -5,9 +5,11 @@ date: "6/29/2023"
 output: html_document
 ---
 
-Last updated 7/22/2023 by K. McFarland
-RFTM accuracy score = 88.2% (only through June)
-  - Need to fix the code calling the files, something is wrong here
+Last updated 10/11/2023 by M.Kachmar
+RFTM accuracy score = 75.3% (0423 through present)
+  -Some of the data files did not have correct date_collected and sites (June & July). Corrected that & data is reading correctly
+  -fixed code for comparing R1 & R2 ("R1<R2, FALSE" written twice)
+  -Noticed the data_all has a lot of 'NA' outputs into the sheet between data - how to fix this? na.omit() may delete data rows we need
 
 
 ```{r setup, include=FALSE}
@@ -25,13 +27,13 @@ library("lubridate")
 
 ```{r}
 #Set Path
-setwd("C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM")
+setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM")
 ```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
-data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM/Files_by_Month",                           # Identify all CSV files
+data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>%                              # Store all files in list
   bind_rows                                         # Combine data sets into one data set 
@@ -41,7 +43,7 @@ as.data.frame(data_all)                            # Convert tibble to data.fram
 
 tail(data_all)
 
-write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\All_RFTM_data.csv", row.names=FALSE)
+write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\All_RFTM_data.csv", row.names=FALSE)
 ```
 
 
@@ -53,6 +55,8 @@ str(data_all)
 # convert date info in format 'mm/dd/yyyy'
 #data_all$date <- ymd("2023-04-23")
 data_all$site=as.factor(data_all$site)
+
+data_all$date_collected <-format(ymd(data_all$date_collected, format = "%m-%d-%Y"))
 
 str(data_all)
 
@@ -68,7 +72,7 @@ st_rftm_final$Completeness <- st_rftm_final$N /30
 
 st_rftm_final
 
-write.csv(st_rftm_final, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
+write.csv(st_rftm_final, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
 ```
 
 # Comparied reader 1 and reader 2
@@ -76,7 +80,7 @@ write.csv(st_rftm_final, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-A
   
 ```{r}
 data_all$results = ifelse(data_all$rftm_intensity_read1 < data_all$rftm_intensity_read2, 'FALSE',
-  ifelse(data_all$rftm_intensity_read1 < data_all$rftm_intensity_read2, 'FALSE',
+  ifelse(data_all$rftm_intensity_read1 > data_all$rftm_intensity_read2, 'FALSE',
   ifelse(data_all$rftm_intensity_read1 == data_all$rftm_intensity_read2, 'TRUE', NA)))
   
 data_all
