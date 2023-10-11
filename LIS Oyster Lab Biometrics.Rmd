@@ -17,7 +17,7 @@ library("lubridate")
 
 ```{r}
 #Set Path
-setwd("C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
+setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
 ```
 
 #Reading in google sheets from the good drive
@@ -37,10 +37,10 @@ library(googlesheets4)
 #head(ASHC_0423)
 ```
 
-### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+### This code chunk merges all .csv files within the Tissue processing folder into one data frame and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
-data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
+data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>%                              # Store all files in list
   bind_rows                                         # Combine data sets into one data set 
@@ -48,18 +48,22 @@ data_all                                            # Print data to RStudio cons
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
-write.csv(data_all, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
+write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
  
 ```
 
 
 ## Need to figure out how to fix the date !!!!
+## Tried to add code that I use to change date format but it is saying the columns are of different lengths (10493 vs 10494) 10/11/23 M. Kachmar
  https://lubridate.tidyverse.org/
 ```{r}
 str(data_all)
 
 # convert date info in format 'mm/dd/yyyy'
 #data.frame$date <- ymd("2023-04-23")
+
+data_all$date_collected <-format(ymd(data_all$date_collected, format = "%m-%d-%Y"))
+
 
 str(data_all)
 
@@ -76,7 +80,7 @@ st_height$Completeness <- st_height$N /30
 
 st_height
 
-write.csv(st_height, "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\Completeness_tissue_processing_data.csv", row.names=FALSE)
+write.csv(st_height, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\Completeness_tissue_processing_data.csv", row.names=FALSE)
 ```
 ```{r}
 ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
