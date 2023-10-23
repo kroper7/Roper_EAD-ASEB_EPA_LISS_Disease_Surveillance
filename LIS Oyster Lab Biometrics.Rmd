@@ -62,7 +62,7 @@ str(data_all)
 # convert date info in format 'mm/dd/yyyy'
 #data.frame$date <- ymd("2023-04-23")
 
-data_all$date_collected <-format(ymd(data_all$date_collected, format = "%m-%d-%Y"))
+#data_all$date_collected <-format(ymd(data_all$date_collected, format = "%m-%d-%Y"))
 
 
 str(data_all)
