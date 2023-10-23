@@ -3,6 +3,13 @@ title: "LIS Oyster Lab Tissue Processing"
 output: html_notebook
 ---
 
+Updated 10/23/2023 by M. Kachmar
+- All data up to date
+- Added mean height plots to all individual sites
+- Added bar graphs for body condition distribution 
+  - BCS are currently categorical. Will need to change to numerical. i.e. 3 vs 3_good_minus
+  - Q:We also in Apr & May using fat, medium, watery, for ASHC & FENC. How do we want to standardize this? 
+
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
 
@@ -95,6 +102,7 @@ ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
 ```{r}
 df_ASHC<- data_all%>%
   filter(site=="ASHC")
+df_ASHC
 
 st_height_ASHC <- summarySE(df_ASHC, measurevar="height_mm", groupvars=c("date_collected"))
 st_height_ASHC
@@ -102,22 +110,58 @@ st_height_ASHC
 
 
 ```{r}
-ggplot(data=df_ASHC, aes(x=date_collected, y=height_mm, fill=site)) +
+ggplot(data=df_ASHC, aes(x=date_collected, y=height_mm, group= date_collected)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
 ```
+
+```{r}
+ggplot(data=df_ASHC, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Body Condition index ", x ="Condition categorization")
+
+#Condition distribution by collection date
+p_ASHC<-ggplot(data=df_ASHC, aes(x= condition, fill=date_collected)) 
+p_ASHC +geom_density(alpha=0.5)+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Body Condition index ", x ="Condition categorization")
+```
+
+
+
 # Fence Creek Summary
 ```{r}
 df_FENC<- data_all%>%
   filter(site=="FENC")
-
+df_FENC
 
 st_height_FENC <- summarySE(df_FENC, measurevar="height_mm", groupvars=c("date_collected"))
 st_height_FENC 
 
 ```
+
+
+```{r}
+ggplot(data=df_FENC, aes(x=date_collected, y=height_mm, group=date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+
+ggplot(data=df_FENC, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Body Condition index ", x ="Condition categorization")
+```
+
+
+
 
 # Laurel Hollow Summary
 ```{r}
@@ -130,6 +174,23 @@ st_height_LAUR
 
 ```
 
+```{r}
+ggplot(data=df_LAUR, aes(x=date_collected, y=height_mm, group= date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+
+ggplot(data=df_LAUR, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Body Condition index ", x ="Condition categorization")
+
+```
+
+
+
 # Gold Star Beach Summary
 ```{r}
 df_GOLD<- data_all%>%
@@ -140,6 +201,21 @@ st_height_GOLD <- summarySE(df_GOLD, measurevar="height_mm", groupvars=c("date_c
 st_height_GOLD 
 
 ```
+
+```{r}
+ggplot(data=df_GOLD, aes(x=date_collected, y=height_mm, group= date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+
+ggplot(data=df_GOLD, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Body Condition index ", x ="Condition categorization")
+```
+
 
 ```{r}
 sessionInfo()
