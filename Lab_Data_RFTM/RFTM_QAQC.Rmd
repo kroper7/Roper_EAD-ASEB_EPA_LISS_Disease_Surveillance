@@ -5,11 +5,10 @@ date: "6/29/2023"
 output: html_document
 ---
 
-Last updated 10/11/2023 by M.Kachmar
+Last updated 10/25/2023 by M.Kachmar
 RFTM accuracy score = 75.3% (0423 through present)
-  -Some of the data files did not have correct date_collected and sites (June & July). Corrected that & data is reading correctly
-  -fixed code for comparing R1 & R2 ("R1<R2, FALSE" written twice)
-  -Noticed the data_all has a lot of 'NA' outputs into the sheet between data - how to fix this? na.omit() may delete data rows we need
+- added summary for individual sites and graphs for intensity across months
+
 
 
 ```{r setup, include=FALSE}
@@ -125,11 +124,89 @@ ggplot(data=data_all, aes(x=date_collected, y=rftm_final, fill=site)) +
   facet_wrap(~site)
 
 ```
+# Ash Creek Summary
+```{r}
+df_ASHC <- data_all%>%
+  filter(site=="ASHC")
+df_ASHC 
+
+st_intensity_ASHC <- summarySE(df_ASHC, measurevar="rftm_final", groupvars=c("date_collected"))
+st_intensity_ASHC
+
+```
 
 
+```{r, echo=FALSE}
+ggplot(data=df_ASHC, aes(x=date_collected, y=rftm_final, group= date_collected)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Date", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
 
+```
 
+# Fence Creek Summary
+```{r}
+df_FENC <- data_all%>%
+  filter(site=="FENC")
+df_FENC 
 
+st_intensity_FENC <- summarySE(df_FENC, measurevar="rftm_final", groupvars=c("date_collected"))
+st_intensity_FENC
+
+```
+
+```{r, echo=FALSE}
+ggplot(data=df_FENC, aes(x=date_collected, y=rftm_final, group= date_collected)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Date", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+# Laurel Hollow summary
+```{r}
+df_LAUR <- data_all%>%
+  filter(site=="LAUR")
+df_LAUR 
+
+st_intensity_LAUR <- summarySE(df_LAUR, measurevar="rftm_final", groupvars=c("date_collected"))
+st_intensity_LAUR
+
+```
+
+```{r, echo=FALSE}
+ggplot(data=df_LAUR, aes(x=date_collected, y=rftm_final, group= date_collected)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Date", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+
+# Gold Star summary
+```{r}
+df_GOLD <- data_all%>%
+  filter(site=="GOLD")
+df_GOLD 
+
+st_intensity_GOLD <- summarySE(df_GOLD, measurevar="rftm_final", groupvars=c("date_collected"))
+st_intensity_GOLD
+
+```
+
+```{r, echo=FALSE}
+ggplot(data=df_GOLD, aes(x=date_collected, y=rftm_final, group= date_collected)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Date", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
 
 
 
