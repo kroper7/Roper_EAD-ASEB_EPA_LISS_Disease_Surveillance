@@ -1,4 +1,3 @@
-#test
 
 ---
 title: "QAQC_PopulationSurveyMetrics"
@@ -27,7 +26,7 @@ library(Rmisc)
 ```{r}
 
 #### need to work on this chunk to read in all files at once - not ready to use
-data_all <- list.files(path = "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
+data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
   pattern = "*.xlsx", full.names = TRUE) %>%         # Identify all xlsx files
   lapply(read_excel) %>%                            # Store all files in list
 data_all                                            # Print data to RStudio console
@@ -164,6 +163,20 @@ write.csv(shellsize_summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_
   
 ```
 
-
+# This chunk is exploritory for fall surveys. Thinking about best way to pull, clean, and merge data and best ways to standardize June and October survey data
 ```{r}
+
+## OCTOBER FALL SURVEY ##
+
+#Ash Creek
+
+charac_ASH <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\1023ASHC_Characteristics.xlsx",
+                     sheet = 1, col_names = TRUE) 
+
+shellsize_ASHC <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\1023ASHC_Length_Master.xlsx",
+                     sheet = 1, col_names = TRUE) 
+
+
+data_all_test <- merge(charac_ASH, shellsize_ASH, group_by())
+
 ```
