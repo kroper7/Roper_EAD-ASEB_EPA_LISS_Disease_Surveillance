@@ -207,10 +207,67 @@ ggplot(data=df_GOLD, aes(x=date_collected, y=rftm_final, group= date_collected))
   theme(axis.text=element_text(size=12))
 
 ```
+# This chunk of data combines tissue processing and RFTM data into one sheet to observe disease across zones and light regimes for ASHC and FENC
+# We want to determine whether or not to continue using zone and light regime for collections - are there differences between them? 
+```{r}
+#Tissue processing data
+data_all_tissue <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows                                         # Combine data sets into one data set 
+data_all_tissue                                            # Print data to RStudio console
+
+as.data.frame(data_all_tissue)                            # Convert tibble to data.frame
+
+# Subset CT sites using zone and light regime 
+df_tissue_CT<- data_all_tissue%>%
+  filter(site %in% c("ASHC", "FENC"))
+df_tissue_CT
+
+#merging tissue processing and RFTM 
+df_combined <- merge(data_all, df_tissue_CT, by= c("lab_id", "date_collected", "site", "lab_sample"))
+df_combined
+
+#subset by site
+df_combined_ASHC<- df_combined%>%
+  filter(site == "ASHC")
+df_combined_ASHC
+
+df_combined_FENC<- df_combined%>%
+  filter(site == "FENC")
+df_combined_FENC
+```
+
+```{r, echo=FALSE}
+# ASHC 
+ggplot(data=df_combined_ASHC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Zone", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+```{r, echo=FALSE}
+# FENC 
+#Zone
+ggplot(data=df_combined_FENC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Zone", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Light regime
+ggplot(data=df_combined_FENC, aes(x=light_regime, y=rftm_final, group= light_regime)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Light Regime", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
 
 
-
-
+```
 
 Version
 ```{r}
