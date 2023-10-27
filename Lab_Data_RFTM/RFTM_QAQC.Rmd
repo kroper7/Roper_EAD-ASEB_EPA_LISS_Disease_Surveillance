@@ -102,7 +102,7 @@ x <- Data_Accuracy %>%
   dplyr::summarise(count = n())
 x2 <- x %>% 
   dplyr::group_by()
-
+x
 T <- nrow(Data_Accuracy %>% filter(data_all.results == 'TRUE'))
 F <- nrow(Data_Accuracy %>% filter(data_all.results == 'FALSE'))
 
@@ -123,6 +123,51 @@ ggplot(data=data_all, aes(x=date_collected, y=rftm_final, fill=site)) +
   theme(axis.text=element_text(size=12))+
   facet_wrap(~site)
 
+```
+# Prevalence calculations for all sites
+```{r}
+## Prevalence T/F
+
+data_all$prevalent = ifelse(data_all$rftm_final == 0, '0',
+  ifelse(data_all$rftm_final > 0, '1', NA))
+  
+data_all
+
+# YEARLY PREVALENCE %
+present <- nrow(data_all %>% filter(prevalent == '1'))
+absent <- nrow(data_all %>% filter(prevalent == '0'))
+
+prevalence_all <- present/(present+absent)
+prevalence_all
+# 67.9%
+
+str(data_all$prevalent)
+data_all$prevalent <- as.numeric(data_all$prevalent)
+
+df_prevalence_summary <- data_all %>%
+  dplyr::group_by(site, date_collected) %>% 
+  dplyr::summarize( prevalence_precentage= mean(prevalent)* 100)
+df_prevalence_summary
+
+```
+```{r}
+
+ggplot(data=df_prevalence_summary, aes(x=date_collected, y=prevalence_precentage, color=site)) +
+  geom_point()+  
+  geom_line(aes(group = site))+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence of Dermo infection", x ="Date", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+```
+```{r}
+
+ggplot(data=df_prevalence_summary, aes(x=site, y=prevalence_precentage, fill = site)) +
+ geom_boxplot()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence of Dermo infection", x ="Date", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
 ```
 # Ash Creek Summary
 ```{r}
@@ -145,6 +190,8 @@ ggplot(data=df_ASHC, aes(x=date_collected, y=rftm_final, group= date_collected))
   theme(axis.text=element_text(size=12))
 
 ```
+
+
 
 # Fence Creek Summary
 ```{r}
@@ -240,7 +287,7 @@ df_combined_FENC
 
 ```{r, echo=FALSE}
 # ASHC 
-ggplot(data=df_combined_ASHC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone)) +
+ggplot(data=df_combined_ASHC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone, fill = oyster_zone)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
@@ -251,7 +298,7 @@ ggplot(data=df_combined_ASHC, aes(x=oyster_zone, y=rftm_final, group= oyster_zon
 ```{r, echo=FALSE}
 # FENC 
 #Zone
-ggplot(data=df_combined_FENC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone)) +
+ggplot(data=df_combined_FENC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone, fill = oyster_zone)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
@@ -259,7 +306,7 @@ ggplot(data=df_combined_FENC, aes(x=oyster_zone, y=rftm_final, group= oyster_zon
   theme(axis.text=element_text(size=12))
 
 #Light regime
-ggplot(data=df_combined_FENC, aes(x=light_regime, y=rftm_final, group= light_regime)) +
+ggplot(data=df_combined_FENC, aes(x=light_regime, y=rftm_final, group= light_regime, fill = light_regime)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
