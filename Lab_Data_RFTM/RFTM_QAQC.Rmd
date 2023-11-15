@@ -5,11 +5,11 @@ date: "6/29/2023"
 output: html_document
 ---
 
-Last updated 11/09/2023 by M.Kachmar
-Added language to distinguish prevalence, weighted prevalence, and intensity (population) calculations. I think we need to start using them correctly when talking about the data. 
-Calculated Weighted prevalence, prevalence, and intensity (population)
-Graphed weighted prevalence
+Last updated 11/15/2023 by M.Kachmar
 intensity calculation for august gold star needs to be fixed. 
+Data updated - need 1123FENC only 
+Accuracy 75% ; Completeness 100%
+All graphs up to date
 
 
 
@@ -201,6 +201,7 @@ df_intensity_summary <- data_all %>%
   dplyr::summarize( intensity = sum(rftm_final, na.rm= TRUE)/sum(prevalent, na.rm = TRUE))
 df_intensity_summary
 
+# Need to fix 0823GOLD
 ```
 ```{r}
 

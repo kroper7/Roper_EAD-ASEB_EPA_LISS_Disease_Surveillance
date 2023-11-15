@@ -3,12 +3,9 @@ title: "LIS Oyster Lab Tissue Processing"
 output: html_notebook
 ---
 
-Updated 10/23/2023 by M. Kachmar
+Updated 11/14/2023 by M. Kachmar
 - All data up to date
-- Added mean height plots to all individual sites
-- Added bar graphs for body condition distribution 
-  - BCS are currently categorical. Will need to change to numerical. i.e. 3 vs 3_good_minus
-  - Q:We also in Apr & May using fat, medium, watery, for ASHC & FENC. How do we want to standardize this? 
+ 
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
