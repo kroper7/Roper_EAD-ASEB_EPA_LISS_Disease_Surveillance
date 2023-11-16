@@ -5,11 +5,11 @@ date: "6/29/2023"
 output: html_document
 ---
 
-Last updated 11/15/2023 by M.Kachmar
+Last updated 11/16/2023 by M.Kachmar
 intensity calculation for august gold star needs to be fixed. 
-Data updated - need 1123FENC only 
+Data updated 
 Accuracy 75% ; Completeness 100%
-All graphs up to date
+All graphs up to date & ready to discuss
 
 
 
