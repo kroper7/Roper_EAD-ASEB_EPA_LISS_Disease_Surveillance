@@ -1,0 +1,211 @@
+---
+title: "BedCharacteristics_June2023"
+author: "Meghana Parikh"
+date: "2023-11-17"
+output: html_document
+
+description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's June 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut. The data from this survey was initial input into an Access database (LISS_Database_FieldCollectionData_2023-07-18.accb). The data files input here are from that database. After July 2023 that database was discontinued. Code for Bed Characteristic data from later surveys is in a separate file....
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
+
+library(readxl)
+library(dplyr)
+library(Rmisc)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+#read in all bed characteristics. Currently setup for Meghana's filepath
+
+quadratdensity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
+                     sheet = 1, col_names = TRUE) 
+
+rugosity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
+                     sheet = 1, col_names = TRUE) 
+
+BedHeight <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
+                     sheet = 1, col_names = TRUE) 
+```
+
+```{r}
+#Summary of bed height at each site 
+
+bedheight_summary <- summarySE(data = BedHeight, measurevar = "BedHeight_cm", groupvars = c("Site_Name"))
+```
+
+```{r}
+#Summary of rugosity at each site 
+
+
+
+#need to separate Ash and Fence Creeks
+
+ashc_rug <- rugosity %>% filter(Site_Name == "Ash Creek")
+fenc_rug <- rugosity %>% filter(Site_Name == "Fence Creek")
+
+
+
+#ASHC rugosity summaries
+ASHCrugosity_sumzone <- summarySE(data = ashc_rug, measurevar = "Rugosity", groupvars =c("Site_Name", "Zone"))
+ASHCrugosity_sumall <-summarySE(data = ashc_rug, measurevar = "Rugosity", groupvars =c("Site_Name"))
+
+#combine into 1 ASHC summary dataset 
+
+ASHCrugosity_sumall <- ASHCrugosity_sumall %>% mutate(Zone = "All")
+ASHCrugosity_final <- rbind(ASHCrugosity_sumall,ASHCrugosity_sumzone)
+
+
+
+#FENC rugosity summaries
+FENCrugosity_sumzone <- summarySE(data = fenc_rug, measurevar = "Rugosity", groupvars =c("Site_Name", "Bed_Section", "Zone"))
+FENCrugosity_sumall <-summarySE(data = fenc_rug, measurevar = "Rugosity", groupvars =c("Site_Name"))
+
+#combine into 1 FENC summary dataset 
+
+FENCrugosity_sumall <- FENCrugosity_sumall %>% mutate(Zone = "All", Bed_Section = "All")
+FENCrugosity_final <- rbind(FENCrugosity_sumall,FENCrugosity_sumzone)
+
+
+#ALL Rugosity Summary 
+
+ASHCrugosity_final <-ASHCrugosity_final %>% mutate(Bed_Section = "NA")
+Rugosity_AllSite_Summary <- rbind(ASHCrugosity_final, FENCrugosity_final)
+
+```
+
+
+```{r}
+```{r}
+#oyster density metrics 
+
+
+#need to separate Ash and Fence Creeks
+
+ashc_density <- quadratdensity %>% filter(Site_Name == "Ash Creek")
+fenc_density <- quadratdensity %>% filter(Site_Name == "Fence Creek")
+
+#sum total number of oysters counted per quadrat
+ashc_density$AllCount_Total <- rowSums(ashc_density[, c("LiveCount_Total", "BoxCount_Total", "GaperCount_Total")])
+fenc_density$AllCount_Total <- rowSums(fenc_density[, c("LiveCount_Total", "BoxCount_Total", "GaperCount_Total")])
+
+#############AshCreek Summary ##############
+
+#summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
+ashc_density_sum_all <-summarySE(data = ashc_density, measurevar = "AllCount_Total",groupvars=c("Site_Name"))
+ashc_density_sum_live <- summarySE(data = ashc_density, measurevar = "LiveCount_Total",groupvars=c("Site_Name"))
+ashc_density_sum_box <-summarySE(data = ashc_density, measurevar = "BoxCount_Total",groupvars=c("Site_Name"))
+ashc_density_sum_gaper <-summarySE(data = ashc_density, measurevar = "GaperCount_Total",groupvars=c("Site_Name"))
+
+#summary of each oyster type by zone
+ashc_density_sum_all_zone <-summarySE(data = ashc_density, measurevar = "AllCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
+ashc_density_sum_live_zone <- summarySE(data = ashc_density, measurevar = "LiveCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
+ashc_density_sum_box_zone <-summarySE(data = ashc_density, measurevar = "BoxCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
+ashc_density_sum_gaper_zone <-summarySE(data = ashc_density, measurevar = "GaperCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
+
+
+#Add Zone variable to "All" dfs 
+ashc_density_sum_all <- ashc_density_sum_all %>% mutate(Quadrat_Zone = "All")
+ashc_density_sum_live <- ashc_density_sum_live %>% mutate(Quadrat_Zone = "All")
+ashc_density_sum_box <- ashc_density_sum_box %>% mutate(Quadrat_Zone = "All")
+ashc_density_sum_gaper <- ashc_density_sum_gaper %>% mutate(Quadrat_Zone = "All")
+
+ASHCdensitysummary_all <- subset(ashc_density_sum_all, select = -c(sd,se,ci)) %>%
+    left_join(subset(ashc_density_sum_live, select = -c(N,sd,se,ci)), by = "Site_Name", "Quadrat_Zone") %>%
+    left_join(subset(ashc_density_sum_box, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name", "Quadrat_Zone") %>%
+    left_join(subset(ashc_density_sum_gaper, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name", "Quadrat_Zone") 
+
+ASHCdensitysummary_zone <- subset(ashc_density_sum_all_zone, select = -c(sd,se,ci)) %>%
+    left_join(subset(ashc_density_sum_live_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Quadrat_Zone") %>%
+    left_join(subset(ashc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Quadrat_Zone") %>%
+    left_join(subset(ashc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Quadrat_Zone") 
+
+
+ASHCdensitysummary2 <- rbind(ASHCdensitysummary,ASHCdensitysummary_zone)
+  
+
+#renaming for clarity. need to use dplyr:: because another package is overriding the function
+ASHCdensitysummary3 <- ASHCdensitysummary2 %>%
+    dplyr::rename(
+      AllCount_Mean = AllCount_Total,
+      LiveCount_Mean = LiveCount_Total,
+      BoxCount_Mean = BoxCount_Total, 
+      GaperCount_Mean = GaperCount_Total, 
+      NumQuad = N) 
+
+
+```
+
+```{r}
+
+##################  Fence Creek Summary #################
+
+#summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
+fenc_density_sum_all <-summarySE(data = fenc_density, measurevar = "AllCount_Total",groupvars=c("Site_Name"))
+fenc_density_sum_live <- summarySE(data = fenc_density, measurevar = "LiveCount_Total",groupvars=c("Site_Name"))
+fenc_density_sum_box <-summarySE(data = fenc_density, measurevar = "BoxCount_Total",groupvars=c("Site_Name"))
+fenc_density_sum_gaper <-summarySE(data = fenc_density, measurevar = "GaperCount_Total",groupvars=c("Site_Name"))
+
+#summary of each oyster type by zone
+fenc_density_sum_all_zone <-summarySE(data = fenc_density, measurevar = "AllCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
+fenc_density_sum_live_zone <- summarySE(data = fenc_density, measurevar = "LiveCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
+fenc_density_sum_box_zone <-summarySE(data = fenc_density, measurevar = "BoxCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
+fenc_density_sum_gaper_zone <-summarySE(data = fenc_density, measurevar = "GaperCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
+
+
+#Add Zone variable to "All" dfs 
+fenc_density_sum_all <- fenc_density_sum_all %>% mutate(Quadrat_Zone = "All")
+fenc_density_sum_live <- fenc_density_sum_live %>% mutate(Quadrat_Zone = "All")
+fenc_density_sum_box <- fenc_density_sum_box %>% mutate(Quadrat_Zone = "All")
+fenc_density_sum_gaper <- fenc_density_sum_gaper %>% mutate(Quadrat_Zone = "All")
+
+FENCdensitysummary_all <- subset(fenc_density_sum_all, select = -c(sd,se,ci)) %>%
+    left_join(subset(fenc_density_sum_live, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") %>%
+    left_join(subset(fenc_density_sum_box, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") %>%
+    left_join(subset(fenc_density_sum_gaper, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") 
+
+
+
+######unable to get code for this piece to work####
+#Error: Warning: Detected an unexpected many-to-many relationship between `x` and `y`.Warning: Detected an unexpected many-to-many relationship between `x` and `y`.Warning: Detected an unexpected many-to-many relationship between `x` and `y`.#####
+
+FENCdensitysummary_zone <- subset(fenc_density_sum_all_zone, select = -c(sd,se,ci)) %>%
+    left_join(subset(fenc_density_sum_live_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Bed_Section", "Quadrat_Zone") %>%
+    left_join(subset(fenc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Bed_Section", "Quadrat_Zone") %>%
+    left_join(subset(fenc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Bed_Section", "Quadrat_Zone") 
+
+
+
+FENCdensitysummary2 <- rbind(ASHCdensitysummary,ASHCdensitysummary_zone)
+  
+
+#renaming for clarity. need to use dplyr:: because another package is overriding the function
+FENCdensitysummary3 <- FENCdensitysummary2 %>%
+    dplyr::rename(
+      AllCount_Mean = AllCount_Total,
+      LiveCount_Mean = LiveCount_Total,
+      BoxCount_Mean = BoxCount_Total, 
+      GaperCount_Mean = GaperCount_Total, 
+      NumQuad = N) 
+  
+
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
