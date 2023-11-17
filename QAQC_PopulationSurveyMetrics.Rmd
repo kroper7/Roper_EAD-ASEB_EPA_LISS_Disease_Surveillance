@@ -6,6 +6,11 @@ date: "2023-06-29"
 output: html_document
 ---
 
+Last updated 11/17/23 by M.Kachmar
+All survey height data inputted and cleaned to merge for spring and fall
+Need to merged spring and fall together and re-organize code
+Need to determine QAQC needs for data
+
 ```{r, setup, include=FALSE}
 
 knitr::opts_knit$set(root.dir = 'C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
@@ -39,24 +44,54 @@ as.data.frame(data_all)                            # Convert tibble to data.fram
 
 ```
 
+# Spring Survey Data - June 2023
 ```{r}
 
 #read in all population survey sheets 
 
 
 #June 2023
-shellsize <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_ShellSize.xlsx",
+shellsize <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_ShellSize.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-quadratdensity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
+quadratdensity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-rugosity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
+rugosity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-BedHeight <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
+BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
                      sheet = 1, col_names = TRUE) 
 ```
+
+#Cleaning up June 2023 survey data to be meragable with other data
+```{r}
+
+
+#renaming columns
+shellsize <- shellsize %>% rename(Date_collected = TripDate) %>% rename(Quadrat = QUADRAT_NUM) %>% rename(Height= Height_mm) %>% rename(Survival_status= SpecimenType)
+
+#adding columns
+shellsize$Season<- rep("Spring", nrow(shellsize))
+shellsize$State<- rep("CT", nrow(shellsize))
+
+#removing unneeded columns
+shellsize<- select( shellsize, -c("QuadSpec_NUM", "Year", "Month", "Day", "Length_mm", "Width_mm", "Specimen_Notes")) 
+
+#Changing site name and removing unneeded column
+shellsize<- shellsize %>%
+  mutate(Site = recode(Site_Name, "Ash Creek" = "ASHC", "Fence Creek" = "FENC")) %>% 
+  select(-c("Site_Name"))
+
+head(shellsize)
+
+shellsize
+
+
+```
+
+
+
 
 ```{r}
 #oyster density metrics 
@@ -164,19 +199,57 @@ write.csv(shellsize_summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_
 ```
 
 # This chunk is exploritory for fall surveys. Thinking about best way to pull, clean, and merge data and best ways to standardize June and October survey data
+
+#Pulling all length data into single sheet
 ```{r}
 
-## OCTOBER FALL SURVEY ##
-
-#Ash Creek
-
-charac_ASH <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\1023ASHC_Characteristics.xlsx",
-                     sheet = 1, col_names = TRUE) 
-
-shellsize_ASHC <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\1023ASHC_Length_Master.xlsx",
-                     sheet = 1, col_names = TRUE) 
+## OCTOBER FALL SURVEY 
 
 
-data_all_test <- merge(charac_ASH, shellsize_ASH, group_by())
+
+length_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Length",                           # Identify all CSV files
+  pattern = "*.xlsx", full.names = TRUE) %>% 
+  lapply(read_excel) %>%    # Store all files in list
+  bind_rows 
+
+ length_all
+
+ #Removing 'Count' column
+ length_all$Count<- NULL
+
+
+```
+
+#Cleaning up length data
+#Need to fix "length" and change to "height" - using terms incorrectly
+```{r}
+
+# Subset by category length (live, box, gaper)
+
+#Live
+
+length_live <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_live')
+length_live <- na.omit(length_live)
+length_live$Survival_status<- rep("live", nrow(length_live))
+length_live <- length_live %>% rename(Height = Length_live)
+length_live
+
+#Box
+
+length_box <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_box')
+length_box <- na.omit(length_box)
+length_box$Survival_status<- rep("box", nrow(length_box))
+length_box <- length_box %>% rename(Height = Length_box)
+
+#Gaper
+
+length_gaper <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_gaper')
+length_gaper <- na.omit(length_gaper)
+length_gaper$Survival_status<- rep("gaper", nrow(length_gaper))
+length_gaper <- length_gaper %>% rename(Height = Length_gaper)
+
+Height_all<- rbind(length_live,length_box,length_gaper)
+Height_all$Season<- rep("Fall", nrow(Height_all))
+Height_all
 
 ```
