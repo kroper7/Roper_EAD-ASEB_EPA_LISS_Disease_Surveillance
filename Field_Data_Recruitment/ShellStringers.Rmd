@@ -22,21 +22,6 @@ library("tidyverse")
 #Set Path
 setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Recruitment")
 ```
-
-# Path for others - comment out 
-```{r}
-setwd("C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Recruitment")
-
-data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Recruitment/RawData",                  # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%                              # Store all files in list
-  bind_rows                                         # Combine data sets into one data set 
-data_all                                            # Print data to RStudio console
-
-as.data.frame(data_all)  
-```
-
-
 ### This code chunk merges all .csv files within the Tissue processing folder into one data frame and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
@@ -48,6 +33,43 @@ data_all                                            # Print data to RStudio cons
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
 ```
+
+
+# Path for others - comment out 
+```{r}
+#setwd("C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Recruitment")
+
+#data_all <- list.files(path = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Recruitment/RawData",                  # Identify all CSV files
+#  pattern = "*.csv", full.names = TRUE) %>% 
+#  lapply(read_csv) %>%                              # Store all files in list
+#  bind_rows                               # Combine data sets into one data set 
+#data_all                                            # Print data to RStudio console
+
+#as.data.frame(data_all)  
+```
+
+# Summary of all data 
+```{r}
+st_rec <- summarySE(data_all, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
+st_rec 
+
+#Calculate completeness for QC
+st_rec$Completeness <- st_rec$N /24
+
+st_rec
+
+#write.csv(st_height, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\Completeness_tissue_processing_data.csv", row.names=FALSE)
+```
+
+```{r}
+ggplot(data=data_all, aes(x=Site, y=Count_1, fill=Site)) +
+  geom_boxplot()+  
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Recruitment ", x ="Site", y = "Mean Recruitment (spat/shell)")
+
+```
+
 
 
 
