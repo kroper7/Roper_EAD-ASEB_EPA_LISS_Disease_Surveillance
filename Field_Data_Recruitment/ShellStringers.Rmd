@@ -14,9 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r cars, echo=FALSE}
 library("Rmisc")
 library("ggplot2")
-library(tidyr)
-library("dplyr")
-library(plyr)
+library("tidyverse")
 ```
 
 #path for Mariah
