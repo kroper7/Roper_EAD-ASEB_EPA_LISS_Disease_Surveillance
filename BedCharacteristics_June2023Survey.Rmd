@@ -3,6 +3,7 @@ title: "BedCharacteristics_June2023"
 author: "Meghana Parikh"
 date: "2023-11-17"
 output: html_document
+last updated: 11/20/2023
 
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's June 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut. The data from this survey was initial input into an Access database (LISS_Database_FieldCollectionData_2023-07-18.accb). The data files input here are from that database. After July 2023 that database was discontinued. Code for Bed Characteristic data from later surveys is in a separate file....
 ---
@@ -40,6 +41,8 @@ BedHeight <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_
 #Summary of bed height at each site 
 
 bedheight_summary <- summarySE(data = BedHeight, measurevar = "BedHeight_cm", groupvars = c("Site_Name"))
+
+write.csv(bedheight_summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
 ```
 
 ```{r}
@@ -80,14 +83,13 @@ FENCrugosity_final <- rbind(FENCrugosity_sumall,FENCrugosity_sumzone)
 ASHCrugosity_final <-ASHCrugosity_final %>% mutate(Bed_Section = "NA")
 Rugosity_AllSite_Summary <- rbind(ASHCrugosity_final, FENCrugosity_final)
 
+write.csv(Rugosity_AllSite_Summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Rugosity_AllSite.csv", row.names=FALSE)
+
 ```
 
 
 ```{r}
-```{r}
-#oyster density metrics 
-
-
+#oyster density metrics
 #need to separate Ash and Fence Creeks
 
 ashc_density <- quadratdensity %>% filter(Site_Name == "Ash Creek")
@@ -96,7 +98,11 @@ fenc_density <- quadratdensity %>% filter(Site_Name == "Fence Creek")
 #sum total number of oysters counted per quadrat
 ashc_density$AllCount_Total <- rowSums(ashc_density[, c("LiveCount_Total", "BoxCount_Total", "GaperCount_Total")])
 fenc_density$AllCount_Total <- rowSums(fenc_density[, c("LiveCount_Total", "BoxCount_Total", "GaperCount_Total")])
+```
 
+
+```{r}
+#oyster density metrics
 #############AshCreek Summary ##############
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
@@ -132,20 +138,21 @@ ASHCdensitysummary_zone <- subset(ashc_density_sum_all_zone, select = -c(sd,se,c
 ASHCdensitysummary2 <- rbind(ASHCdensitysummary,ASHCdensitysummary_zone)
   
 
-#renaming for clarity. need to use dplyr:: because another package is overriding the function
+#renaming for clarity and to allow for binding with Fence Creek Data 
 ASHCdensitysummary3 <- ASHCdensitysummary2 %>%
+    mutate(Bed_Section = "NA") %>%
+  
     dplyr::rename(
       AllCount_Mean = AllCount_Total,
       LiveCount_Mean = LiveCount_Total,
       BoxCount_Mean = BoxCount_Total, 
-      GaperCount_Mean = GaperCount_Total, 
-      NumQuad = N) 
+      GaperCount_Mean = GaperCount_Total) 
 
 
 ```
 
 ```{r}
-
+#oyster density metrics
 ##################  Fence Creek Summary #################
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
@@ -172,19 +179,22 @@ FENCdensitysummary_all <- subset(fenc_density_sum_all, select = -c(sd,se,ci)) %>
     left_join(subset(fenc_density_sum_box, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") %>%
     left_join(subset(fenc_density_sum_gaper, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") 
 
+#add bedsection variable to all for rbind with zone summary in later step 
+FENCdensitysummary_all <- FENCdensitysummary_all %>% mutate(Bed_Section = "All")
 
 
-######unable to get code for this piece to work####
-#Error: Warning: Detected an unexpected many-to-many relationship between `x` and `y`.Warning: Detected an unexpected many-to-many relationship between `x` and `y`.Warning: Detected an unexpected many-to-many relationship between `x` and `y`.#####
+
+######when joining on multiple variables, need to use by = join_by() 
+#see https://dplyr.tidyverse.org/reference/mutate-joins.html#:~:text=To%20join%20by%20multiple%20variables,join_by(a%2C%20c)%20. for additional documentation. 
 
 FENCdensitysummary_zone <- subset(fenc_density_sum_all_zone, select = -c(sd,se,ci)) %>%
-    left_join(subset(fenc_density_sum_live_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Bed_Section", "Quadrat_Zone") %>%
-    left_join(subset(fenc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Bed_Section", "Quadrat_Zone") %>%
-    left_join(subset(fenc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Bed_Section", "Quadrat_Zone") 
+    left_join(subset(fenc_density_sum_live_zone, select = -c(N,sd,se,ci,Site_Name)), by = join_by("Bed_Section", "Quadrat_Zone")) %>%
+    left_join(subset(fenc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), join_by("Bed_Section", "Quadrat_Zone")) %>%
+    left_join(subset(fenc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  join_by("Bed_Section", "Quadrat_Zone")) 
 
 
-
-FENCdensitysummary2 <- rbind(ASHCdensitysummary,ASHCdensitysummary_zone)
+#append All sections summary with zone specific summaries 
+FENCdensitysummary2 <- rbind(FENCdensitysummary_all,FENCdensitysummary_zone)
   
 
 #renaming for clarity. need to use dplyr:: because another package is overriding the function
@@ -193,19 +203,22 @@ FENCdensitysummary3 <- FENCdensitysummary2 %>%
       AllCount_Mean = AllCount_Total,
       LiveCount_Mean = LiveCount_Total,
       BoxCount_Mean = BoxCount_Total, 
-      GaperCount_Mean = GaperCount_Total, 
-      NumQuad = N) 
+      GaperCount_Mean = GaperCount_Total) 
   
-
 ```
 
+```{r}
+#oyster density metrics
+#combine Ash and Fence Creeks 
 
-## Including Plots
+Density_AllSite <- rbind(ASHCdensitysummary3, FENCdensitysummary3)
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+write.csv(Density_AllSite, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Density_AllSite.csv", row.names=FALSE)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+#oyster coverage 
+
+##coverage was recorded as a categorical value. How should we aggregate coverage data? 
+```
+
