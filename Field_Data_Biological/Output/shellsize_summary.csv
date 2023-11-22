@@ -1,0 +1,12 @@
+"Site","Season","median_height","min_height","max_height","Q1","Q3","Survial_status","Survival_status"
+"ASHC","fall",64.19,8.05,1515.2,35.04,97.92,"All",NA
+"ASHC","spring",65.6,8,167,28.13,90,"All",NA
+"FENC","fall",62.02,5.08,189,41.25,95.5,"All",NA
+"FENC","spring",53.91,5.82,232.1,26.33,86.6075,"All",NA
+"GOLD","fall",83.655,25.44,814.1,52.03,105.0075,"All",NA
+"LAUR","fall",108.44,83.18,139.32,100.83,116.62,"All",NA
+NA,"fall",63.89,5.08,189,39.11,97.96,NA,"Live"
+NA,"spring",52.76,5.82,183.66,25.385,85.67,NA,"Live"
+NA,"fall",78.24,8.05,1515.2,47.6325,102.1875,NA,"Box"
+NA,"spring",68.3,7.59,232.1,42.625,95.18,NA,"Box"
+NA,"spring",47.9,10.8,107.98,28.23,70.61,NA,"Gaper"
