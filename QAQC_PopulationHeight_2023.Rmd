@@ -6,9 +6,10 @@ date: "2023-06-29"
 output: html_document
 ---
 
-Last updated 11/22/23 by M.Kachmar
-Calculated density metrics - need to go through and check quadrat numbers
-Output of both population density and height master file in github
+Last updated 11/17/23 by M.Kachmar
+All survey height data inputted and cleaned to merge for spring and fall
+want to create output of master height sheet into repository
+Need to determine QAQC needs for data
 
 ```{r, setup, include=FALSE}
 
@@ -71,7 +72,7 @@ BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_
 shellsize <- shellsize %>% rename(Date_collected = TripDate) %>% rename(Quadrat = QUADRAT_NUM) %>% rename(Height= Height_mm) %>% rename(Survival_status= SpecimenType)
 
 #adding columns
-shellsize$Season<- rep("spring", nrow(shellsize))
+shellsize$Season<- rep("Spring", nrow(shellsize))
 shellsize$State<- rep("CT", nrow(shellsize))
 
 #removing unneeded columns
@@ -126,7 +127,7 @@ length_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-AS
 
 length_live <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_live')
 length_live <- na.omit(length_live)
-length_live$Survival_status<- rep("Live", nrow(length_live))
+length_live$Survival_status<- rep("live", nrow(length_live))
 length_live <- length_live %>% rename(Height = Length_live)
 length_live
 
@@ -134,18 +135,18 @@ length_live
 
 length_box <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_box')
 length_box <- na.omit(length_box)
-length_box$Survival_status<- rep("Box", nrow(length_box))
+length_box$Survival_status<- rep("box", nrow(length_box))
 length_box <- length_box %>% rename(Height = Length_box)
 
 #Gaper
 
 length_gaper <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_gaper')
 length_gaper <- na.omit(length_gaper)
-length_gaper$Survival_status<- rep("Gaping", nrow(length_gaper))
+length_gaper$Survival_status<- rep("gaper", nrow(length_gaper))
 length_gaper <- length_gaper %>% rename(Height = Length_gaper)
 
 Height_all<- rbind(length_live,length_box,length_gaper)
-Height_all$Season<- rep("fall", nrow(Height_all))
+Height_all$Season<- rep("Fall", nrow(Height_all))
 Height_all
 
 Height_all$`Field ID`<- NULL
@@ -157,39 +158,11 @@ Height_all$`Field ID`<- NULL
 Height_master<- rbind(Height_all, shellsize)
 Height_master
 
-
 # Output to repository
-write.csv(Height_master, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Height_master.csv", row.names=FALSE)
 
-```
-```{r}
-#Oyster density metrics
-
-#Sum total number of oyster counter per quadrat
-quadratdensity_all<- Height_master %>%
-  group_by(Quadrat, Season, Survival_status, Site, Date_collected, State) %>%
-  summarize(Count = n())
-quadratdensity_all
-
-#summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
-all_density_SE <-summarySE(data = quadratdensity_all, measurevar = "Count", groupvars=c("Site", "Survival_status", "Season"))
-all_density_SE
-
-#calculate percent standard error as 100*se/mean
-all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
-
-#calculate completeness as 100*N/12, where 12 is the desired number of quadrats per site 
-  densitysummary <- all_density_SE %>%
-    mutate(PercentComplete_Quad = ((N/12)*100))
-
-
-write.csv(densitysummary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/populationdensity_summary.csv", row.names=FALSE)
 
 ```
 
-
-
-#Old code originally for June 2023 survey data format
 ```{r}
 #oyster density metrics 
 
@@ -199,7 +172,6 @@ quadratdensity$AllCount_Total <- rowSums(quadratdensity[, c("LiveCount_Total", "
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
 all_density_SE <-summarySE(data = quadratdensity, measurevar = "AllCount_Total", groupvars=c("Site_Name"))
-all_density_SE
 live_density_SE <- summarySE(data = quadratdensity, measurevar = "LiveCount_Total", groupvars=c("Site_Name"))
 box_density_SE <-summarySE(data = quadratdensity, measurevar = "BoxCount_Total", groupvars=c("Site_Name"))
 gaper_density_SE <-summarySE(data = quadratdensity, measurevar = "GaperCount_Total", groupvars=c("Site_Name"))
