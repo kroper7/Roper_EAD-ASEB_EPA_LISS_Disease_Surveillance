@@ -4,6 +4,8 @@ title: "QAQC_PopulationSurveyMetrics"
 author: "Meghana Parikh"
 date: "2023-06-29"
 output: html_document
+
+description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
 Last updated 11/22/23 by M.Kachmar
@@ -413,4 +415,7 @@ shellsize_summary <- rbind(shellsize_all, shellsize_live, shellsize_box, shellsi
 write.csv(shellsize_summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological\\shellsize_summary.csv", row.names=FALSE)
 
   
+```
+```{r}
+sessionInfo()
 ```

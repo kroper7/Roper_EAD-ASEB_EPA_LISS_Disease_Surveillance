@@ -3,6 +3,8 @@ title: "Recruitment"
 author: "Katie McFarland"
 date: "11/17/2023"
 output: html_document
+
+description: This R code is used to import and summarize recruitment data collected using shellstringers from the LISS Oyster Health Project at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
 ```{r setup, include=FALSE}
@@ -46,6 +48,7 @@ as.data.frame(data_all)                            # Convert tibble to data.fram
 #data_all                                            # Print data to RStudio console
 
 #as.data.frame(data_all)  
+
 ```
 
 # Summary of all data 

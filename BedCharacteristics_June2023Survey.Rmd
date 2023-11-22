@@ -222,3 +222,6 @@ write.csv(Density_AllSite, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EP
 ##coverage was recorded as a categorical value. How should we aggregate coverage data? 
 ```
 
+```{r}
+sessionInfo()
+```
