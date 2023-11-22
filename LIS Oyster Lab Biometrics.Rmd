@@ -1,10 +1,13 @@
 ---
 title: "LIS Oyster Lab Tissue Processing"
 output: html_notebook
+
+description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 11/14/2023 by M. Kachmar
-- All data up to date
+Updated 11/22/2023 by M. Kachmar
+- added description to the code above
+- facet wrapped the histograms by month for body condition distribution
  
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
@@ -149,7 +152,8 @@ ggplot(data=df_ASHC, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Body Condition index ", x ="Condition categorization")
+  labs(title="Body Condition index ", x ="Condition categorization")+
+  facet_wrap(~ date_collected, scales = "free")
 
 #Mean Body condition per month
 ggplot(data=df_ASHC, aes(x= date_collected, y= condition_score, group = date_collected)) +
@@ -204,7 +208,8 @@ ggplot(data=df_FENC, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Body Condition index ", x ="Condition categorization")
+  labs(title="Body Condition index ", x ="Condition categorization")+
+    facet_wrap(~ date_collected, scales = "free")
 
 #Mean Body condition per month
 ggplot(data=df_FENC, aes(x= date_collected, y= condition_score, group = date_collected)) +
@@ -262,7 +267,8 @@ ggplot(data=df_LAUR, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Body Condition index ", x ="Condition categorization")
+  labs(title="Body Condition index ", x ="Condition categorization")+
+    facet_wrap(~ date_collected, scales = "free")
 
 #Mean Body condition per month
 ggplot(data=df_LAUR, aes(x= date_collected, y= condition_score, group = date_collected)) +
@@ -303,7 +309,8 @@ ggplot(data=df_GOLD, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Body Condition index ", x ="Condition categorization")
+  labs(title="Body Condition index ", x ="Condition categorization")+
+    facet_wrap(~ date_collected, scales = "free")
 
 #Mean Body condition per month
 ggplot(data=df_GOLD, aes(x= date_collected, y= condition_score, group = date_collected)) +
