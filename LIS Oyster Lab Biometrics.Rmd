@@ -155,14 +155,14 @@ ggplot(data=df_ASHC, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)") + scale_y_reverse()
 
 ## Mean body condition per 'Zone'
 ggplot(data=df_ASHC, aes(x= oyster_zone, y= condition_score, group = oyster_zone, fill = oyster_zone)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)") + scale_y_reverse()
 
 
 ```
@@ -211,21 +211,21 @@ ggplot(data=df_FENC, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition Score", x ="month", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
 
 ## Mean body condition per 'Zone'
 ggplot(data=df_FENC, aes(x= oyster_zone, y= condition_score, group = oyster_zone, fill = oyster_zone)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")+ scale_y_reverse()
 
 ## Mean body condition per 'light regime'
 ggplot(data=df_FENC, aes(x= light_regime, y= condition_score, group = light_regime, fill = light_regime)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")+ scale_y_reverse()
 
 ```
 
@@ -269,7 +269,7 @@ ggplot(data=df_LAUR, aes(x= condition)) +
 ggplot(data=df_LAUR, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 
 ```
@@ -311,7 +311,7 @@ ggplot(data=df_GOLD, aes(x= condition)) +
 ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 
 ```
