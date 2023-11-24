@@ -60,20 +60,13 @@ write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_
 ```
 
 
-## Need to figure out how to fix the date !!!!
-## Tried to add code that I use to change date format but it is saying the columns are of different lengths (10493 vs 10494) 10/11/23 M. Kachmar
- https://lubridate.tidyverse.org/
+## adding a month column to the data
+
 ```{r}
-str(data_all)
+data_all <- data_all %>%
+  mutate(date_collected= as.Date(date_collected), month = month(date_collected))
 
-# convert date info in format 'mm/dd/yyyy'
-#data.frame$date <- ymd("2023-04-23")
-
-#data_all$date_collected <-format(ymd(data_all$date_collected, format = "%m-%d-%Y"))
-
-
-str(data_all)
-
+data_all
 ```
 
 # This chunk of code creates a numerical value in a new column for the body condition scores
@@ -86,6 +79,8 @@ data_all<- data_all %>%
 head(data_all)
 
 
+```
+```{r}
 ```
 
 # Summary of all data 
@@ -139,11 +134,11 @@ st_condition_ASHC
 
 
 ```{r}
-ggplot(data=df_ASHC, aes(x=date_collected, y=height_mm, group= date_collected)) +
+ggplot(data=df_ASHC, aes(x=month, y=height_mm, group= month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+  labs(title="Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
 ```
 
 ```{r}
@@ -152,22 +147,22 @@ ggplot(data=df_ASHC, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Body Condition index ", x ="Condition categorization")+
-  facet_wrap(~ date_collected, scales = "free")
+  labs(title="Body Condition Score ", x ="Condition categorization")+
+  facet_wrap(~ month, scales = "free")
 
 #Mean Body condition per month
-ggplot(data=df_ASHC, aes(x= date_collected, y= condition_score, group = date_collected)) +
+ggplot(data=df_ASHC, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition index ", x ="date collected", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")
 
 ## Mean body condition per 'Zone'
 ggplot(data=df_ASHC, aes(x= oyster_zone, y= condition_score, group = oyster_zone, fill = oyster_zone)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition index ", x ="Zone", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")
 
 
 ```
@@ -194,11 +189,11 @@ st_condition_FENC
 
 
 ```{r}
-ggplot(data=df_FENC, aes(x=date_collected, y=height_mm, group=date_collected)) +
+ggplot(data=df_FENC, aes(x=month, y=height_mm, group=month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+  labs(title="Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
 
 ```
 
@@ -209,28 +204,28 @@ ggplot(data=df_FENC, aes(x= condition)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Body Condition index ", x ="Condition categorization")+
-    facet_wrap(~ date_collected, scales = "free")
+    facet_wrap(~ month, scales = "free")
 
 #Mean Body condition per month
-ggplot(data=df_FENC, aes(x= date_collected, y= condition_score, group = date_collected)) +
+ggplot(data=df_FENC, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition index ", x ="date collected", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score", x ="month", y= " condition score (1-9)")
 
 ## Mean body condition per 'Zone'
 ggplot(data=df_FENC, aes(x= oyster_zone, y= condition_score, group = oyster_zone, fill = oyster_zone)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition index ", x ="Zone", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")
 
 ## Mean body condition per 'light regime'
 ggplot(data=df_FENC, aes(x= light_regime, y= condition_score, group = light_regime, fill = light_regime)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition index ", x ="Zone", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")
 
 ```
 
@@ -253,11 +248,11 @@ st_condition_LAUR
 ```
 
 ```{r}
-ggplot(data=df_LAUR, aes(x=date_collected, y=height_mm, group= date_collected)) +
+ggplot(data=df_LAUR, aes(x=month, y=height_mm, group= month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+  labs(title="Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
 
 
 ```
@@ -268,13 +263,13 @@ ggplot(data=df_LAUR, aes(x= condition)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Body Condition index ", x ="Condition categorization")+
-    facet_wrap(~ date_collected, scales = "free")
+    facet_wrap(~ month, scales = "free")
 
 #Mean Body condition per month
-ggplot(data=df_LAUR, aes(x= date_collected, y= condition_score, group = date_collected)) +
+ggplot(data=df_LAUR, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Mean Body Condition index ", x ="date collected", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 
 ```
@@ -296,11 +291,11 @@ st_condition_GOLD
 ```
 
 ```{r}
-ggplot(data=df_GOLD, aes(x=date_collected, y=height_mm, group= date_collected)) +
+ggplot(data=df_GOLD, aes(x=month, y=height_mm, group= month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+  labs(title="Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
 
 ```
 ```{r}
@@ -309,14 +304,14 @@ ggplot(data=df_GOLD, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Body Condition index ", x ="Condition categorization")+
-    facet_wrap(~ date_collected, scales = "free")
+  labs(title="Body Condition Score ", x ="Condition categorization")+
+    facet_wrap(~ month, scales = "free")
 
 #Mean Body condition per month
-ggplot(data=df_GOLD, aes(x= date_collected, y= condition_score, group = date_collected)) +
+ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Mean Body Condition index ", x ="date collected", y= " condition score (1-9)")
+  labs(title="Mean Body Condition Score ", x ="month", y= " condition score (1-9)")
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 
 ```
