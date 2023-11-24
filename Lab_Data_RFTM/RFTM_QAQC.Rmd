@@ -52,20 +52,22 @@ write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_
 ```
 
 
-## Need to figure out how to fix the date !!!!
- https://lubridate.tidyverse.org/
+## adding a month column to the data
+
 ```{r}
-#str(data_all)
+data_all <- data_all %>%
+  mutate(date_collected= as.Date(date_collected), month = month(date_collected))
 
-# convert date info in format 'mm/dd/yyyy'
-#data_all$date <- ymd("2023-04-23")
-#data_all$site=as.factor(data_all$site)
+data_all
+```
 
-#data_all$date_collected <-format(ymd(data_all$date_collected, format = "%m-%d-%Y"))
-
-#str(data_all)
+#Filtering NAs 
+```{r}
+data_all <- data_all %>% filter(!is.na(date_collected))
+data_all
 
 ```
+
 
 # Summary of all data and Completeness Check
 ```{r}
@@ -200,12 +202,14 @@ ggplot(data=df_prevalence_summary, aes(x=site, y=prevalence_precentage, fill = s
 ```{r}
 data_all
 
+data_all$rftm_final<-as.numeric(as.character(data_all$rftm_final))
+
 df_intensity_summary <- data_all %>%
   dplyr::group_by(site, date_collected) %>% 
   dplyr::summarize( intensity = sum(rftm_final, na.rm= TRUE)/sum(prevalent, na.rm = TRUE))
 df_intensity_summary
 
-# Need to fix 0823GOLD
+# Need to fix 0823GOLD? Looked at the raw data sheet and the scores were all 0. 
 ```
 ```{r}
 
@@ -215,7 +219,7 @@ ggplot(data=df_intensity_summary, aes(x=date_collected, y=intensity, color=site)
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Intensity (population) of Dermo infection", x ="Date", y = "Intensity score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))
+  theme(axis.text=element_text(size=12)) + scale_y_continuous(limits = c(0, 3))
 
 ```
 ```{r}
@@ -237,7 +241,7 @@ df_intensity_proportions<- na.omit(df_intensity_proportions)
 df_intensity_proportions
 
 ggplot(data=df_intensity_proportions, aes(x=date_collected, y= Proportion, fill=intensity_bin)) +
-  geom_bar(stat="identity", position = "fill")+  
+  geom_bar(width = 6, stat="identity", position = "fill")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Proportion of Intensity (population) scores of Dermo infection", x ="Date", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
@@ -267,7 +271,7 @@ ggplot(data=df_ASHC, aes(x=date_collected, y=rftm_final, group= date_collected))
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Weighted Prevalence Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Ash Creek Weighted Prevalence Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 
 ```
@@ -294,7 +298,7 @@ ggplot(data=df_FENC, aes(x=date_collected, y=rftm_final, group= date_collected))
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Weighted prevalence Dermo infection", x ="Date", y = "Weighted prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Fence Creek Weighted prevalence Dermo infection", x ="Date", y = "Weighted prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 
 ```
@@ -318,7 +322,7 @@ ggplot(data=df_LAUR, aes(x=date_collected, y=rftm_final, group= date_collected))
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Weighted prevalence of Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Laurel Hollow Weighted prevalence of Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 
 ```
@@ -343,7 +347,7 @@ ggplot(data=df_GOLD, aes(x=date_collected, y=rftm_final, group= date_collected))
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Weighted prevalence of Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Gold Star Beach Weighted prevalence of Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 
 ```
