@@ -208,3 +208,245 @@ for(i in 1:nrow(vars)) {
               theme_bw()
 ```
 
+# Clean CT sites (ASHC and FENC) for the LISS proposal
+```{r, figs for LISS proposal}
+
+CT_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('FENC', 'ASHC'))
+CT_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC', 'ASHC'))
+CT_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC', 'ASHC'))
+CT_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC', 'ASHC'))
+
+
+# pH 
+
+CT_pH_all <- CT_pH %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-07-01 00:00:00' & `Date Time` < '2023-09-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("pH - Summer") +
+              labs(x = "Time", y = "pH") +
+              theme_classic() +
+              theme(legend.position = "none")
+
+
+CT_pH_callout <- CT_pH %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("pH - Diurnal cycle") +
+              #ggtitle(NA) +
+              labs(x = "Time") +
+              theme_classic() +
+              theme(legend.position = "none", axis.title.y = element_blank())
+
+pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_pH.pdf"), height = 6, width = 11)
+ggarrange(CT_pH_all, CT_pH_callout, ncol = 2, widths = c(2, 1))
+dev.off()
+  
+
+
+
+
+
+# Salinity 
+
+CT_Salinity_all <- CT_Salinity %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-07-01 00:00:00' & `Date Time` < '2023-09-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity - Summer") +
+              labs(x = "Time", y = "Salinity") +
+              theme_classic() +
+              theme(legend.position = "none")
+
+
+CT_Salinity_callout <- CT_Salinity %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity - Diurnal cycle") +
+              #ggtitle(NA) +
+              labs(x = "Time") +
+              theme_classic() +
+              theme(legend.position = "none", axis.title.y = element_blank())
+
+pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_Salinity.pdf"), height = 6, width = 11)
+ggarrange(CT_Salinity_all, CT_Salinity_callout, ncol = 2, widths = c(2, 1))
+dev.off()
+
+
+# Temperature 
+
+CT_Temperature_all <- CT_Temperature %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-07-01 00:00:00' & `Date Time` < '2023-09-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - Summer") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none")
+
+
+CT_Temperature_callout <- CT_Temperature %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - Diurnal cycle") +
+              #ggtitle(NA) +
+              labs(x = "Time") +
+              theme_classic() +
+              theme(legend.position = "none", axis.title.y = element_blank())
+
+pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_Temperature.pdf"), height = 6, width = 11)
+ggarrange(CT_Temperature_all, CT_Temperature_callout, ncol = 2, widths = c(2, 1))
+dev.off()
+
+
+# DO 
+
+CT_DO_all <- CT_DO %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-07-01 00:00:00' & `Date Time` < '2023-09-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration - Summer") +
+              labs(x = "Time", y = "DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none")
+
+
+CT_DO_callout <- CT_DO %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration - Diurnal cycle") +
+              #ggtitle(NA) +
+              labs(x = "Time") +
+              theme_classic() +
+              theme(legend.position = "none", axis.title.y = element_blank())
+
+pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_DO.pdf"), height = 6, width = 11)
+ggarrange(CT_DO_all, CT_DO_callout, ncol = 2, widths = c(2, 1))
+dev.off()
+
+```
+
