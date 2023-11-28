@@ -123,7 +123,7 @@ Accuracy
 #Graphing Weighted prevalence(= Sum of individual intensity scores / total number of oyster sampled)
 
 ```{r, echo=FALSE}
-ggplot(data=data_all, aes(x=date_collected, y=rftm_final, fill=site)) +
+ggplot(data=data_all, aes(x=month, y=rftm_final, fill=site)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
@@ -135,16 +135,16 @@ ggplot(data=data_all, aes(x=date_collected, y=rftm_final, fill=site)) +
 ```{r}
 #Graphing mean weighted prevalence over time
 df_wp_summary <- data_all %>%
-  dplyr::group_by(site, date_collected) %>% 
+  dplyr::group_by(site, month) %>% 
   dplyr::summarize( Weighted_prevalence = mean(rftm_final))
 df_wp_summary
 
-ggplot(data=df_wp_summary, aes(x=date_collected, y=Weighted_prevalence, color=site)) +
+ggplot(data=df_wp_summary, aes(x=month, y=Weighted_prevalence, color=site)) +
   geom_point()+  
   geom_line(aes(group = site))+
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Weighted Prevalence of Dermo infection", x ="Date", y = "Weighted Prevalence Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Weighted Prevalence of Dermo infection", x ="Month", y = "Weighted Prevalence Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 
 ```
@@ -171,7 +171,7 @@ str(data_all$prevalent)
 data_all$prevalent <- as.numeric(data_all$prevalent)
 
 df_prevalence_summary <- data_all %>%
-  dplyr::group_by(site, date_collected) %>% 
+  dplyr::group_by(site, month) %>% 
   dplyr::summarize( prevalence_precentage= mean(prevalent)* 100)
 df_prevalence_summary
 
@@ -179,12 +179,12 @@ df_prevalence_summary
 #Graphing mean prevalence 
 ```{r}
 
-ggplot(data=df_prevalence_summary, aes(x=date_collected, y=prevalence_precentage, color=site)) +
+ggplot(data=df_prevalence_summary, aes(x=month, y=prevalence_precentage, color=site)) +
   geom_point()+  
   geom_line(aes(group = site))+
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Prevalence of Dermo infection", x ="Date", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Prevalence of Dermo infection", x ="Month", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 ```
 ```{r}
@@ -193,7 +193,7 @@ ggplot(data=df_prevalence_summary, aes(x=site, y=prevalence_precentage, fill = s
  geom_boxplot()+
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Prevalence of Dermo infection", x ="Date", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Prevalence of Dermo infection", x ="Site", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 ```
 
@@ -205,7 +205,7 @@ data_all
 data_all$rftm_final<-as.numeric(as.character(data_all$rftm_final))
 
 df_intensity_summary <- data_all %>%
-  dplyr::group_by(site, date_collected) %>% 
+  dplyr::group_by(site, month) %>% 
   dplyr::summarize( intensity = sum(rftm_final, na.rm= TRUE)/sum(prevalent, na.rm = TRUE))
 df_intensity_summary
 
@@ -213,12 +213,12 @@ df_intensity_summary
 ```
 ```{r}
 
-ggplot(data=df_intensity_summary, aes(x=date_collected, y=intensity, color=site)) +
+ggplot(data=df_intensity_summary, aes(x=month, y=intensity, color=site)) +
   geom_point()+  
   geom_line(aes(group = site))+
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Intensity (population) of Dermo infection", x ="Date", y = "Intensity score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Intensity of Dermo infection", x ="Month", y = "Intensity score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12)) + scale_y_continuous(limits = c(0, 3))
 
 ```
@@ -229,9 +229,10 @@ ggplot(data=df_intensity_summary, aes(x=date_collected, y=intensity, color=site)
 ## Not letting be add a 5 category - need to figure out why
 ## Also gold star is missing data? 
 
+
 df_intensity_proportions<- data_all %>%
-  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = cut(rftm_final, breaks = c(0,0.5, 1, 2, 3, 4, 5), labels=c("0","0.5","1","2","3","4","5"))) %>%
-  group_by(site, date_collected, intensity_bin) %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(site, month, intensity_bin) %>%
   summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
@@ -240,11 +241,11 @@ df_intensity_proportions<- na.omit(df_intensity_proportions)
 
 df_intensity_proportions
 
-ggplot(data=df_intensity_proportions, aes(x=date_collected, y= Proportion, fill=intensity_bin)) +
-  geom_bar(width = 6, stat="identity", position = "fill")+  
+ggplot(data=df_intensity_proportions, aes(x=month, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Proportion of Intensity (population) scores of Dermo infection", x ="Date", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Proportion of Intensity scores of Dermo infection", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
   facet_wrap(~ site)
 
