@@ -258,23 +258,44 @@ df_ASHC <- data_all%>%
 df_ASHC 
 
 #Weighted prevalence 
-st_intensity_ASHC <- summarySE(df_ASHC, measurevar="rftm_final", groupvars=c("date_collected"))
+st_intensity_ASHC <- summarySE(df_ASHC, measurevar="rftm_final", groupvars=c("month"))
 st_intensity_ASHC
 
 
+df_ASHC_prevalence <- df_prevalence_summary %>% 
+  filter(site == "ASHC")
+df_ASHC_prevalence
 ```
 
 
 ```{r, echo=FALSE}
 #Graphing weighted prevalence ASHC
 
-ggplot(data=df_ASHC, aes(x=date_collected, y=rftm_final, group= date_collected)) +
+ggplot(data=df_ASHC, aes(x=month, y=rftm_final, group= month)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Ash Creek Weighted Prevalence Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Ash Creek Weighted Prevalence Dermo infection", x ="Month", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 
+
+
+ggplot(data=st_intensity_ASHC, aes(x=month, y=rftm_final)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Weighted Prevalence of Dermo infection", x ="Month", y = "Weighted Prevalence Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+##Prevalence
+ggplot(data=df_ASHC_prevalence, aes(x=month, y=prevalence_precentage)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence", x ="Month", y = "Prevalence precent")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
 ```
 
 
