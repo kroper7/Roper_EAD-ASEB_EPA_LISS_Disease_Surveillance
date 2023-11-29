@@ -80,9 +80,23 @@ head(data_all)
 
 
 ```
+#This chunk of code is removing 0723LAUR_20 and 0723LAUR_26 from the datasheet as they have been identified as spat on shell to avoid bias in the data. During this sample collection there were animals that were significantly smaller than the single set oysters. These individuals should be removed from all monthly sampling related datasheets including disease analysis. All tissue amples will be disgarded. 
 ```{r}
+data_all <- data_all %>%
+  subset(lab_id != "0723LAUR_20") %>%
+  subset(lab_id != "0723LAUR_26")
+
+View(data_all)
+
 ```
 
+#A wrong value caliper input was identified for the height of sample 0923GOLD_23. This code is removing that value from the data set as we cannot conclude what this original value was. The value is 8.62. This will cause this individual to fall out of the dataset when standardized to length. This code does not completely remove the individual from the dataset.
+```{r}
+data_all$height_mm[data_all$height_mm == "8.62"] <- "NA"
+
+View(data_all)
+
+```
 # Summary of all data 
 ```{r}
 st_height <- summarySE(data_all, measurevar="height_mm", groupvars=c("site", "date_collected"))
