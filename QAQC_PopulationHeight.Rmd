@@ -293,13 +293,19 @@ df_quadrat_ASHC <- quadratdensity_all%>%
   filter(Site == "ASHC")
 df_quadrat_ASHC
 
-#Quadrat size is 25 x25cm = .25x.25m = 0.0625 m^2
-Q_area_ASHC <- 0.0625
+#Quadrat size is 25 x25cm. To calculate density (oysters per m^2) multiply number of oysters counted X 4
 
 df_density_ASHC <- df_quadrat_ASHC %>%
   dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
-  dplyr::summarize(Density = sum(Count)/Q_area_ASHC)
+  dplyr::summarize(Density = sum(Count)*4)
 df_density_ASHC
+
+#Sum of Oysters per m^2 across all quadrats
+total_oysters_ASHC <- df_density_ASHC %>%
+  group_by(Site, Season, Survival_status) %>%
+  summarize(Total_Density = sum(Density))
+total_oysters_ASHC
+ 
 
 #Density per quadrat totals
 ggplot(data=df_quadrat_ASHC, aes(x= Survival_status, y = Count, fill = Survival_status)) +
@@ -341,13 +347,18 @@ df_quadrat_FENC <- quadratdensity_all%>%
   filter(Site == "FENC")
 df_quadrat_FENC
 
-#Quadrat size is 25 x25cm = .25x.25m = 0.0625 m^2
-Q_area_FENC <- 0.0625
+#Quadrat size is 25 x25cm. To calculate density (oysters per m^2) multiply number of oysters counted X 4
 
 df_density_FENC <- df_quadrat_FENC %>%
   dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
-  dplyr::summarize(Density = sum(Count)/Q_area_FENC)
+  dplyr::summarize(Density = sum(Count)*4)
 df_density_FENC
+
+#Sum of Oysters per m^2 across all quadrats
+total_oysters_FENC <- df_density_FENC %>%
+  group_by(Site, Season, Survival_status) %>%
+  summarize(Total_Density = sum(Density))
+total_oysters_FENC
 
 #Density per quadrat totals
 ggplot(data=df_quadrat_FENC, aes(x= Survival_status, y = Count, fill = Survival_status)) +
