@@ -7,12 +7,7 @@ output: html_document
 description: This R code is used to import and summarize RFTM (Rays Fluid Thioglycollate Medium) intensity scoring from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. The scale used to score intensity for individuals is the Mackins Scale (citation). This score can be used to calculate prevalence, weighted prevalence and intensity across the population. 
 ---
 
-Last updated 11/22/2023 by M.Kachmar
-- added description
-- attempting to created a faceted stacked bar graph for intensity score proportions each month
-    - gold star is missing data in the graphs
-    - was able to omit NAs for this graph
-    - not allowing me to create a "5" score bin
+Last updated 11/30/2023 by M.Kachmar
 
 
 
@@ -68,6 +63,15 @@ data_all
 
 ```
 
+#This chunk of code is removing 0723LAUR_20 and 0723LAUR_26 from the datasheet as they have been identified as spat on shell to avoid bias in the data. During this sample collection there were animals that were significantly smaller than the single set oysters. 
+```{r}
+data_all <- data_all %>%
+  subset(lab_id != "0723LAUR_20") %>%
+  subset(lab_id != "0723LAUR_26")
+
+View(data_all)
+
+```
 
 # Summary of all data and Completeness Check
 ```{r}
@@ -261,10 +265,17 @@ df_ASHC
 st_intensity_ASHC <- summarySE(df_ASHC, measurevar="rftm_final", groupvars=c("month"))
 st_intensity_ASHC
 
-
+#Prevalence
 df_ASHC_prevalence <- df_prevalence_summary %>% 
   filter(site == "ASHC")
 df_ASHC_prevalence
+
+#Intensity Index
+df_ASHC_intensity <- df_intensity_summary %>%
+  filter(site == "ASHC")
+df_ASHC_intensity
+
+
 ```
 
 
@@ -279,7 +290,7 @@ ggplot(data=df_ASHC, aes(x=month, y=rftm_final, group= month)) +
   theme(axis.text=element_text(size=12))
 
 
-
+#Weighted prevalence
 ggplot(data=st_intensity_ASHC, aes(x=month, y=rftm_final)) +
   geom_point()+  
   geom_line()+
@@ -295,6 +306,15 @@ ggplot(data=df_ASHC_prevalence, aes(x=month, y=prevalence_precentage)) +
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Prevalence", x ="Month", y = "Prevalence precent")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Intensity index
+ggplot(data=df_ASHC_intensity, aes(x=month, y=intensity)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Ash Creek Intensity Index", x ="Month", y = "Intensity Index")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 ```
 

@@ -3,15 +3,16 @@ title: "BedCharacteristics_June2023"
 author: "Meghana Parikh"
 date: "2023-11-17"
 output: html_document
-last updated: 11/20/2023
+last updated: 11/30/2023
 
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's June 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut. The data from this survey was initial input into an Access database (LISS_Database_FieldCollectionData_2023-07-18.accb). The data files input here are from that database. After July 2023 that database was discontinued. Code for Bed Characteristic data from later surveys is in a separate file....
 ---
 
+#need to fix code somewhere - need to look at more
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
 
 library(readxl)
 library(dplyr)
@@ -27,13 +28,13 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r}
 #read in all bed characteristics. Currently setup for Meghana's filepath
 
-quadratdensity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
+quadratdensity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-rugosity <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
+rugosity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-BedHeight <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
+BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
                      sheet = 1, col_names = TRUE) 
 ```
 
@@ -42,7 +43,7 @@ BedHeight <- read_excel("C:\\Users\\meghana.parikh\\Documents\\GitHub\\EAD-ASEB_
 
 bedheight_summary <- summarySE(data = BedHeight, measurevar = "BedHeight_cm", groupvars = c("Site_Name"))
 
-write.csv(bedheight_summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
+write.csv(bedheight_summary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
 ```
 
 ```{r}
@@ -83,7 +84,7 @@ FENCrugosity_final <- rbind(FENCrugosity_sumall,FENCrugosity_sumzone)
 ASHCrugosity_final <-ASHCrugosity_final %>% mutate(Bed_Section = "NA")
 Rugosity_AllSite_Summary <- rbind(ASHCrugosity_final, FENCrugosity_final)
 
-write.csv(Rugosity_AllSite_Summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Rugosity_AllSite.csv", row.names=FALSE)
+write.csv(Rugosity_AllSite_Summary, "C:/Users/mariah.kachmar/Documents/github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Rugosity_AllSite.csv", row.names=FALSE)
 
 ```
 
@@ -134,7 +135,7 @@ ASHCdensitysummary_zone <- subset(ashc_density_sum_all_zone, select = -c(sd,se,c
     left_join(subset(ashc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Quadrat_Zone") %>%
     left_join(subset(ashc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Quadrat_Zone") 
 
-
+#This is not working - saying ASHCdensitysummary not found. should it be _all?
 ASHCdensitysummary2 <- rbind(ASHCdensitysummary,ASHCdensitysummary_zone)
   
 
@@ -213,7 +214,7 @@ FENCdensitysummary3 <- FENCdensitysummary2 %>%
 
 Density_AllSite <- rbind(ASHCdensitysummary3, FENCdensitysummary3)
 
-write.csv(Density_AllSite, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Density_AllSite.csv", row.names=FALSE)
+write.csv(Density_AllSite, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Density_AllSite.csv", row.names=FALSE)
 ```
 
 ```{r}

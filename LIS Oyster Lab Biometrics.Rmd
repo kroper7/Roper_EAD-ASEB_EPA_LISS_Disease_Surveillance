@@ -5,9 +5,8 @@ output: html_notebook
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 11/22/2023 by M. Kachmar
-- added description to the code above
-- facet wrapped the histograms by month for body condition distribution
+Updated 11/30/2023 by M. Kachmar
+
  
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
@@ -86,7 +85,7 @@ data_all <- data_all %>%
   subset(lab_id != "0723LAUR_20") %>%
   subset(lab_id != "0723LAUR_26")
 
-View(data_all)
+data_all
 
 ```
 
@@ -94,7 +93,7 @@ View(data_all)
 ```{r}
 data_all$height_mm[data_all$height_mm == "8.62"] <- "NA"
 
-View(data_all)
+
 
 ```
 # Summary of all data 
@@ -124,7 +123,7 @@ ggplot(data=data_all, aes(x=site, y=condition_score, fill=site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition ", x ="site", y = "Mean Body condition score")
+  labs(title="Mean Condition Score ", x ="site", y = "Mean Body Condition Score")+ scale_y_reverse()
 ```
 
 # Ash Creek Summary
