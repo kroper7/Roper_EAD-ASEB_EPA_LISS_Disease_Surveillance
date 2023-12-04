@@ -6,6 +6,9 @@ output: html_document
 
 description: This R code is used to import and summarize recruitment data collected using shellstringers from the LISS Oyster Health Project at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
+#Last updated 12/4/2023 by M.Kachmar
+#Accuracy of spat counting 0.75 - did not double read for all collections and we lost data due to shell stringers disappearing
+#Would like to discuss this data - NAs frequent. Is this because stringers were not counted? I would like to add notes into the code explaining things like this. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -74,16 +77,71 @@ ggplot(data=data_all, aes(x=Site, y=Count_1, fill=Site)) +
 ```
 
 
-
+#Comparing counter 1 & counter 2
 
 ```{r}
+data_all$results = ifelse(data_all$Count_1 < data_all$Count_2, 'FALSE',
+  ifelse(data_all$Count_1 > data_all$Count_2, 'FALSE',
+  ifelse(data_all$Count_1 == data_all$Count_2, 'TRUE', NA)))
+  
+data_all
+```
+#Counter accuracy
+```{r}
+#count TRUE values in vector
+x <- Data_Accuracy %>% 
+  dplyr::group_by(data_all.site, data_all.date_collected, data_all.results) %>% 
+  dplyr::summarise(count = n())
+x2 <- x %>% 
+  dplyr::group_by()
+x
+T <- nrow(Data_Accuracy %>% filter(data_all.results == 'TRUE'))
+F <- nrow(Data_Accuracy %>% filter(data_all.results == 'FALSE'))
+
+Accuracy <- T/(T+F)
+Accuracy
+
+
+```
+#Ash creek summary
+```{r}
+
+df_ASHC<- data_all %>%
+  filter(Site == "ASHC")
+
+st_rec_ASHC <- summarySE(df_ASHC, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
+st_rec_ASHC
+
 
 ```
 
+#Fence Creek summary
+```{r}
+df_FENC<- data_all %>%
+  filter(Site == "FENC")
 
+st_rec_FENC <- summarySE(df_FENC, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
+st_rec_FENC
+```
 
+#Gold star beach summary
+```{r}
+df_GOLD<- data_all %>%
+  filter(Site == "GOLD")
 
+st_rec_GOLD <- summarySE(df_GOLD, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
+st_rec_GOLD
+```
 
+#Laurel Hollow summary
+```{r}
+df_LAUR<- data_all %>%
+  filter(Site == "LAUR")
+
+st_rec_LAUR <- summarySE(df_LAUR, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
+st_rec_LAUR
+
+```
 
 
 
