@@ -25,8 +25,9 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
+#read in all bed characteristics. Currently setup for Mariah's filepath
 ```{r}
-#read in all bed characteristics. Currently setup for Meghana's filepath
+#read in all bed characteristics. Currently setup for Mariah's filepath
 
 quadratdensity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
                      sheet = 1, col_names = TRUE) 
@@ -38,24 +39,24 @@ BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_
                      sheet = 1, col_names = TRUE) 
 ```
 
-```{r}
 #Summary of bed height at each site 
+```{r}
 
 bedheight_summary <- summarySE(data = BedHeight, measurevar = "BedHeight_cm", groupvars = c("Site_Name"))
+
+bedheight_summary
 
 write.csv(bedheight_summary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
 ```
 
+
+#Summary of rugosity at each site
 ```{r}
-#Summary of rugosity at each site 
-
-
 
 #need to separate Ash and Fence Creeks
 
 ashc_rug <- rugosity %>% filter(Site_Name == "Ash Creek")
 fenc_rug <- rugosity %>% filter(Site_Name == "Fence Creek")
-
 
 
 #ASHC rugosity summaries
@@ -67,6 +68,7 @@ ASHCrugosity_sumall <-summarySE(data = ashc_rug, measurevar = "Rugosity", groupv
 ASHCrugosity_sumall <- ASHCrugosity_sumall %>% mutate(Zone = "All")
 ASHCrugosity_final <- rbind(ASHCrugosity_sumall,ASHCrugosity_sumzone)
 
+ASHCrugosity_final
 
 
 #FENC rugosity summaries
@@ -83,6 +85,8 @@ FENCrugosity_final <- rbind(FENCrugosity_sumall,FENCrugosity_sumzone)
 
 ASHCrugosity_final <-ASHCrugosity_final %>% mutate(Bed_Section = "NA")
 Rugosity_AllSite_Summary <- rbind(ASHCrugosity_final, FENCrugosity_final)
+
+Rugosity_AllSite_Summary
 
 write.csv(Rugosity_AllSite_Summary, "C:/Users/mariah.kachmar/Documents/github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Rugosity_AllSite.csv", row.names=FALSE)
 
@@ -101,9 +105,9 @@ ashc_density$AllCount_Total <- rowSums(ashc_density[, c("LiveCount_Total", "BoxC
 fenc_density$AllCount_Total <- rowSums(fenc_density[, c("LiveCount_Total", "BoxCount_Total", "GaperCount_Total")])
 ```
 
+#oyster density metrics
 
 ```{r}
-#oyster density metrics
 #############AshCreek Summary ##############
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
@@ -125,18 +129,26 @@ ashc_density_sum_live <- ashc_density_sum_live %>% mutate(Quadrat_Zone = "All")
 ashc_density_sum_box <- ashc_density_sum_box %>% mutate(Quadrat_Zone = "All")
 ashc_density_sum_gaper <- ashc_density_sum_gaper %>% mutate(Quadrat_Zone = "All")
 
-ASHCdensitysummary_all <- subset(ashc_density_sum_all, select = -c(sd,se,ci)) %>%
+
+
+ASHCdensitysummary_all <- subset(ashc_density_sum_all, select = -c(sd,se,ci, Quadrat_Zone)) %>%
     left_join(subset(ashc_density_sum_live, select = -c(N,sd,se,ci)), by = "Site_Name", "Quadrat_Zone") %>%
     left_join(subset(ashc_density_sum_box, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name", "Quadrat_Zone") %>%
     left_join(subset(ashc_density_sum_gaper, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name", "Quadrat_Zone") 
+
+
+
 
 ASHCdensitysummary_zone <- subset(ashc_density_sum_all_zone, select = -c(sd,se,ci)) %>%
     left_join(subset(ashc_density_sum_live_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Quadrat_Zone") %>%
     left_join(subset(ashc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Quadrat_Zone") %>%
     left_join(subset(ashc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Quadrat_Zone") 
 
+
+
+
 #This is not working - saying ASHCdensitysummary not found. should it be _all?
-ASHCdensitysummary2 <- rbind(ASHCdensitysummary,ASHCdensitysummary_zone)
+ASHCdensitysummary2 <- rbind(ASHCdensitysummary_all,ASHCdensitysummary_zone)
   
 
 #renaming for clarity and to allow for binding with Fence Creek Data 
@@ -148,12 +160,12 @@ ASHCdensitysummary3 <- ASHCdensitysummary2 %>%
       LiveCount_Mean = LiveCount_Total,
       BoxCount_Mean = BoxCount_Total, 
       GaperCount_Mean = GaperCount_Total) 
-
+ASHCdensitysummary3
 
 ```
-
-```{r}
 #oyster density metrics
+```{r}
+
 ##################  Fence Creek Summary #################
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval

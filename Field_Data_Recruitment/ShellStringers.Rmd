@@ -11,6 +11,7 @@ description: This R code is used to import and summarize recruitment data collec
 #Would like to discuss this data - NAs frequent. Is this because stringers were not counted? I would like to add notes into the code explaining things like this. 
 #Best way to report recruitment to stakeholders?
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
