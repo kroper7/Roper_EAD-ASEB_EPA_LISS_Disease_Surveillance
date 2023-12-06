@@ -34,8 +34,9 @@ library(ggplot2)
 #### need to work on this chunk to read in all files at once - not ready to use
 data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
   pattern = "*.xlsx", full.names = TRUE) %>%         # Identify all xlsx files
-  lapply(read_excel) %>%                            # Store all files in list
-data_all                                            # Print data to RStudio console
+  lapply(read_excel)                           # Store all files in list
+
+  data_all                                            # Print data to RStudio console
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
@@ -298,11 +299,11 @@ df_density_ASHC <- df_quadrat_ASHC %>%
   dplyr::summarize(Density = sum(Count)*4)
 df_density_ASHC
 
-#Sum of Oysters per m^2 across all quadrats
-total_oysters_ASHC <- df_density_ASHC %>%
+#Mean of Oysters per m^2 across all quadrats
+mean_total_oysters_ASHC <- df_density_ASHC %>%
   group_by(Site, Season, Survival_status) %>%
-  summarize(Total_Density = sum(Density))
-total_oysters_ASHC
+  summarize(Total_Density = mean(Density))
+mean_total_oysters_ASHC
  
 
 #Density per quadrat totals
@@ -314,7 +315,7 @@ ggplot(data=df_quadrat_ASHC, aes(x= Survival_status, y = Count, fill = Survival_
   facet_wrap(~ Season, scales = "free")
 
 #Density of oysters per meter squared
-ggplot(data=df_density_ASHC, aes(x= Survival_status, y = Density, fill = Survival_status)) +
+ggplot(data=mean_total_oysters_ASHC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
@@ -352,11 +353,11 @@ df_density_FENC <- df_quadrat_FENC %>%
   dplyr::summarize(Density = sum(Count)*4)
 df_density_FENC
 
-#Sum of Oysters per m^2 across all quadrats
-total_oysters_FENC <- df_density_FENC %>%
+#mean of Oysters per m^2 across all quadrats
+mean_total_oysters_FENC <- df_density_FENC %>%
   group_by(Site, Season, Survival_status) %>%
-  summarize(Total_Density = sum(Density))
-total_oysters_FENC
+  summarize(Total_Density = mean(Density))
+mean_total_oysters_FENC
 
 #Density per quadrat totals
 ggplot(data=df_quadrat_FENC, aes(x= Survival_status, y = Count, fill = Survival_status)) +
@@ -367,7 +368,7 @@ ggplot(data=df_quadrat_FENC, aes(x= Survival_status, y = Count, fill = Survival_
   facet_wrap(~ Season, scales = "free")
 
 #Density of oysters per meter squared
-ggplot(data=df_density_FENC, aes(x= Survival_status, y = Density, fill = Survival_status)) +
+ggplot(data=mean_total_oysters_FENC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
