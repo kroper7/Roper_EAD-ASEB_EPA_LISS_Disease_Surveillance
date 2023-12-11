@@ -148,6 +148,20 @@ ggplot(data=data_all, aes(x=site, y=condition_score, fill=site)) +
   labs(title="Mean Condition Score ", x ="site", y = "Mean Body Condition Score")+ scale_y_reverse()
 ```
 
+```{r}
+
+mean_body_condition <- data_all %>%
+  dplyr::group_by(site, month)%>%
+  dplyr::summarize(mean_bsc = mean(condition_score, na.rm = TRUE))
+mean_body_condition
+  
+ggplot(data=data_all, aes(x=month, y=condition_score, group = month, fill = site)) +
+  geom_boxplot()+ 
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Condition Score ", x ="month", y = "Mean Body Condition Score")+ scale_y_reverse()+facet_wrap(~site)
+```
+
 # Ash Creek Summary
 ```{r}
 

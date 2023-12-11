@@ -3,12 +3,12 @@ title: "BedCharacteristics_June2023"
 author: "Meghana Parikh"
 date: "2023-11-17"
 output: html_document
-last updated: 11/30/2023
+last updated: 12/11/2023
 
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's June 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut. The data from this survey was initial input into an Access database (LISS_Database_FieldCollectionData_2023-07-18.accb). The data files input here are from that database. After July 2023 that database was discontinued. Code for Bed Characteristic data from later surveys is in a separate file....
 ---
 
-#need to fix code somewhere - need to look at more
+#all density counts multiplied by 4 (quadrats are only 25x25cm)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -162,6 +162,11 @@ ASHCdensitysummary3 <- ASHCdensitysummary2 %>%
       GaperCount_Mean = GaperCount_Total) 
 ASHCdensitysummary3
 
+ASHCdensitysummary4 <- ASHCdensitysummary3 %>%
+  dplyr::group_by(Site_Name, Quadrat_Zone, Bed_Section) %>% 
+  dplyr::summarize(Live_Density = sum(LiveCount_Mean)*4, Box_Density = sum(BoxCount_Mean)*4, Gaper_Density = sum(GaperCount_Mean)*4)
+ASHCdensitysummary4
+
 ```
 #oyster density metrics
 ```{r}
@@ -217,8 +222,43 @@ FENCdensitysummary3 <- FENCdensitysummary2 %>%
       LiveCount_Mean = LiveCount_Total,
       BoxCount_Mean = BoxCount_Total, 
       GaperCount_Mean = GaperCount_Total) 
+FENCdensitysummary3
+
+# calculating per m^2
+FENCdensitysummary4 <- FENCdensitysummary3 %>%
+  dplyr::group_by(Site_Name, Quadrat_Zone, Bed_Section) %>% 
+  dplyr::summarize(Live_Density = sum(LiveCount_Mean)*4, Box_Density = sum(BoxCount_Mean)*4, Gaper_Density = sum(GaperCount_Mean)*4)
+FENCdensitysummary4
+
   
 ```
+```{r}
+#graphing FENC density by region (lease, ocean, bridge)
+
+#Live
+ggplot(data=FENCdensitysummary4, aes(x= Quadrat_Zone, y= Live_Density, fill = Quadrat_Zone)) +
+  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Fence Creek Density Live ", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  facet_wrap(~ Bed_Section, scales = "free")
+#Box
+ggplot(data=FENCdensitysummary4, aes(x= Quadrat_Zone, y= Box_Density, fill = Quadrat_Zone)) +
+  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Fence Creek Density Box ", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  facet_wrap(~ Bed_Section, scales = "free")
+
+#Gaper
+ggplot(data=FENCdensitysummary4, aes(x= Quadrat_Zone, y= Gaper_Density, fill = Quadrat_Zone)) +
+  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Fence Creek Density Gaper ", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  facet_wrap(~ Bed_Section, scales = "free")
+```
+
 
 ```{r}
 #oyster density metrics
