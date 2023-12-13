@@ -39,6 +39,8 @@ data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB
 data_all                                            # Print data to RStudio console
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
+
+View(data_all)
 ```
 
 
