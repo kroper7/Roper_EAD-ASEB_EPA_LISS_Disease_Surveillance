@@ -51,7 +51,14 @@ file.names.table         <- data.frame(txt.files =
                                                               recursive = FALSE)))) 
 Master_Table             <- data.frame() 
 
+
+# Notes on formatting datas 
+# ymd_hms for 072023_GOLD_Sonde.csv, 072023_LAUR_Sonde.csv, 082023_FENC_Sonde.csv, 082023_GOLD_Sonde.csv, 092023_FENC_Sonde.csv
+# mdy_hms for 072023_ASHC_Sonde.csv
+# mdy_hm for 082023_ASHC_Sonde.csv, 082023_LAUR_Sonde.csv, 092023_ASHC_Sonde.csv, 092023_GOLD_Sonde.csv, 102023_ASHC_Sonde.csv,102023_FENC_Sonde.csv, 102023_GOLD_Sonde.csv, 102023_LAUR_Sonde.csv, 112023_ASHC_Sonde.csv, 112023_FENC_Sonde.csv
+
 # for loop to merge all csv files to one dataframe
+
 for (m in 1:nrow(file.names.table)) {
   # call the dir of the csv file in loop
   raw_Sonde_rootdir        <- paste(path.p,'/',file.names.table[m,1], sep='') #reads in the data files
@@ -66,22 +73,30 @@ for (m in 1:nrow(file.names.table)) {
   raw_df[2:(ncol(raw_df))] <- lapply(raw_df[2:(ncol(raw_df))],as.numeric) # convert all data  to numeric
   # ommit all numeric data, also the format of the units does not pair between datasets, cannot rbind later
   names(raw_df) <- sapply(strsplit(names(raw_df), '\\s*[()]'), `[`, 1) 
-
+  raw_df[,1]
 
   # now for the dates - for some reason the sondes have diff format -  fix it up!
-  if(gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in% 
-     c('082023_ASHC_Sonde.csv', 
-       '082023_LAUR_Sonde.csv', 
+  if(gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in%
+     c('082023_ASHC_Sonde.csv',
+       '082023_LAUR_Sonde.csv',
+
        '092023_ASHC_Sonde.csv',
+       '092023_GOLD_Sonde.csv',
+
        '102023_ASHC_Sonde.csv',
-       '102023_FENC_Sonde.csv'))  { # date formatted as mdy_hm
-    raw_df[,1] <- mdy_hm(raw_df[,1]) # reformat as date using lubridate 
-    } else if (gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in% 
+       '102023_FENC_Sonde.csv',
+       '102023_GOLD_Sonde.csv',
+       '102023_LAUR_Sonde.csv',
+
+       '112023_ASHC_Sonde.csv',
+       '112023_FENC_Sonde.csv'))  { # date formatted as mdy_hm
+    raw_df[,1] <- mdy_hm(raw_df[,1]) # reformat as date using lubridate
+    } else if (gsub(".*/","", (gsub("\\","/",raw_Sonde_rootdir, fixed=T))) %in%
                '072023_ASHC_Sonde.csv') {
       raw_df[,1] <- mdy_hms(raw_df[,1]) # reformat as date using lubridate
     } else (raw_df[,1] <- ymd_hms(raw_df[,1]) # reformat as date using lubridate
   )
-  
+
   # add a column for the site 
   filename      <- file.names.table[m,1]
   raw_df        <- raw_df %>% 
@@ -90,8 +105,9 @@ for (m in 1:nrow(file.names.table)) {
   
   Master_Table <- rbind(raw_df,Master_Table) #bind to a cumulative list dataframe
 }
-
+# View(Master_Table)
 unique(Master_Table$Site)
+
 ```
 
 # Visualize data 
