@@ -201,9 +201,12 @@ for(i in 1:nrow(vars)) {
   } # close the loop
 
 
-# an example 
- Table_by_var %>% 
+# Temperature pre October 1st 2023 
+# why? we have a hefty gap in the FENC data during all october, this is 
+# a clean plot for Genevieve's NACE 2024 presentation
+Sonde_Temp_2023 <- Table_by_var %>% 
     dplyr::filter(variable %in% vars[11,]) %>% 
+    dplyr::filter(`Date Time` < '2023-10-01 00:00:00') %>% 
               ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
@@ -222,6 +225,11 @@ for(i in 1:nrow(vars)) {
               facet_grid(rows = vars(Site), scales = "free_y") +
               ggtitle(vars[11,]) +
               theme_bw()
+ 
+pdf(paste0(path_out,"/raw_plots/Temperature_JuneOct_2023.pdf"), height = 12, width = 15)
+print(Sonde_Temp_2023) 
+dev.off()
+  
 ```
 
 # Clean CT sites (ASHC and FENC) for the LISS proposal
