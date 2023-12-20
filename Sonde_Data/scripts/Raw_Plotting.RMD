@@ -206,7 +206,7 @@ for(i in 1:nrow(vars)) {
 # a clean plot for Genevieve's NACE 2024 presentation
 Sonde_Temp_2023 <- Table_by_var %>% 
     dplyr::filter(variable %in% vars[11,]) %>% 
-    dplyr::filter(`Date Time` < '2023-10-01 00:00:00') %>% 
+    dplyr::filter(`Date Time` > '2023-06-15 00:00:00' & `Date Time` < '2023-10-01 00:00:00') %>% 
               ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
