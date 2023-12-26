@@ -8,7 +8,7 @@ output: html_document
 description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
-Last updated 11/30/23 by M.Kachmar
+Last updated 12/26/23 by M.Kachmar
 
 
 ```{r, setup, include=FALSE}
@@ -268,6 +268,15 @@ ggplot(Height_master, aes(x=Season, y=Height, fill=Site)) +
 
 height_ASHC<- Height_master %>% filter(Site == "ASHC")
 
+height_ASHC<- height_ASHC %>%
+  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
+
+live_height_ASHC<- height_ASHC %>%
+ group_by(Site, Season)%>%
+  filter(Survival_status == "Live")%>%
+  summarize(Mean_Height = mean(Height))
+live_height_ASHC
+
 ggplot(height_ASHC, aes(x=Season, y=Height, fill=Season)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
@@ -280,7 +289,7 @@ ggplot(data=height_ASHC, aes(x= Height)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Height ", x ="Height (mm)")+
-  facet_wrap(~ Season, scales = "free", ncol = 1)
+  facet_wrap(~ Month, scales = "free", ncol = 1)
 
 ```
 
@@ -298,6 +307,11 @@ df_density_ASHC <- df_quadrat_ASHC %>%
   dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
   dplyr::summarize(Density = sum(Count)*4)
 df_density_ASHC
+
+df_density_sum_ASHC <- df_density_ASHC %>%
+  dplyr::group_by(Site, Season, Survival_status) %>% 
+  dplyr::summarize(Density = sum(Density))
+df_density_sum_ASHC
 
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_ASHC <- df_density_ASHC %>%
@@ -458,6 +472,8 @@ ggplot(height_LAUR, aes(x=Season, y=Height, fill=Season)) +
   theme(axis.text=element_text(size=12))
 
 ```
+
+
 #Old code originally for June 2023 survey data format
 ```{r}
 #oyster density metrics 
