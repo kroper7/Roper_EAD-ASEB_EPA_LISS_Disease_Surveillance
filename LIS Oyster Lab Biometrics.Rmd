@@ -5,7 +5,7 @@ output: html_notebook
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 11/30/2023 by M. Kachmar
+Updated 12/27/23/2023 by M. Kachmar
 
  
 
@@ -26,29 +26,13 @@ library("lubridate")
 setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
 ```
 
-#Reading in google sheets from the good drive
-
-```{r}
-#Install the required package
-#install.packages('googlesheets4')
-
-library(googlesheets4)
-```
-
-```{r}
-#ASHC_0423 <- read_sheet("https://docs.google.com/spreadsheets/d/1FTIfau5DBKxqmWdYpQB--2qYXgYGwsqRw3Qxy7Zi7Wk/edit?usp=drive_link")
-```
-
-```{r}
-#head(ASHC_0423)
-```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data frame and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
 data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%                              # Store all files in list
+  lapply(read_csv) %>%     # Store all files in list
   bind_rows                                         # Combine data sets into one data set 
 data_all                                            # Print data to RStudio console
 
@@ -179,6 +163,11 @@ st_height_ASHC
 st_condition_ASHC<- summarySE(df_ASHC, measurevar = "condition_score", groupvars = c("date_collected"))
 st_condition_ASHC
 
+mean_condition_ASHC <- st_condition_ASHC %>%
+  filter(!is.na(condition_score)) %>%  # Filter out rows where condition_score is NA
+  summarize(mean_bcs = mean(condition_score, na.rm = TRUE))
+mean_condition_ASHC
+
 ```
 
 
@@ -192,12 +181,16 @@ ggplot(data=df_ASHC, aes(x=month, y=height_mm, group= month)) +
 
 ```{r}
 #Condition distribution across all sample months
-ggplot(data=df_ASHC, aes(x= condition)) +
+ASHC_BCS_dist <-ggplot(data=df_ASHC, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Body Condition Score ", x ="Condition categorization")+
   facet_wrap(~ month, scales = "free")
+
+pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/ASHC_BCS_dist.pdf"), height = 7, width = 13)
+print(ASHC_BCS_dist)
+dev.off()
 
 #Mean Body condition per month
 ggplot(data=df_ASHC, aes(x= month, y= condition_score, group = month)) +

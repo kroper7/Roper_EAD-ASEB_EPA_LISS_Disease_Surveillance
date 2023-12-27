@@ -602,6 +602,7 @@ ASHC_Salinity_callout <- ASHC_Salinity %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 
+ASHC_Salinity_callout
 pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Salinity.pdf"), height = 6, width = 11)
 ggarrange(ASHC_Salinity_all,ASHC_Salinity_callout, ncol = 2, widths = c(2, 1))
 dev.off()
