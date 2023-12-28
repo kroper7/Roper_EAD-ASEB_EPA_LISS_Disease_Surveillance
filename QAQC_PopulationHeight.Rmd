@@ -13,7 +13,7 @@ Last updated 12/26/23 by M.Kachmar
 
 ```{r, setup, include=FALSE}
 
-knitr::opts_knit$set(root.dir = 'C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
 
 
 install.packages("tidyverse")
@@ -301,11 +301,11 @@ df_quadrat_ASHC <- quadratdensity_all%>%
   filter(Site == "ASHC")
 df_quadrat_ASHC
 
-#Quadrat size is 25 x25cm. To calculate density (oysters per m^2) multiply number of oysters counted X 4
+#Quadrat size is 25 x25cm (.0625 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 16
 
 df_density_ASHC <- df_quadrat_ASHC %>%
   dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
-  dplyr::summarize(Density = sum(Count)*4)
+  dplyr::summarize(Density = sum(Count)*16)
 df_density_ASHC
 
 df_density_sum_ASHC <- df_density_ASHC %>%
