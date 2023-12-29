@@ -21,9 +21,10 @@ library("ggplot2")
 library("lubridate")
 ```
 
-```{r}
+```{r setup, include = FALSE}
 #Set Path
-setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
+#setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
 ```
 
 
