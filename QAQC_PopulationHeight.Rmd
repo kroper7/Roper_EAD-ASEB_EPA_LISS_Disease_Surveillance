@@ -288,7 +288,9 @@ ggplot(data=height_ASHC, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Height ", x ="Height (mm)")+
+  labs(title="Ash Creek Height ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  ylim(0,50)+
+  
   facet_wrap(~ Month, scales = "free", ncol = 1)
 
 ```
