@@ -479,7 +479,7 @@ dev.off()
 ```
 
 # Clean ASHC for the LISS stakeholder reports
-```{r, figs for LISS proposal}
+```{r, figs for LISS stakeholder reports}
 
 ASHC_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('ASHC'))
 ASHC_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('ASHC'))
@@ -540,8 +540,9 @@ ASHC_pH_callout <- ASHC_pH %>% na.omit() %>%
 ASHC_pH_all
 ASHC_pH_callout
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_pH.pdf"), height = 6, width = 11)
-print(ASHC_pH_all, ncol = 2, widths = c(2, 1))
+pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_pH.pdf"), height = 7, width = 14)
+print(ASHC_pH_all)
+#ggarrange(ASHC_pH_all,ASHC_pH_callout, ncol = 2, widths = c(2, 1))
 dev.off()
   
 
@@ -603,8 +604,10 @@ ASHC_Salinity_callout <- ASHC_Salinity %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 
 ASHC_Salinity_callout
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Salinity.pdf"), height = 6, width = 11)
-ggarrange(ASHC_Salinity_all,ASHC_Salinity_callout, ncol = 2, widths = c(2, 1))
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Salinity.pdf"), height = 7, width = 14)
+print(ASHC_Salinity_all)
+#ggarrange(ASHC_Salinity_all,ASHC_Salinity_callout, ncol = 2, widths = c(2, 1))
 dev.off()
 
 
@@ -635,7 +638,7 @@ ASHC_Temperature_all <-ASHC_Temperature %>% na.omit() %>%
               theme(legend.position = "none")
 ASHC_Temperature_all
 
-CT_Temperature_callout <- CT_Temperature %>% na.omit() %>%
+ASHC_Temperature_callout <- ASHC_Temperature %>% na.omit() %>%
              dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
@@ -659,9 +662,11 @@ CT_Temperature_callout <- CT_Temperature %>% na.omit() %>%
               labs(x = "Time") +
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
+ASHC_Temperature_callout
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_Temperature.pdf"), height = 6, width = 11)
-ggarrange(CT_Temperature_all, CT_Temperature_callout, ncol = 2, widths = c(2, 1))
+pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Temperature.pdf"), height = 7, width = 14)
+print(ASHC_Temperature_all)
+#ggarrange(ASHC_Temperature_all, ASHC_Temperature_callout, ncol = 2, widths = c(2, 1))
 dev.off()
 
 
@@ -692,7 +697,7 @@ ASHC_DO_all <- ASHC_DO %>% na.omit() %>%
               theme(legend.position = "none")
 ASHC_DO_all
 
-CT_DO_callout <- CT_DO %>% na.omit() %>%
+ASHC_DO_callout <- ASHC_DO %>% na.omit() %>%
              dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
@@ -717,8 +722,9 @@ CT_DO_callout <- CT_DO %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_DO.pdf"), height = 6, width = 11)
-ggarrange(CT_DO_all, CT_DO_callout, ncol = 2, widths = c(2, 1))
+pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_DO.pdf"), height = 7, width = 14)
+print(ASHC_DO_all)
+#ggarrange(ASHC_DO_all, ASHC_DO_callout, ncol = 2, widths = c(2, 1))
 dev.off()
 
 #Chlorophyll-a
@@ -748,4 +754,7 @@ ASHC_CHLA_all <- ASHC_CHLA %>% na.omit() %>%
               theme(legend.position = "none")
 
 ASHC_CHLA_all
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_CHLA.pdf"), height = 7, width = 14)
+print(ASHC_CHLA_all)
 ```
