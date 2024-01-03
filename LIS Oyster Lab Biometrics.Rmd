@@ -45,7 +45,7 @@ data_all
 
 write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
 
-View(data_all)
+data_all
  
 ```
 
@@ -151,6 +151,34 @@ ggplot(data=data_all, aes(x=month, y=condition_score, group = month, fill = site
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Mean Condition Score ", x ="month", y = "Mean Body Condition Score")+ scale_y_reverse()+facet_wrap(~site)
+```
+#Proportions graph Body condition scores
+
+```{r}
+data_all
+df_BCS_proportions<- data_all %>%
+  mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
+  group_by(site, month, condition_score_bin) %>%
+  summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+
+df_BCS_proportions<- na.omit(df_BCS_proportions)
+
+df_BCS_proportions
+
+BCS_proportion_all<- ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Ash Creek proportion of body condition scores June- November", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ #scale_fill_brewer() +
+  facet_wrap(~ site)
+
+pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/BCS_proportion_all.pdf"), height = 7, width = 13)
+print(BCS_proportion_all)
+dev.off()
 ```
 
 # Ash Creek Summary
