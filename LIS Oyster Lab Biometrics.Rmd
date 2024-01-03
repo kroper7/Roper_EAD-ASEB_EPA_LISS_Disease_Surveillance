@@ -269,23 +269,37 @@ BCS_proportion_ASHC<- ggplot(data=ASHC_BCS_proportions, aes(x=month, y= Proporti
 pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/BCS_proportion_ASHC.pdf"), height = 7, width = 13)
 print(BCS_proportion_ASHC)
 dev.off()
-
+```
 
 # % of scores >3 at ash creek june - november 
+```{r}
 df_ASHC
 
 ASHC_precent_greater_3 <- df_ASHC %>%
   dplyr::group_by(month, site) %>%
-  dplyr::summarise(Percentage = mean(condition_score > 3, na.rm = TRUE)*100)
+  dplyr::summarise(Percentage = mean(condition_score <= 3)*100)
 ASHC_precent_greater_3
 
-ASHC_BCS_precentage<- ASHC_precent_greater_3 %>% na.omit() %>%
-  ggplot(aes(x=month, y= Percentage)) +
-  geom_bar(width = .5, stat="identity", position = "fill")+  
-   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Ash Creek % of body condition scores >3 June- November", x ="month", y = "Precentage of body condition scores >3 ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))
+ASHC_BCS_percentage <- ASHC_precent_greater_3 
+  ggplot(ASHC_precent_greater_3,aes(x = month, y = Percentage)) +
+  #geom_bar(width = 0.5, stat = "identity", position = "fill") +
+    geom_col()+
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+    axis.title.y = element_text(size = rel(1.3), angle = 90),
+    axis.title.x = element_text(size = rel(1.3), angle = 0),
+    axis.text = element_text(size = 12)
+  ) +
+  labs(
+    title = "Ash Creek % of body condition scores >= 3 June- November",
+    x = "month",
+    y = "Percentage of body condition scores >= 3"
+  )+ scale_x_continuous( breaks = seq(5,12, by =1) )+
+  #ylim(0,60)+ 
+  scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
 
 pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing", "/ASHC_BCS_percentage.pdf"),height = 7, width = 13)
 print(ASHC_BCS_percentage)
@@ -507,7 +521,8 @@ ggplot(data=df_GOLD, aes(x=month, y=height_mm, group= month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Beach Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
+  labs(title="Goldstar Beach Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)") + scale_x_continuous(limits= c(4,11), breaks = seq(5,10, by =1))+
+  geom_smooth(method = "lm", se = FALSE)
 
 ```
 
