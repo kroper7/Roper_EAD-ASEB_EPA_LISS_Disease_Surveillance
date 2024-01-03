@@ -511,7 +511,7 @@ ASHC_pH_all <- ASHC_pH %>% na.omit() %>%
               ggtitle("pH ") +
               labs(x = "Time", y = "pH") +
               theme_classic() +
-              theme(legend.position = "none")
+              theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_pH_callout <- ASHC_pH %>% na.omit() %>%
              dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
@@ -548,8 +548,6 @@ dev.off()
 
 
 
-
-
 # Salinity 
 
 ASHC_Salinity_all <- ASHC_Salinity %>% na.omit() %>%
@@ -574,7 +572,7 @@ ASHC_Salinity_all <- ASHC_Salinity %>% na.omit() %>%
               ggtitle("Salinity") +
               labs(x = "Time", y = "Salinity") +
               theme_classic() +
-              theme(legend.position = "none")
+              theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_Salinity_all
 
@@ -635,7 +633,7 @@ ASHC_Temperature_all <-ASHC_Temperature %>% na.omit() %>%
               ggtitle("Temperature") +
               labs(x = "Time", y = "Temperature (Celcius)") +
               theme_classic() +
-              theme(legend.position = "none")
+              theme(legend.position = "none", axis.text= element_text(size= 15))
 ASHC_Temperature_all
 
 ASHC_Temperature_callout <- ASHC_Temperature %>% na.omit() %>%
@@ -694,8 +692,7 @@ ASHC_DO_all <- ASHC_DO %>% na.omit() %>%
               ggtitle("DO Concentration") +
               labs(x = "Time", y = "DO Concentration (mg/L)") +
               theme_classic() +
-              theme(legend.position = "none")
-ASHC_DO_all
+              theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_DO_callout <- ASHC_DO %>% na.omit() %>%
              dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% 
@@ -749,12 +746,336 @@ ASHC_CHLA_all <- ASHC_CHLA %>% na.omit() %>%
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
               ggtitle("Chlorophyll-a flourescences ") +
-              labs(x = "Time", y = "Chlorophyll-a") +
+              labs(x = "Time", y = "Chlorophyll-a (RFU)") +
               theme_classic() +
-              theme(legend.position = "none")
+              theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_CHLA_all
 
 pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_CHLA.pdf"), height = 7, width = 14)
 print(ASHC_CHLA_all)
+```
+
+```{r}
+
+## DAILY AVERAGES OF DO - ASHC###
+
+ASHC_DO$`Date Time` <- as.character(ASHC_DO$`Date Time`)
+date_time <- strsplit(ASHC_DO$`Date Time`, " ")  # Split at the space
+print(ASHC_DO)
+
+# Create separate columns for date and time
+ASHC_DO$date <- sapply(date_time, "[[", 1)  # Extract date
+ASHC_DO$time <- sapply(date_time, "[[", 2)
+print(ASHC_DO)
+
+
+ASHC_DO_avg <- ASHC_DO %>% na.omit() %>%
+  dplyr::group_by(date , Site)%>%
+  dplyr::summarize(Daily_mean = mean(mean))
+ASHC_DO_avg
+
+
+class(ASHC_DO_avg$Date)
+ASHC_DO_avg$date <- as.Date(ASHC_DO_avg$date)
+
+ASHC_DAILY_DO <- ASHC_DO_avg %>% ggplot(aes(x= date, 
+                       y=Daily_mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              #geom_errorbar(aes(ymin=(mean)-(se), 
+                                #ymax=(mean)+(se)), 
+                           # width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration") +
+              labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d") 
+
+
+ASHC_DAILY_DO
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_daily_DO.pdf"), height = 7, width = 14)
+print(ASHC_DAILY_DO)
+
+# Monthly mean temperatures ASHC
+ASHC_Temperature$`Date Time` <- as.character(ASHC_Temperature$`Date Time`)
+date_time <- strsplit(ASHC_Temperature$`Date Time`, " ")  # Split at the space
+print(ASHC_Temperature)
+
+# Create separate columns for date and time
+ASHC_Temperature$date <- sapply(date_time, "[[", 1)  # Extract date
+ASHC_Temperature$time <- sapply(date_time, "[[", 2)
+print(ASHC_Temperature)
+
+ASHC_Temperature$Month <- month(ASHC_Temperature$date, label = TRUE)
+head(ASHC_Temperature)
+
+ASHC_Monthly_Temperature <- ASHC_Temperature %>% na.omit() %>%
+  dplyr::group_by(Month , Site)%>%
+  dplyr::summarize(Monthly_mean = mean(mean))
+ASHC_Monthly_Temperature
+
+```
+# Clean GOLD for the LISS stakeholder reports
+```{r, figs for LISS stakeholder reports}
+
+GOLD_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('GOLD'))
+GOLD_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('GOLD'))
+GOLD_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('GOLD'))
+GOLD_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('GOLD'))
+GOLD_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('GOLD'))
+
+# pH 
+
+GOLD_pH_all <- GOLD_pH %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("pH ") +
+              labs(x = "Time", y = "pH") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+
+GOLD_pH_all
+
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/GOLD_pH.pdf"), height = 7, width = 14)
+print(GOLD_pH_all)
+dev.off()
+  
+
+
+# Salinity 
+
+GOLD_Salinity_all <- GOLD_Salinity %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity") +
+              labs(x = "Time", y = "Salinity") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+GOLD_Salinity_all
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/GOLD_Salinity.pdf"), height = 7, width = 14)
+print(GOLD_Salinity_all)
+dev.off()
+
+
+# Temperature 
+
+GOLD_Temperature_all <-GOLD_Temperature %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+GOLD_Temperature_all
+
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/GOLD_Temperature.pdf"), height = 7, width = 14)
+print(GOLD_Temperature_all)
+dev.off()
+
+
+# DO 
+
+GOLD_DO_all <- GOLD_DO %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration") +
+              labs(x = "Time", y = "DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/GOLD_DO.pdf"), height = 7, width = 14)
+print(GOLD_DO_all)
+dev.off()
+
+#Chlorophyll-a
+
+GOLD_CHLA_all <- GOLD_CHLA %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Chlorophyll-a flourescences ") +
+              labs(x = "Time", y = "Chlorophyll-a (RFU)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+GOLD_CHLA_all
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/GOLD_CHLA.pdf"), height = 7, width = 14)
+print(GOLD_CHLA_all)
+```
+
+```{r}
+
+## DAILY AVERAGES OF DO - GOLD###
+
+GOLD_DO$`Date Time` <- as.character(GOLD_DO$`Date Time`)
+date_time <- strsplit(GOLD_DO$`Date Time`, " ")  # Split at the space
+print(GOLD_DO)
+
+# Create separate columns for date and time
+GOLD_DO$date <- sapply(date_time, "[[", 1)  # Extract date
+GOLD_DO$time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(GOLD_DO)
+
+
+GOLD_DO_avg <- GOLD_DO %>% na.omit() %>%
+  dplyr::group_by(date , Site)%>%
+  dplyr::summarize(Daily_mean = mean(mean))
+GOLD_DO_avg
+
+
+class(GOLD_DO_avg$Date)
+GOLD_DO_avg$date <- as.Date(GOLD_DO_avg$date)
+
+GOLD_DAILY_DO <- GOLD_DO_avg %>% ggplot(aes(x= date, 
+                       y=Daily_mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              #geom_errorbar(aes(ymin=(mean)-(se), 
+                                #ymax=(mean)+(se)), 
+                           # width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration") +
+              labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d") 
+
+
+GOLD_DAILY_DO
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/GOLD_daily_DO.pdf"), height = 7, width = 14)
+print(GOLD_DAILY_DO)
+
+# Monthly mean temperatures ASHC
+GOLD_Temperature$`Date Time` <- as.character(GOLD_Temperature$`Date Time`)
+date_time <- strsplit(GOLD_Temperature$`Date Time`, " ")  # Split at the space
+print(GOLD_Temperature)
+
+# Create separate columns for date and time
+GOLD_Temperature$date <- sapply(date_time, "[[", 1)  # Extract date
+GOLD_Temperature$time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(GOLD_Temperature)
+
+GOLD_Temperature$Month <- month(GOLD_Temperature$date, label = TRUE)
+head(GOLD_Temperature)
+
+GOLD_Monthly_Temperature <- GOLD_Temperature %>% na.omit() %>%
+  dplyr::group_by(Month , Site)%>%
+  dplyr::summarize(Monthly_mean = mean(mean))
+GOLD_Monthly_Temperature
+
 ```
