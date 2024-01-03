@@ -37,9 +37,15 @@ data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB
   bind_rows                                         # Combine data sets into one data set 
 data_all                                            # Print data to RStudio console
 
-as.data.frame(data_all)                            # Convert tibble to data.frame
+as.data.frame(data_all)  # Convert tibble to data.frame
+
+#Filtering NAs 
+data_all <- data_all %>% filter(!is.na(date_collected))
+data_all
 
 write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
+
+View(data_all)
  
 ```
 
