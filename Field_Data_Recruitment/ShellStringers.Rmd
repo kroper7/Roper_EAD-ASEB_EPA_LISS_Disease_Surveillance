@@ -38,9 +38,9 @@ data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB
   bind_rows                                         # Combine data sets into one data set 
 data_all                                            # Print data to RStudio console
 
+
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
-View(data_all)
 ```
 
 
@@ -69,6 +69,11 @@ st_rec$Completeness <- st_rec$N /24
 st_rec
 
 #write.csv(st_height, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\Completeness_tissue_processing_data.csv", row.names=FALSE)
+```
+
+```{r}
+Avg_spat_stringer <- summarySE(data_all, measurevar="Count_1", groupvars=c("Site", "date_collected"))
+Avg_spat_stringer
 ```
 
 ```{r}
@@ -112,9 +117,26 @@ Accuracy
 
 df_ASHC<- data_all %>%
   filter(Site == "ASHC")
+df_ASHC
 
 st_rec_ASHC <- summarySE(df_ASHC, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
 st_rec_ASHC
+
+#Mean spat per shell per replicate
+ASHC_spat <- df_ASHC %>%
+  group_by(Replicate, Shell, date_collected) %>%
+  summarize(sum_count_1 = sum(Count_1),sum_count_2 = sum(Count_2))
+ASHC_spat
+
+ASHC_spat_avg <- ASHC_spat %>%
+  group_by(Replicate, date_collected)%>%
+  summarize(Mean_1 = mean(sum_count_1), Mean_2 = mean(sum_count_2))
+ASHC_spat_avg
+
+ASHC_spat_avg2 <- ASHC_spat_avg %>%
+  group_by(date_collected)%>%
+  summarize(mean_1 = mean(Mean_1), mean_2 = mean(Mean_2))
+ASHC_spat_avg2
 
 
 ```
