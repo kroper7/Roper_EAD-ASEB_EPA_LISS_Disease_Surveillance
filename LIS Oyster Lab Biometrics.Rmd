@@ -168,7 +168,7 @@ df_BCS_proportions<- na.omit(df_BCS_proportions)
 df_BCS_proportions
 
 BCS_proportion_all<- ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
-  geom_bar(width = .5, stat="identity", position = "fill")+  
+  geom_bar(width = .5, stat="identity", position = "fill", colour = "black")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Proportion of body condition scores April- November", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
@@ -513,6 +513,72 @@ st_height_GOLD
 ## Body Condition ##
 st_condition_GOLD<- summarySE(df_GOLD, measurevar = "condition_score", groupvars = c("date_collected"))
 st_condition_GOLD
+
+```
+#GOLD Proportions graph Body condition scores
+
+```{r}
+
+GOLD_BCS_proportions<- df_GOLD %>%
+  mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
+  group_by(site, month, condition_score_bin) %>%
+  summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+
+GOLD_BCS_proportions<- na.omit(GOLD_BCS_proportions)
+
+GOLD_BCS_proportions
+
+BCS_proportion_GOLD <- ggplot(data=GOLD_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Gold Star Beach Proportion of body condition scores June- November", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ #scale_fill_brewer() +
+  #facet_wrap(~ site)
+
+pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/BCS_proportion_GOLD.pdf"), height = 7, width = 13)
+print(BCS_proportion_GOLD)
+dev.off()
+```
+
+# % of scores >3 at ash creek june - november 
+```{r}
+df_GOLD
+
+GOLD_precent_greater_3 <- df_GOLD %>%
+  dplyr::group_by(month, site) %>%
+  dplyr::summarise(Percentage = mean(condition_score <= 3)*100)
+GOLD_precent_greater_3
+
+GOLD_BCS_percentage <- GOLD_precent_greater_3 
+  ggplot(GOLD_precent_greater_3,aes(x = month, y = Percentage)) +
+  #geom_bar(width = 0.5, stat = "identity", position = "fill") +
+    geom_col()+
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+    axis.title.y = element_text(size = rel(1.3), angle = 90),
+    axis.title.x = element_text(size = rel(1.3), angle = 0),
+    axis.text = element_text(size = 12)
+  ) +
+  labs(
+    title = "Gold Star Beach % of body condition scores >= 3 June- November",
+    x = "month",
+    y = "Percentage of body condition scores >= 3"
+  )+ scale_x_continuous( breaks = seq(5,12, by =1) )+
+  #ylim(0,60)+ 
+  scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
+
+pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing", "/GOLD_BCS_percentage.pdf"),height = 7, width = 13)
+print(GOLD_BCS_percentage)
+dev.off() 
+
+
 
 ```
 
