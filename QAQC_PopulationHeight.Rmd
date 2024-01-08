@@ -208,7 +208,7 @@ shellsize_all <-
 shellsize_all
 
 shellsize_live <- 
-  Height_master %>% group_by(Season) %>% filter(Survival_status=="Live") %>%
+  Height_master %>% group_by(Site, Season) %>% filter(Survival_status=="Live") %>%
    summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
@@ -219,7 +219,7 @@ shellsize_live <-
 shellsize_live
 
 shellsize_box <- 
-  Height_master %>%  group_by(Season) %>%filter(Survival_status=="Box") %>%
+  Height_master %>%  group_by(Site, Season) %>%filter(Survival_status=="Box") %>%
    summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
@@ -229,7 +229,7 @@ shellsize_box <-
   mutate(Survival_status = "Box")
 
 shellsize_gaper <- 
-  shellsize %>%  group_by(Season) %>% filter(Survival_status=="Gaping") %>%
+  shellsize %>%  group_by(Site, Season) %>% filter(Survival_status=="Gaping") %>%
    summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
@@ -277,6 +277,30 @@ live_height_ASHC<- height_ASHC %>%
   summarize(Mean_Height = mean(Height))
 live_height_ASHC
 
+#How many animals fall within the distributions
+# Define size bins (modify these according to your size ranges)
+size_breaks <- seq(0, 190, by = 10)  # Define size breaks (0, 10, 20, 30, 40, 50)
+size_labels <- paste(size_breaks[-length(size_breaks)], size_breaks[-1], sep = "-")  # Labels for size ranges
+
+# Create size bins and count animals in each bin
+height_ASHC$Size_Group <- cut(height_ASHC$Height, breaks = size_breaks, labels = size_labels)
+animals_count <- table(height_ASHC$Size_Group)
+animals_count
+
+# Display the count of animals in each size range
+print(animals_count)
+
+
+
+#Subset by survival status
+height_ASHC_Live <- height_ASHC[height_ASHC$Survival_status == "Live",]
+print(height_ASHC_Live)
+height_ASHC_Live
+
+height_ASHC_Dead <- height_ASHC[height_ASHC$Survival_status == "Box"|height_ASHC$Survival_status == "Gaper",]
+print(height_ASHC_Dead)
+
+#plots
 ggplot(height_ASHC, aes(x=Season, y=Height, fill=Season)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
@@ -284,14 +308,23 @@ ggplot(height_ASHC, aes(x=Season, y=Height, fill=Season)) +
   labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))
 
-ggplot(data=height_ASHC, aes(x= Height)) +
+#Distribution Live
+ggplot(data=height_ASHC_Live, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Height ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
-  ylim(0,50)+
-  
-  facet_wrap(~ Month, scales = "free", ncol = 1)
+  labs(title="Ash Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
+ facet_wrap(~ Month, scales = "free", ncol = 1)
+
+#Distribution Dead
+ggplot(data=height_ASHC_Dead, aes(x= Height)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Ash Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
+   facet_wrap(~ Month, scales = "free", ncol = 1)
 
 ```
 
@@ -309,11 +342,6 @@ df_density_ASHC <- df_quadrat_ASHC %>%
   dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
   dplyr::summarize(Density = sum(Count)*16)
 df_density_ASHC
-
-df_density_sum_ASHC <- df_density_ASHC %>%
-  dplyr::group_by(Site, Season, Survival_status) %>% 
-  dplyr::summarize(Density = sum(Density))
-df_density_sum_ASHC
 
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_ASHC <- df_density_ASHC %>%
@@ -408,20 +436,65 @@ ggplot(data=mean_total_oysters_FENC, aes(x= Survival_status, y = Total_Density, 
 #graphing shell height GOLD
 
 height_GOLD<- Height_master %>% filter(Site == "GOLD")
+height_GOLD
 
-ggplot(height_GOLD, aes(x=Season, y=Height, fill=Season)) +
-  geom_boxplot()+  
-   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))
+height_GOLD<- height_GOLD %>%
+  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
 
-ggplot(data=height_GOLD, aes(x= Height)) +
+live_height_GOLD<- height_GOLD %>%
+ group_by(Site, Season)%>%
+  filter(Survival_status == "Live")%>%
+  summarize(Mean_Height = mean(Height))
+live_height_GOLD
+
+#How many animals fall within the distributions
+# Define size bins (modify these according to your size ranges)
+size_breaks <- seq(0, 190, by = 10)  # Define size breaks (0, 10, 20, 30, 40, 50)
+size_labels <- paste(size_breaks[-length(size_breaks)], size_breaks[-1], sep = "-")  # Labels for size ranges
+
+# Create size bins and count animals in each bin
+height_GOLD$Size_Group <- cut(height_GOLD$Height, breaks = size_breaks, labels = size_labels)
+animals_count <- table(height_GOLD$Size_Group)
+animals_count
+
+# Display the count of animals in each size range
+print(animals_count)
+
+#plots
+class(height_GOLD$Month)
+height_GOLD
+
+height_GOLD_Live <- height_GOLD[height_GOLD$Survival_status == "Live",]
+print(height_GOLD_Live)
+
+height_GOLD_Dead <- height_GOLD[height_GOLD$Survival_status == "Box"|height_GOLD$Survival_status == "Gaper",]
+print(height_GOLD_Dead)
+
+ggplot(height_GOLD, aes(x = Date_collected, y = Height, color = Date_collected)) +
+  geom_boxplot() +  
+  theme_bw() +  
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  labs(title = "Shell Height", x = "Month", y = "Height (mm)") +
+  theme(axis.title.y = element_text(size = rel(1.3), angle = 90), axis.title.x = element_text(size = rel(1.3), angle = 0)) +
+  theme(axis.text = element_text(size = 12))
+
+#Distribution Live
+ggplot(data=height_GOLD_Live, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Height ", x ="Height (mm)")+
-  facet_wrap(~ Season, scales = "free", ncol = 1)
+  labs(title="Gold Star Beach Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,170), breaks = seq(0,170, by =10) )+
+  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))
+ # facet_wrap(~ Month, scales = "free", ncol = 1)
+
+#Distribution Dead
+ggplot(data=height_GOLD_Dead, aes(x= Height)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Gold Star Beach Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,170), breaks = seq(0,170, by =10) )+
+  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))
 
 
 ```
@@ -431,33 +504,26 @@ df_quadrat_GOLD <- quadratdensity_all%>%
   filter(Site == "GOLD")
 df_quadrat_GOLD
 
-#Quadrat size is 25 x25cm. To calculate density (oysters per m^2) multiply number of oysters counted X 4
+#Quadrat size is 25 x25cm (.0625 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 16
 
 df_density_GOLD <- df_quadrat_GOLD %>%
   dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
-  dplyr::summarize(Density = sum(Count)*4)
+  dplyr::summarize(Density = sum(Count)*16)
 df_density_GOLD
 
-#mean of Oysters per m^2 across all quadrats
+#Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_GOLD <- df_density_GOLD %>%
   group_by(Site, Season, Survival_status) %>%
   summarize(Total_Density = mean(Density))
 mean_total_oysters_GOLD
+ 
 
 #Density per quadrat totals
 ggplot(data=df_quadrat_GOLD, aes(x= Survival_status, y = Count, fill = Survival_status)) +
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Count ", x ="Survival status", y= "Density")+
-  facet_wrap(~ Season, scales = "free")
-
-#Density of oysters per meter squared
-ggplot(data=mean_total_oysters_GOLD, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
-  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  labs(title="Gold Star Beach Count ", x ="Survival status", y= "Density")+
   facet_wrap(~ Season, scales = "free")
 ```
 #LAUR

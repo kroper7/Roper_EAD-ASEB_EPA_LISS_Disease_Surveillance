@@ -1,4 +1,4 @@
-lab_id,date_collected,site,lab_sample,oyster_zone,light_regime,date_processed,ww_total_g,height_mm,length_mm,width_mm,condition,dissection_notes,mantle_rftm,ggr1_etoh,ggr1_etoh,adductor_etoh,cross_histology,date_davidsons,date_etoh,,,,,,,,,,,,,
+lab_id,date_collected,site,lab_sample,oyster_zone,light_regime,date_processed,ww_total_g,height_mm,length_mm,width_mm,condition,dissection_notes,mantle_rftm,ggr1_etoh,ggr2_etoh,adductor_etoh,cross_histology,date_davidsons,date_etoh,,,,,,,,,,,,,
 0523ASHC_01,2023-05-10,ASHC,1,upper,NA,2023-05-10,69.75,124.63,54.2,20.81,medium,,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-10,2023-05-11,,,,,,,,,,,,,
 0523ASHC_02,2023-05-10,ASHC,2,upper,NA,2023-05-10,130.87,136.24,70.52,23.27,medium,,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-10,2023-05-11,,,,,,,,,,,,,
 0523ASHC_03,2023-05-10,ASHC,3,upper,NA,2023-05-10,95.8,123.86,61.01,21.1,medium,,TRUE,TRUE,TRUE,TRUE,TRUE,2023-05-10,2023-05-11,,,,,,,,,,,,,

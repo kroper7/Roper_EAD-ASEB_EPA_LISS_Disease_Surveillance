@@ -897,7 +897,7 @@ GOLD_Salinity_all <- GOLD_Salinity %>% na.omit() %>%
               labs(x = "Time", y = "Salinity") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))+
-              scale_y_continuous(breaks = seq(0,30, by = 5))
+              scale_y_continuous(breaks = seq(0,30, by = 2))
 
 GOLD_Salinity_all
 
