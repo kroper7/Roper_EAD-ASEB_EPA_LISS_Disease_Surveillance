@@ -766,7 +766,7 @@ print(ASHC_DO)
 
 # Create separate columns for date and time
 ASHC_DO$date <- sapply(date_time, "[[", 1)  # Extract date
-ASHC_DO$time <- sapply(date_time, "[[", 2)
+#ASHC_DO$time <- sapply(date_time, "[[", 2)
 print(ASHC_DO)
 
 
@@ -798,7 +798,9 @@ ASHC_DAILY_DO <- ASHC_DO_avg %>% ggplot(aes(x= date,
               ggtitle("DO Concentration") +
               labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
               theme_classic() +
-              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d") 
+              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
+  scale_y_continuous(limits= c(2,10), breaks = seq(2,10, by= 1))
+
 
 
 ASHC_DAILY_DO
@@ -813,7 +815,7 @@ print(ASHC_Temperature)
 
 # Create separate columns for date and time
 ASHC_Temperature$date <- sapply(date_time, "[[", 1)  # Extract date
-ASHC_Temperature$time <- sapply(date_time, "[[", 2)
+#ASHC_Temperature$time <- sapply(date_time, "[[", 2)
 print(ASHC_Temperature)
 
 ASHC_Temperature$Month <- month(ASHC_Temperature$date, label = TRUE)
@@ -894,7 +896,8 @@ GOLD_Salinity_all <- GOLD_Salinity %>% na.omit() %>%
               ggtitle("Salinity") +
               labs(x = "Time", y = "Salinity") +
               theme_classic() +
-              theme(legend.position = "none", axis.text= element_text(size= 15))
+              theme(legend.position = "none", axis.text= element_text(size= 15))+
+              scale_y_continuous(breaks = seq(0,30, by = 5))
 
 GOLD_Salinity_all
 
@@ -1077,5 +1080,29 @@ GOLD_Monthly_Temperature <- GOLD_Temperature %>% na.omit() %>%
   dplyr::group_by(Month , Site)%>%
   dplyr::summarize(Monthly_mean = mean(mean))
 GOLD_Monthly_Temperature
+
+#Salinity average
+GOLD_Salinity$`Date Time` <- as.character(GOLD_Salinity$`Date Time`)
+date_time <- strsplit(GOLD_Salinity$`Date Time`, " ")  # Split at the space
+print(GOLD_Salinity)
+
+# Create separate columns for date and time
+GOLD_Salinity$date <- sapply(date_time, "[[", 1)  # Extract date
+GOLD_Salinity$time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(GOLD_Salinity)
+
+GOLD_Salinity$Month <- month(GOLD_Salinity$date, label = TRUE)
+head(GOLD_Salinity)
+
+GOLD_Monthly_Salinity <- GOLD_Salinity %>% na.omit() %>%
+  dplyr::group_by(Month , Site)%>%
+  dplyr::summarize(Monthly_mean = mean(mean))
+GOLD_Monthly_Salinity
 
 ```
