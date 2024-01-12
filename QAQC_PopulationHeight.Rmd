@@ -204,7 +204,7 @@ shellsize_all <-
     max_height=max(Height, na.rm = TRUE), 
     Q1=quantile(Height,probs = 0.25, na.rm = TRUE),
     Q3=quantile(Height,probs = 0.75, na.rm = TRUE))%>%
-  mutate(Survial_status = "All")
+  mutate(Survival_status = "All")
 shellsize_all
 
 shellsize_live <- 
