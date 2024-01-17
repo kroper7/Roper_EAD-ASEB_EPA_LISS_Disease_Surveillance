@@ -291,7 +291,6 @@ animals_count
 print(animals_count)
 
 
-
 #Subset by survival status
 height_ASHC_Live <- height_ASHC[height_ASHC$Survival_status == "Live",]
 print(height_ASHC_Live)
@@ -374,6 +373,42 @@ ggplot(data=mean_total_oysters_ASHC, aes(x= Survival_status, y = Total_Density, 
 
 height_FENC<- Height_master %>% filter(Site == "FENC")
 
+height_FENC<- height_FENC %>%
+  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
+
+#Subset by survival status
+height_FENC_Live <- height_FENC[height_FENC$Survival_status == "Live",]
+print(height_FENC_Live)
+height_FENC_Live
+
+height_FENC_Dead <- height_FENC[height_FENC$Survival_status == "Box"|height_FENC$Survival_status == "Gaper",]
+print(height_FENC_Dead)
+
+#plots
+ggplot(height_FENC, aes(x=Season, y=Height, fill=Season)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Distribution Live
+ggplot(data=height_FENC_Live, aes(x= Height)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Fence Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))+
+ facet_wrap(~ Month, scales = "free", ncol = 1)
+
+#Distribution Dead
+ggplot(data=height_ASHC_Dead, aes(x= Height)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Ash Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  scale_y_continuous(limits = c(0,60), breaks = seq(0,60, by = 5))+
+   facet_wrap(~ Month, scales = "free", ncol = 1)
 ggplot(height_FENC, aes(x=Season, y=Height, fill=Season)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
@@ -397,18 +432,20 @@ df_quadrat_FENC <- quadratdensity_all%>%
   filter(Site == "FENC")
 df_quadrat_FENC
 
-#Quadrat size is 25 x25cm. To calculate density (oysters per m^2) multiply number of oysters counted X 4
+
+#Quadrat size is 25 x25cm (.0625 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 16
 
 df_density_FENC <- df_quadrat_FENC %>%
   dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
-  dplyr::summarize(Density = sum(Count)*4)
+  dplyr::summarize(Density = sum(Count)*16)
 df_density_FENC
 
-#mean of Oysters per m^2 across all quadrats
+#Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_FENC <- df_density_FENC %>%
-  group_by(Site, Season, Survival_status) %>%
-  summarize(Total_Density = mean(Density))
+  dplyr::group_by(Site, Season, Survival_status) %>%
+  dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_FENC
+
 
 #Density per quadrat totals
 ggplot(data=df_quadrat_FENC, aes(x= Survival_status, y = Count, fill = Survival_status)) +
@@ -425,8 +462,6 @@ ggplot(data=mean_total_oysters_FENC, aes(x= Survival_status, y = Total_Density, 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Fence Creek Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
   facet_wrap(~ Season, scales = "free")
-
-#Gaper mortality
 
 
 ```
