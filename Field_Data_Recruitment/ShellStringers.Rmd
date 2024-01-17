@@ -163,10 +163,25 @@ st_rec_GOLD
 ```{r}
 df_LAUR<- data_all %>%
   filter(Site == "LAUR")
-
+df_LAUR
 st_rec_LAUR <- summarySE(df_LAUR, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
 st_rec_LAUR
 
+#Mean spat per shell per replicate
+LAUR_spat <- df_LAUR %>%
+  group_by(Replicate, Shell, date_collected) %>%
+  summarize(sum_count_1 = sum(Count_1),sum_count_2 = sum(Count_2))
+LAUR_spat
+
+LAUR_spat_avg <- LAUR_spat %>%
+  group_by(Replicate, date_collected)%>%
+  summarize(Mean_1 = mean(sum_count_1), Mean_2 = mean(sum_count_2))
+LAUR_spat_avg
+
+LAUR_spat_avg2 <- LAUR_spat_avg %>%
+  group_by(date_collected)%>%
+  summarize(mean_1 = mean(Mean_1), mean_2 = mean(Mean_2))
+LAUR_spat_avg2
 ```
 
 

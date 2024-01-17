@@ -1049,7 +1049,7 @@ GOLD_DAILY_DO <- GOLD_DO_avg %>% ggplot(aes(x= date,
               ggtitle("DO Concentration") +
               labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
               theme_classic() +
-              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d") 
+              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d")
 
 
 GOLD_DAILY_DO
@@ -1104,5 +1104,287 @@ GOLD_Monthly_Salinity <- GOLD_Salinity %>% na.omit() %>%
   dplyr::group_by(Month , Site)%>%
   dplyr::summarize(Monthly_mean = mean(mean))
 GOLD_Monthly_Salinity
+
+```
+
+
+# Clean LAUR for the LISS stakeholder reports
+```{r, figs for LISS stakeholder reports}
+
+LAUR_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('LAUR'))
+LAUR_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('LAUR'))
+LAUR_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('LAUR'))
+LAUR_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('LAUR'))
+LAUR_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('LAUR'))
+
+# pH 
+
+LAUR_pH_all <- LAUR_pH %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'LAUR' ~ 'Laurel Hollow', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("pH ") +
+              labs(x = "Time", y = "pH") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+
+LAUR_pH_all
+
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/LAUR_pH.pdf"), height = 7, width = 14)
+print(LAUR_pH_all)
+dev.off()
+  
+
+
+# Salinity 
+
+LAUR_Salinity_all <- LAUR_Salinity %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'LAUR' ~ 'Laurel Hollow', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity") +
+              labs(x = "Time", y = "Salinity") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))+
+              scale_y_continuous(breaks = seq(0,30, by = 2))
+
+LAUR_Salinity_all
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/LAUR_Salinity.pdf"), height = 7, width = 14)
+print(LAUR_Salinity_all)
+dev.off()
+
+
+# Temperature 
+
+LAUR_Temperature_all <-LAUR_Temperature %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'LAUR' ~ 'Laurel Hollow', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+LAUR_Temperature_all
+
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/LAUR_Temperature.pdf"), height = 7, width = 14)
+print(LAUR_Temperature_all)
+dev.off()
+
+
+# DO 
+
+LAUR_DO_all <- LAUR_DO %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'LAUR' ~ 'Laurel Hollow', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration") +
+              labs(x = "Time", y = "DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/LAUR_DO.pdf"), height = 7, width = 14)
+print(LAUR_DO_all)
+dev.off()
+
+#Chlorophyll-a
+
+LAUR_CHLA_all <- LAUR_CHLA %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'LAUR' ~ 'Laurel Hollow', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Chlorophyll-a flourescences ") +
+              labs(x = "Time", y = "Chlorophyll-a (RFU)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+LAUR_CHLA_all
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/LAUR_CHLA.pdf"), height = 7, width = 14)
+print(LAUR_CHLA_all)
+
+```
+
+```{r}
+
+## DAILY AVERAGES OF DO - LAUR ###
+
+LAUR_DO$`Date Time` <- as.character(LAUR_DO$`Date Time`)
+date_time <- strsplit(LAUR_DO$`Date Time`, " ")  # Split at the space
+print(LAUR_DO)
+
+# Create separate columns for date and time
+LAUR_DO$date <- sapply(date_time, "[[", 1)  # Extract date
+LAUR_DO$time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(LAUR_DO)
+
+
+LAUR_DO_avg <- LAUR_DO %>% na.omit() %>%
+  dplyr::group_by(date , Site)%>%
+  dplyr::summarize(Daily_mean = mean(mean))
+LAUR_DO_avg
+
+
+class(LAUR_DO_avg$Date)
+LAUR_DO_avg$date <- as.Date(LAUR_DO_avg$date)
+
+LAUR_DAILY_DO <- LAUR_DO_avg %>% ggplot(aes(x= date, 
+                       y=Daily_mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              #geom_errorbar(aes(ymin=(mean)-(se), 
+                                #ymax=(mean)+(se)), 
+                           # width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration") +
+              labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d")  +  scale_y_continuous(limits = c(0,10), breaks = seq(0,10, by = 1))
+
+
+LAUR_DAILY_DO
+
+pdf(paste0(path_out,"/raw_plots/Report_plots/LAUR_daily_DO.pdf"), height = 7, width = 14)
+print(LAUR_DAILY_DO)
+
+# Monthly mean temperatures ASHC
+LAUR_Temperature$`Date Time` <- as.character(LAUR_Temperature$`Date Time`)
+date_time <- strsplit(LAUR_Temperature$`Date Time`, " ")  # Split at the space
+print(LAUR_Temperature)
+
+# Create separate columns for date and time
+LAUR_Temperature$date <- sapply(date_time, "[[", 1)  # Extract date
+LAUR_Temperature$time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(LAUR_Temperature)
+
+LAUR_Temperature$Month <- month(LAUR_Temperature$date, label = TRUE)
+head(LAUR_Temperature)
+
+LAUR_Monthly_Temperature <- LAUR_Temperature %>% na.omit() %>%
+  dplyr::group_by(Month , Site)%>%
+  dplyr::summarize(Monthly_mean = mean(mean))
+LAUR_Monthly_Temperature
+
+#Salinity average
+LAUR_Salinity$`Date Time` <- as.character(LAUR_Salinity$`Date Time`)
+date_time <- strsplit(LAUR_Salinity$`Date Time`, " ")  # Split at the space
+print(LAUR_Salinity)
+
+# Create separate columns for date and time
+LAUR_Salinity$date <- sapply(date_time, "[[", 1)  # Extract date
+LAUR_Salinity$time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(LAUR_Salinity)
+
+LAUR_Salinity$Month <- month(LAUR_Salinity$date, label = TRUE)
+head(LAUR_Salinity)
+
+LAUR_Monthly_Salinity <- LAUR_Salinity %>% na.omit() %>%
+  dplyr::group_by(Month , Site)%>%
+  dplyr::summarize(Monthly_mean = mean(mean))
+LAUR_Monthly_Salinity
 
 ```
