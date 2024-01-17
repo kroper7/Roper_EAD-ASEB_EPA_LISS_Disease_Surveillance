@@ -1400,7 +1400,7 @@ FENC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlor
 # pH 
 
 FENC_pH_all <- FENC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1436,7 +1436,7 @@ dev.off()
 # Salinity 
 
 FENC_Salinity_all <- FENC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1470,7 +1470,7 @@ dev.off()
 # Temperature 
 
 FENC_Temperature_all <-FENC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1503,7 +1503,7 @@ dev.off()
 # DO 
 
 FENC_DO_all <- FENC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1533,7 +1533,7 @@ dev.off()
 #Chlorophyll-a
 
 FENC_CHLA_all <- FENC_CHLA %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1565,7 +1565,7 @@ print(FENC_CHLA_all)
 
 ```{r}
 
-## DAILY AVERAGES OF DO - LAUR ###
+## DAILY AVERAGES OF DO - FENC ###
 
 FENC_DO$`Date Time` <- as.character(FENC_DO$`Date Time`)
 date_time <- strsplit(FENC_DO$`Date Time`, " ")  # Split at the space
@@ -1592,7 +1592,10 @@ FENC_DO_avg
 class(FENC_DO_avg$Date)
 FENC_DO_avg$date <- as.Date(FENC_DO_avg$date)
 
-FENC_DAILY_DO <- FENC_DO_avg %>% ggplot(aes(x= date, 
+FENC_DO_avg
+
+FENC_DAILY_DO <- FENC_DO_avg %>% dplyr::filter(`date` > '2023-06-01 00:00:00' & `date` < '2023-10-15 00:00:00' ) %>% 
+  ggplot(aes(x= date, 
                        y=Daily_mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
