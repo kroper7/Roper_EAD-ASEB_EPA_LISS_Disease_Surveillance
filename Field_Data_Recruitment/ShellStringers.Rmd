@@ -145,9 +145,27 @@ ASHC_spat_avg2
 ```{r}
 df_FENC<- data_all %>%
   filter(Site == "FENC")
+df_FENC
 
 st_rec_FENC <- summarySE(df_FENC, measurevar="Count_1", groupvars=c("Site", "date_collected", "Replicate"))
 st_rec_FENC
+
+
+#Mean spat per shell per replicate
+FENC_spat <- df_FENC %>%
+  dplyr::group_by(Replicate, Shell, date_collected) %>%
+  dplyr::summarize(sum_count_1 = sum(Count_1),sum_count_2 = sum(Count_2))
+FENC_spat
+
+FENC_spat_avg <- FENC_spat %>%
+  dplyr::group_by(Replicate, date_collected)%>%
+ dplyr::summarize(Mean_1 = mean(sum_count_1), Mean_2 = mean(sum_count_2))
+FENC_spat_avg
+
+FENC_spat_avg2 <- FENC_spat_avg %>%
+  dplyr::group_by(date_collected)%>%
+  dplyr::summarize(mean_1 = mean(Mean_1), mean_2 = mean(Mean_2))
+FENC_spat_avg2
 ```
 
 #Gold star beach summary
