@@ -71,7 +71,7 @@ BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_
 
 
 #renaming columns
-shellsize <- shellsize %>% rename(Date_collected = TripDate) %>% rename(Quadrat = QUADRAT_NUM) %>% rename(Height= Height_mm) %>% rename(Survival_status = SpecimenType)
+shellsize <- shellsize %>% dplyr::rename(Date_collected = TripDate) %>% dplyr::rename(Quadrat = QUADRAT_NUM) %>% dplyr::rename(Height= Height_mm) %>% dplyr::rename(Survival_status = SpecimenType)
 
 #adding columns
 shellsize$Season<- rep("spring", nrow(shellsize))
@@ -130,7 +130,7 @@ length_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-AS
 length_live <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_live')
 length_live <- na.omit(length_live)
 length_live$Survival_status<- rep("Live", nrow(length_live))
-length_live <- length_live %>% rename(Height = Length_live)
+length_live <- length_live %>% dplyr::rename(Height = Length_live)
 length_live
 
 #Box
@@ -138,14 +138,14 @@ length_live
 length_box <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_box')
 length_box <- na.omit(length_box)
 length_box$Survival_status<- rep("Box", nrow(length_box))
-length_box <- length_box %>% rename(Height = Length_box)
+length_box <- length_box %>% dplyr::rename(Height = Length_box)
 
 #Gaper
 
 length_gaper <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_gaper')
 length_gaper <- na.omit(length_gaper)
 length_gaper$Survival_status<- rep("Gaping", nrow(length_gaper))
-length_gaper <- length_gaper %>% rename(Height = Length_gaper)
+length_gaper <- length_gaper %>% dplyr::rename(Height = Length_gaper)
 
 Height_all<- rbind(length_live,length_box,length_gaper)
 Height_all$Season<- rep("fall", nrow(Height_all))
@@ -172,8 +172,8 @@ write.csv(Height_master, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_
 
 #Sum total number of oyster counter per quadrat
 quadratdensity_all<- Height_master %>%
-  group_by(Quadrat, Season, Survival_status, Site, Date_collected, State) %>%
-  summarize(Count = n())
+  dplyr::group_by(Quadrat, Season, Survival_status, Site, Date_collected, State) %>%
+  dplyr::summarize(Count = n())
 quadratdensity_all
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
@@ -197,46 +197,46 @@ write.csv(densitysummary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA
 
       
 shellsize_all <- 
-  Height_master %>% group_by(Site, Season) %>%
-  summarise(
+  Height_master %>% dplyr::group_by(Site, Season) %>%
+  dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
     max_height=max(Height, na.rm = TRUE), 
     Q1=quantile(Height,probs = 0.25, na.rm = TRUE),
     Q3=quantile(Height,probs = 0.75, na.rm = TRUE))%>%
-  mutate(Survival_status = "All")
+ dplyr:: mutate(Survival_status = "All")
 shellsize_all
 
 shellsize_live <- 
-  Height_master %>% group_by(Site, Season) %>% filter(Survival_status=="Live") %>%
-   summarise(
+  Height_master %>% dplyr::group_by(Site, Season) %>% dplyr::filter(Survival_status=="Live") %>%
+   dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
     max_height=max(Height, na.rm = TRUE), 
     Q1=quantile(Height,probs = 0.25, na.rm = TRUE),
     Q3=quantile(Height,probs = 0.75, na.rm = TRUE))%>%
-  mutate(Survival_status = "Live")
+  dplyr::mutate(Survival_status = "Live")
 shellsize_live
 
 shellsize_box <- 
-  Height_master %>%  group_by(Site, Season) %>%filter(Survival_status=="Box") %>%
-   summarise(
+  Height_master %>%  dplyr::group_by(Site, Season) %>% dplyr::filter(Survival_status=="Box") %>%
+   dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
     max_height=max(Height, na.rm = TRUE), 
     Q1=quantile(Height,probs = 0.25, na.rm = TRUE),
     Q3=quantile(Height,probs = 0.75, na.rm = TRUE))%>%
-  mutate(Survival_status = "Box")
+  dplyr::mutate(Survival_status = "Box")
 
 shellsize_gaper <- 
-  shellsize %>%  group_by(Site, Season) %>% filter(Survival_status=="Gaping") %>%
-   summarise(
+  shellsize %>%  dplyr::group_by(Site, Season) %>% dplyr::filter(Survival_status=="Gaping") %>%
+   dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
     max_height=max(Height, na.rm = TRUE), 
     Q1=quantile(Height,probs = 0.25, na.rm = TRUE),
     Q3=quantile(Height,probs = 0.75, na.rm = TRUE))%>%
-  mutate(Survival_status = "Gaper")
+  dplyr::mutate(Survival_status = "Gaper")
 
 #rbind together 
 
@@ -376,6 +376,19 @@ height_FENC<- Height_master %>% filter(Site == "FENC")
 height_FENC<- height_FENC %>%
   mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
 
+live_height_FENC<- height_FENC %>%
+ group_by(Site, Season)%>%
+  filter(Survival_status == "Live")%>%
+  summarize(Mean_Height = mean(Height))
+live_height_FENC
+
+height_FENC$Size_Group <- cut(height_FENC$Height, breaks = size_breaks, labels = size_labels)
+animals_count <- table(height_FENC$Size_Group)
+animals_count
+
+# Display the count of animals in each size range
+print(animals_count)
+
 #Subset by survival status
 height_FENC_Live <- height_FENC[height_FENC$Survival_status == "Live",]
 print(height_FENC_Live)
@@ -397,7 +410,7 @@ ggplot(data=height_FENC_Live, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  labs(title="Fence Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,210), breaks = seq(0,210, by =10) )+
   scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))+
  facet_wrap(~ Month, scales = "free", ncol = 1)
 

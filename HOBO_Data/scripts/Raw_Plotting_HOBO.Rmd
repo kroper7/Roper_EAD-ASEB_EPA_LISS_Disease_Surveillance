@@ -1,0 +1,79 @@
+---
+title: "Raw_plotting_HOBO"
+author: "Mariah Kachmar"
+date: "1/19/2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#### Load libraries
+
+```{r load_libraries, include = TRUE}
+# load libraries - notes show the install command needed to install (pre installed)
+# Plotting
+library(ggplot2)
+library(dplyr)
+library(gplots)
+library(RColorBrewer)
+library(ggpubr)
+library(stringr)
+library(lubridate)
+library(readr)
+library(reshape2)
+library(read)
+library(tidyr)
+```
+
+#### Set path
+#### Set path for Mariah K. 
+```{r set the path out, include = TRUE}
+path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output'
+```
+
+#### Fence Creek ####
+```{r}
+FENC_HOBO_23 <- read_csv("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\HOBO_Data\\112023_FENC_HOBO.csv", col_names = TRUE)   
+
+as.data.frame(FENC_HOBO_23)
+FENC_HOBO_23
+
+#Change column names
+
+FENC_HOBO_23 <- FENC_HOBO_23 %>%
+  dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
+  dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
+
+
+# Hourly Means
+FENC_means <- FENC_HOBO_23 %>%  
+                      dplyr::mutate(Date_Time = as.factor(substr(Date_Time,1,13))) # remove minutes and seconds
+
+  melt(id.vars = c("Date_Time"),measure.vars = c("Temperature")) %>%
+  group_by(Date_Time, variable) %>%
+  summarise(mean_value = mean(value, na.rm = TRUE),
+            sd_value = sd(value, na.rm = TRUE)) %>%
+  group_by(Date_Time) %>%
+  summarise(mean_value = mean(mean_value),
+            sd_value = sqrt(sum(sd_value^2) / n()),  # Calculate standard error using sd
+            se_value = sd_value / sqrt(n()))
+
+
+print(FENC_means)
+FENC_means
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+```{r}
+sessionInfo()
+```
