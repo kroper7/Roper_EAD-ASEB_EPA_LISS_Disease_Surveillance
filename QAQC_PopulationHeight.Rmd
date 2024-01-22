@@ -382,6 +382,11 @@ live_height_FENC<- height_FENC %>%
   summarize(Mean_Height = mean(Height))
 live_height_FENC
 
+#How many animals fall within the distributions
+# Define size bins (modify these according to your size ranges)
+size_breaks <- seq(0, 240, by = 10) # Define size breaks (0, 10, 20, 30, 40, 50)
+size_labels <- paste(size_breaks[-length(size_breaks)], size_breaks[-1], sep = "-")  # Labels for size ranges
+
 height_FENC$Size_Group <- cut(height_FENC$Height, breaks = size_breaks, labels = size_labels)
 animals_count <- table(height_FENC$Size_Group)
 animals_count
