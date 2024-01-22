@@ -1154,6 +1154,8 @@ dev.off()
 
 
 # Salinity 
+## There are a few outliers in the dataset form removing the sonde to download data. Here is a temporary filter for graphing purposes:
+LAUR_Salinity <- LAUR_Salinity[LAUR_Salinity$mean < 35 & LAUR_Salinity$mean > 10, ]
 
 LAUR_Salinity_all <- LAUR_Salinity %>% na.omit() %>%
              dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 

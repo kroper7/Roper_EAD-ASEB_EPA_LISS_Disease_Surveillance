@@ -24,7 +24,7 @@ library(stringr)
 library(lubridate)
 library(readr)
 library(reshape2)
-library(read)
+library(readr)
 library(tidyr)
 ```
 
@@ -39,31 +39,42 @@ path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_S
 FENC_HOBO_23 <- read_csv("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\HOBO_Data\\112023_FENC_HOBO.csv", col_names = TRUE)   
 
 as.data.frame(FENC_HOBO_23)
-FENC_HOBO_23
+
+
 
 #Change column names
 
 FENC_HOBO_23 <- FENC_HOBO_23 %>%
   dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
   dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
+FENC_HOBO_23
+
+FENC_HOBO_23$Date_Time <- as.character(FENC_HOBO_23$Date_Time)
+date_time <- strsplit(FENC_HOBO_23$Date_Time, " ")  # Split at the space
+FENC_HOBO_23$Date <- sapply(date_time, "[[", 1)  # Extract date
+FENC_HOBO_23$Time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(FENC_HOBO_23)
+
+
+#### Lets look at the data 
+
+library(reshape2)
+
+ggplot(FENC_HOBO_23, aes(Date_Time, Temperature)) + geom_point()
 
 
 # Hourly Means
-FENC_means <- FENC_HOBO_23 %>%  
-                      dplyr::mutate(Date_Time = as.factor(substr(Date_Time,1,13))) # remove minutes and seconds
-
-  melt(id.vars = c("Date_Time"),measure.vars = c("Temperature")) %>%
-  group_by(Date_Time, variable) %>%
-  summarise(mean_value = mean(value, na.rm = TRUE),
-            sd_value = sd(value, na.rm = TRUE)) %>%
-  group_by(Date_Time) %>%
-  summarise(mean_value = mean(mean_value),
-            sd_value = sqrt(sum(sd_value^2) / n()),  # Calculate standard error using sd
-            se_value = sd_value / sqrt(n()))
 
 
-print(FENC_means)
-FENC_means
+
+
+
 ```
 
 ## Including Plots
