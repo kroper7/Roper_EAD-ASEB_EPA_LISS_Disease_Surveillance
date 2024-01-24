@@ -1118,9 +1118,10 @@ LAUR_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO C
 LAUR_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('LAUR'))
 
 # pH 
+LAUR_pH
 
 LAUR_pH_all <- LAUR_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-20 11:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'LAUR' ~ 'Laurel Hollow', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
