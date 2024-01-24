@@ -69,8 +69,9 @@ library(reshape2)
 ggplot(FENC_HOBO_23, aes(Date_Time, Temperature)) + geom_point()
 
 
-# Hourly Means
+# Hourly Means 
 
+#Tried to use code form Sonde data but this did not work at all. Tired trouble shooting a little and couldn't figure out why this isnt working. The date_time data keeps being changed to NA and I cant tell if its formating or something else. 
 
 
 
