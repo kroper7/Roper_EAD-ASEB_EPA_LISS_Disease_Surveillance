@@ -82,7 +82,10 @@ FENC_means <- FENC_HOBO_23 %>%
   dplyr::summarise(mean_value = mean(value),sd_value = sd(value),se_value = sd(value) / sqrt(n())) 
 
 FENC_means
-  plot<- FENC_means %>%
+```
+
+```{r}
+FENC_plot<- FENC_means %>%
     ggplot(aes(Date_Time, mean_value))+ geom_point() + 
     geom_line(size = 0.2, position=position_dodge(.4))+
     #scale_color_manual(values = "grey38")+
@@ -93,11 +96,11 @@ FENC_means
                             width=0,position=position_dodge(.4))+
      ggtitle("Fence Creek HOBO Temperature Data ") +
               labs(x = "Time", y = "Temperature") +
-              theme_classic()
-plot
+              theme_classic() + theme(axis.text= element_text(size=12), axis.title = element_text(size= 12))
+FENC_plot
 
 pdf(paste0(path_out,"/FENC_HOBO.pdf"), height = 7, width = 14)
-print(plot)
+print(FENC_plot)
 
 ```
 
