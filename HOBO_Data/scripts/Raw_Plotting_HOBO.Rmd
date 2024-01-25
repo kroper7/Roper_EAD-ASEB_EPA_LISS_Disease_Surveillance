@@ -75,8 +75,6 @@ ggplot(FENC_HOBO_23, aes(Date_Time, Temperature)) + geom_point()
 
 # Hourly Means 
 
-#Tried to use code form Sonde data but this did not work at all. Tired trouble shooting a little and couldn't figure out why this isnt working. The date_time data keeps being changed to NA and I cant tell if its formating or something else. 
-
 FENC_means <- FENC_HOBO_23 %>%
   mutate(Date_Time = as.POSIXct(substr(Date_Time, 1, 13), format = "%m/%d/%Y %H")) %>% # Adjust the date format
   tidyr::pivot_longer(cols = c("Temperature"), names_to = "variable", values_to = "value") %>%
@@ -87,6 +85,7 @@ FENC_means
   plot<- FENC_means %>%
     ggplot(aes(Date_Time, mean_value))+ geom_point() + 
     geom_line(size = 0.2, position=position_dodge(.4))+
+    #scale_color_manual(values = "grey38")+
               scale_shape_manual(values=c(21, 22, 24, 25)) + 
               scale_fill_manual(values=c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
               geom_errorbar(aes(ymin=(mean_value)-(se_value), 
@@ -97,7 +96,8 @@ FENC_means
               theme_classic()
 plot
 
- 
+pdf(paste0(path_out,"/outputs/raw_plots/FENC_HOBO.pdf"), height = 7, width = 14)
+print(plot)
 
 ```
 
