@@ -61,10 +61,14 @@ FENC_HOBO_23$Time <- sapply(date_time, function(x) {
 })
 print(FENC_HOBO_23)
 
+## removing unneeded columns with NAs
+
+FENC_HOBO_23 <- FENC_HOBO_23 %>%
+  dplyr::select( -c("Host Connected", "Water Detect", "Button Down", "Button Up", "End of File"))
+
+FENC_HOBO_23 <- na.omit(FENC_HOBO_23)
 
 #### Lets look at the data 
-
-library(reshape2)
 
 ggplot(FENC_HOBO_23, aes(Date_Time, Temperature)) + geom_point()
 
@@ -73,8 +77,27 @@ ggplot(FENC_HOBO_23, aes(Date_Time, Temperature)) + geom_point()
 
 #Tried to use code form Sonde data but this did not work at all. Tired trouble shooting a little and couldn't figure out why this isnt working. The date_time data keeps being changed to NA and I cant tell if its formating or something else. 
 
+FENC_means <- FENC_HOBO_23 %>%
+  mutate(Date_Time = as.POSIXct(substr(Date_Time, 1, 13), format = "%m/%d/%Y %H")) %>% # Adjust the date format
+  tidyr::pivot_longer(cols = c("Temperature"), names_to = "variable", values_to = "value") %>%
+  dplyr::group_by(Date_Time, variable) %>%
+  dplyr::summarise(mean_value = mean(value),sd_value = sd(value),se_value = sd(value) / sqrt(n())) 
 
+FENC_means
+  plot<- FENC_means %>%
+    ggplot(aes(Date_Time, mean_value))+ geom_point() + 
+    geom_line(size = 0.2, position=position_dodge(.4))+
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+              geom_errorbar(aes(ymin=(mean_value)-(se_value), 
+                                ymax=(mean_value)+(se_value)), 
+                            width=0,position=position_dodge(.4))+
+     ggtitle("Fence Creek HOBO Temperature Data ") +
+              labs(x = "Time", y = "Temperature") +
+              theme_classic()
+plot
 
+ 
 
 ```
 
