@@ -31,7 +31,7 @@ library(tidyr)
 #### Set path
 #### Set path for Mariah K. 
 ```{r set the path out, include = TRUE}
-path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output'
+path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/HOBO_Data/outputs'
 ```
 
 #### Fence Creek ####
@@ -96,7 +96,7 @@ FENC_means
               theme_classic()
 plot
 
-pdf(paste0(path_out,"/outputs/raw_plots/FENC_HOBO.pdf"), height = 7, width = 14)
+pdf(paste0(path_out,"/FENC_HOBO.pdf"), height = 7, width = 14)
 print(plot)
 
 ```
