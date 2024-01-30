@@ -3,14 +3,16 @@ title: "BedCharacteristics_Oct2023Survey"
 author: "Mariah Kachmar"
 date: "12/13/2023"
 output: html_document
-updated: 
+updated: 1/30/24
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's October 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar Beach and Laurel Hollow subtidal sites in New York. 
 ---
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Characteristics')
+knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 
 library(readr)
 library(dplyr)
@@ -22,7 +24,7 @@ library(Rmisc)
 
 ```{r}
 
-data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Characteristics",                           # Identify all CSV files
+data_all <- list.files(path = "Field_Data_Biological/raw_data/Characteristics",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>% 
   bind_rows()
