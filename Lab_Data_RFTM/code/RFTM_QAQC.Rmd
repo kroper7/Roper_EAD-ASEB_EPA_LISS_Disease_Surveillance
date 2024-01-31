@@ -7,13 +7,15 @@ output: html_document
 description: This R code is used to import and summarize RFTM (Rays Fluid Thioglycollate Medium) intensity scoring from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. The scale used to score intensity for individuals is the Mackins Scale (citation). This score can be used to calculate prevalence, weighted prevalence and intensity across the population. 
 ---
 
-Last updated 11/30/2023 by M.Kachmar
+Last updated 1/31/2024 by K.Lenderman
 
 
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 ```{r, echo=FALSE}
@@ -25,15 +27,10 @@ library("ggplot2")
 library("lubridate")
 ```
 
-```{r}
-#Set Path
-setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM")
-```
-
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
-data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM/Files_by_Month",                           # Identify all CSV files
+data_all <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>%                              # Store all files in list
   bind_rows                                         # Combine data sets into one data set 
@@ -43,7 +40,7 @@ as.data.frame(data_all)                            # Convert tibble to data.fram
 
 tail(data_all)
 
-write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\All_RFTM_data.csv", row.names=FALSE)
+write.csv(data_all, "Master_files\\RFTM_all_data.csv", row.names=FALSE)
 ```
 
 
@@ -83,7 +80,7 @@ st_rftm_final$Completeness <- st_rftm_final$N /30
 
 st_rftm_final
 
-write.csv(st_rftm_final, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
+write.csv(st_rftm_final, "Lab_Data_RFTM\\output\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
 ```
 
 # Comparied reader 1 and reader 2
@@ -495,7 +492,7 @@ ggplot(data=df_GOLD_proportions, aes(x=month, y= Proportion, fill=intensity_bin)
 # We want to determine whether or not to continue using zone and light regime for collections - are there differences between them? 
 ```{r}
 #Tissue processing data
-data_all_tissue <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
+data_all_tissue <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>%                              # Store all files in list
   bind_rows                                         # Combine data sets into one data set 

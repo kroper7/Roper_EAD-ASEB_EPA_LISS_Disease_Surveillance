@@ -7,6 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 
@@ -28,15 +30,15 @@ library(readr)
 library(tidyr)
 ```
 
-#### Set path
-#### Set path for Mariah K. 
-```{r set the path out, include = TRUE}
-path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/HOBO_Data/outputs'
+#Set Path
+```{r}
+path_out <- 'HOBO_Data/output/'
 ```
+
 
 #### Fence Creek ####
 ```{r}
-FENC_HOBO_23 <- read_csv("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\HOBO_Data\\112023_FENC_HOBO.csv", col_names = TRUE)   
+FENC_HOBO_23 <- read_csv("HOBO_Data\\raw_data\\112023_FENC_HOBO.csv", col_names = TRUE)   
 
 as.data.frame(FENC_HOBO_23)
 
@@ -99,7 +101,7 @@ FENC_plot<- FENC_means %>%
               theme_classic() + theme(axis.text= element_text(size=12), axis.title = element_text(size= 12))
 FENC_plot
 
-pdf(paste0(path_out,"/FENC_HOBO.pdf"), height = 7, width = 14)
+pdf(paste0(path_out,"FENC_HOBO.pdf"), height = 7, width = 14)
 print(FENC_plot)
 
 ```
