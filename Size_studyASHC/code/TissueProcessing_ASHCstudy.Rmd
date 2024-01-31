@@ -6,6 +6,9 @@ date: "2024-01-22"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r}
@@ -19,12 +22,12 @@ library("lubridate")
 #Set Path
 #setwd("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data")
 
-data_all <- read.csv("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
+data_all <- read.csv("Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
 as.data.frame(data_all)
 
 data_all <- data_all %>% filter(!is.na(date_collected))
 data_all
-write.csv(data_all, "C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv", row.names=FALSE)
+write.csv(data_all, "Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv", row.names=FALSE)
 data_all
 data_all <- data_all %>%
   mutate(date_collected= as.Date(date_collected), month = month(date_collected))
