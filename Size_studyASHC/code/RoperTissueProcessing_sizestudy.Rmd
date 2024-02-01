@@ -1,0 +1,275 @@
+---
+title: "RoperTissueProcessing_sizestudy"
+output: html_document
+date: "2024-02-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+---
+title: "Tissue_ASHCsizestudy"
+author: "Kelly Roper"
+date: "2024-01-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r}
+library("dplyr")                                    
+library("plyr")                                     
+library("readr")             
+library("Rmisc")
+library("ggplot2")
+library("lubridate")
+
+#Set Path
+#setwd("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data")
+
+data_all <- read.csv("C:/Users/kelly.roper/Documents/Github/Roper_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
+as.data.frame(data_all)
+
+head(data_all)
+
+```
+
+
+```{r}
+g <- select(data_all, -light_regime, -oyster_zone, -X:-X.12)
+```
+
+
+```{r}
+
+```
+
+#Removing unnecessary columns from data (such as light_regime and oyster_zone)
+g <- select(data_all, -light_regime, -oyster_zone, -X:-X.12)
+g
+
+#Removing NA rows
+data <- g %>%  filter(!row_number() %in% c(61:998))
+
+ggplot(data, aes(ww_total_g, height_mm)) + 
+  geom_point()
+  
+  
+
+ggplot(data, aes(ww_total_g, height_mm, color = lab_sample)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  theme(legend.position = "none")
+
+
+ggplot(data, aes(ww_total_g, height_mm)) + 
+  geom_point(aes(colour = condition)) + 
+  geom_smooth(method = "lm", se = FALSE) 
+  
+
+ dplot <- ggplot(diamonds, aes(color, fill = cut)) + 
+  xlab(NULL) + ylab(NULL) + theme(legend.position = "none")
+  dplot+geom_bar()
+
+data + geom_bar(position = "identity", alpha = 1 / 2, colour = "grey50")
+
+print(data + ggtitle("The Height and Weight of Oysters from Ash Creek"))
+
+print(data + labs(y = "Height(mm)", x = "Weight (g)"))
+
+
+```{r}
+sessionInfo()
+```
+
+library(tidyverse)
+
+g+
+xlab("Weight (g)")+
+ylab("Height (mm)")
+
+head(data)
+tail(data)
+
+class(data$ww_total_g)
+class(data$height_mm)
+
+class(data$data)
+
+df$net <- df$data- as.numeric(df$data)
+
+data <- ggplot(data, aes(ww_total_g, height_mm))+ geom_point()
+data
+
+
+ggplot(data, aes(x = ww_total_g, y = height_mm ))
+
+ggplot(data, aes(x = ww_total_g, y = height_mm ))+ geom_point(color = "red")
+
+ggplot(data, aes(x = ww_total_g, y = height_mm ))+ geom_point(color = "red") + labs(x = "Weight (g)", y = "Height (mm)", title = "Weight vs Height Ash Creek")
+
+
+ggplot(data, aes(x = ww_total_g, y = height_mm ))+ geom_point(color = "red") + labs(x = "Weight (g)", y = "Height (mm)", title = "Weight vs Height Ash Creek") +geom_smooth()
+
+ggplot(data, aes(x = ww_total_g, y = height_mm ))+ geom_point(color = "red") + labs(x = "Weight (g)", y = "Height (mm)", title = "Weight vs Height Ash Creek") +geom_smooth(method = "lm", se = FALSE)
+
+
+ggplot(data, aes(x = ww_total_g, y = height_mm, color = condition ))+ geom_point() + labs(x = "Weight (g)", y = "Height (mm)", title = "Weight vs Height Ash Creek") +geom_smooth(method = "lm", se = FALSE)
+
+
+ggplot(data, aes(x = ww_total_g, y = height_mm, color = condition ))+ geom_point() + labs(x = "Weight (g)", y = "Height (mm)", title = "Weight vs Height Ash Creek") +geom_smooth(method = "lm", se = FALSE)+ facet_wrap(~condition)
+
+
+ data.labs <- c("2 Good", "3 Good Minus","4 Fair Plus", "5 Fair", "7 Poor Plus", "9 Very Poor")
+ names(data.labs)<-  c("2_good", "3_good_minus", "4_fair_plus", "5_fair", "7_poor_plus", "9_very_poor")
+
+data+facet_grid()
+
+ggplot(data, aes(x = ww_total_g))+ geom_histogram(color = "blue", fill = condition) + labs(x = "Weight (g)", title = "Weight vs Height Ash Creek")
+
+ggplot(data, aes(x = ww_total_g, y = height_mm, color = condition ))+ geom_bin_2d() + labs(x = "Weight (g)", y = "Height (mm)", title = "Weight vs Height Ash Creek") +geom_smooth(method = "lm", se = FALSE)+ facet_wrap(~condition)
+
+ggplot(data, aes(x = ww_total_g, y = height_mm, color = condition ))+ geom_violin() + labs(x = "Weight (g)", y = "Height (mm)", title = "Weight vs Height Ash Creek") +geom_smooth(method = "lm", se = FALSE)+ facet_wrap(~condition)
+
+
+g + geom_line(aes(g = g)) + geom_errorbar(aes(ymin = lower, ymax = upper)), width = 0.2)
+
+
+ggplot(data, aes(x = condition)) +
+  geom_bar()
+
+
+ggplot(
+  data = data,
+  mapping = aes(x = ww_total_g, y = height_mm)
+) +
+  geom_point(aes(color = condition, shape = condition)) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Total weight and height",
+    subtitle = "Dimensions for Eastern Oysters at Ash Creek",
+    x = "Total Weight (g)", y = "Height (mm)",
+    color = "Condition", shape = "Condition"
+  )
+  
+  
+ data + scale_shape_discrete(name= "Condition", 
+  breaks = c("2_good","3_good_minus","4_fair_plus","5_fair","7_poor_plus","9_very_poor"),
+  labels=c("Good", "Good Minus", "Fair Plus", "Fair", "Poor Plus", "Very Poor"))
+  
+   scale_shape_discrete(name="Condition",
+                         breaks=c("2_good","3_good_minus","4_fair_plus","5_fair","7_poor_plus","9_very_poor"),
+                         labels=c("Good", "Good Minus", "Fair Plus", "Fair", "Poor Plus", "Very Poor"))
+                         
+ggplot +
+scale_x_discrete(
+"Condition",
+labels=c (
+"2_good"= "Good",
+"3_good_minus"= "Good Minus",
+"4_fair_plus"= "Fair Plus",
+"5_fair" = "Fair",
+"7_poor_plus"= "Poor Plus",
+"9_very_poor"= "Very Poor"
+)
+)
+
+dplyr::mutate(Condition = case_when(Condition == "2_good" ~ "Good",
+                                     Condition == "3_good_minus" ~ "Good Minus",
+                                     Condition == "4_fair_plus" ~ "Fair Plus",
+                                     Condition == "5_fair" ~ "Fair",
+                                     Condition == "7_poor_plus" ~ "Poor Plus",
+                                     Condition == "9_very_poor" ~ "Very Poor"))>%>
+                              
+                              
+legend.background = element_rect(fill = "darkgray"),
+legend.key = element_rect(fill = "lightblue", color = NA)
+
+
+ggplot(data, aes(x = ww_total_g)) +
+  geom_histogram(binwidth = 15)
+  
+ggplot(data, aes(x = ww_total_g, y = height_mm)) +geom_point(fill = "blue")
+  
+  
+
+ggplot(data, aes(x = ww_total_g, color = "Condition", fill = "Condition")) +
+  geom_density(alpha = 0.5)
+  
+  
+ggplot() +
+  aes(x = ww_total_g) +
+  geom_histogram(aes(y =  height_mm), bins = 10) +
+  geom_density()
+
+ggplot() +
+  aes(x = height_mm) +
+  geom_histogram(aes(y = ..density..), bins = 10) +
+  geom_density()
+
+  
+  ggplot(data, aes (x, y, col = bucket))+
+  geom_line()
+
+tail (data)  
+  
+ggplot()+
+geom_line(data = ww_total_g, aes(ww_total_g, height_mm), color = "darkblue")+
+geom_line(data = height_mm, aes(ww_total_g,height_mm)linetype = "dashed")
+  
+  
+install.packages(usethis)
+library("usethis")  
+  
+  
+ggplot(data=data,
+mapping = aes (x = ww_total_g, y = height_mm))+
+geom_point(size =5)+
+geom_line(color = "purple")+ labs(
+    title = "Total weight and height",
+    subtitle = "Dimensions for Eastern Oysters at Ash Creek",
+    x = "Total Weight (g)", y = "Height (mm)")
+
+
+data %>%
+  ggplot(aes(length_mm, 
+              width_mm,
+              color = ww_total_g))+
+              geom_point(size=3, alpha = 0.5) + labs(
+    title = "Length vs. Width",
+    subtitle = "Ash Creek In August with Colored Body Condition ",
+    x = "Length (mm)", y = "Width (mm)") + geom_smooth(method = lm,se = F)+ facet_wrap(~condition)+ theme_bw()
+    
+    
+    data%>% 
+    ggplot(aes(ww_total_g, height_mm))+
+    geom_boxplot()+
+    geom_point(alpha = 0.5,
+    aes (size = condition,
+    color = length_mm))+facet_wrap(~condition)
+    +coord_flip()+
+    theme_bw()
+  
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
