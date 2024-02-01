@@ -8,17 +8,16 @@ output: html_document
 description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
-Last updated 12/26/23 by M.Kachmar
+Last updated 1/30/24 by K. Lenderman
 
 
 ```{r, setup, include=FALSE}
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
-
-
-install.packages("tidyverse")
-install.packages("gtools")
-install.packages("Rmisc")
+library(tidyverse)
+library(gtools)
+library(Rmisc)
 library(gtools)
 library(readxl)
 library(plyr)
@@ -30,8 +29,8 @@ library(ggplot2)
 ```
 
 ```{r}
-
-#### need to work on this chunk to read in all files at once - not ready to use
+##Changed working directory for file path, should be able to use now (1/30/24)##
+#### need to work on this chunk to read in all files at once - not ready to use  
 #data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
  # pattern = "*.xlsx", full.names = TRUE) %>%         # Identify all xlsx files
  # lapply(read_excel)                           # Store all files in list
@@ -53,16 +52,16 @@ library(ggplot2)
 
 
 #June 2023
-shellsize <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_ShellSize.xlsx",
+shellsize <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_ShellSize.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-quadratdensity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
+quadratdensity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-rugosity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
+rugosity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
+BedHeight <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.xlsx",
                      sheet = 1, col_names = TRUE) 
 ```
 
@@ -71,8 +70,8 @@ BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_
 
 
 #renaming columns
-shellsize <- shellsize %>% dplyr::rename(Date_collected = TripDate) %>% dplyr::rename(Quadrat = QUADRAT_NUM) %>% dplyr::rename(Height= Height_mm) %>% dplyr::rename(Survival_status = SpecimenType)
-
+shellsize <- shellsize %>% dplyr::rename(Date_collected = TripDate) %>% dplyr::rename(Quadrat = QUADRAT_NUM) %>% dplyr::rename(Height = Height_mm) %>% dplyr::rename(Survival_status = SpecimenType)
+colnames(shellsize)
 #adding columns
 shellsize$Season<- rep("spring", nrow(shellsize))
 shellsize$State<- rep("CT", nrow(shellsize))
@@ -106,7 +105,7 @@ shellsize <- shellsize %>% select("Date_collected", "Site", "State", "Quadrat", 
 
 
 
-length_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Length",                           # Identify all CSV files
+length_all <- list.files(path = "Field_Data_Biological/raw_data/Length",                           # Identify all CSV files
   pattern = "*.xlsx", full.names = TRUE) %>% 
   lapply(read_excel) %>%    # Store all files in list
   bind_rows 
@@ -163,7 +162,7 @@ Height_master
 Height_master<-na.omit(Height_master)
 
 # Output to repository
-write.csv(Height_master, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Height_master.csv", row.names=FALSE)
+write.csv(Height_master, "Master_files/height_all_data.csv", row.names=FALSE)
 
 ```
 #Oyster density metrics
@@ -189,7 +188,7 @@ all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
 densitysummary
 
 
-write.csv(densitysummary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/populationdensity_summary.csv", row.names=FALSE)
+write.csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv", row.names=FALSE)
 
 ```
 #oyster size distribution
@@ -245,7 +244,7 @@ shellsize_summary
 
 #size distribution summary
 #note that calculating PSE and accuracy do not make sense for size distributions. Will need to figure out new metrics for the QAPP
-write.csv(shellsize_summary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/shellsize_summary.csv", row.names=FALSE)
+write.csv(shellsize_summary, "Field_Data_Biological/output/shellsize_summary.csv", row.names=FALSE)
 ```
 
 #graphing shell height all sites
@@ -344,8 +343,8 @@ df_density_ASHC
 
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_ASHC <- df_density_ASHC %>%
-  group_by(Site, Season, Survival_status) %>%
-  summarize(Total_Density = mean(Density))
+ dplyr:: group_by(Site, Season, Survival_status) %>%
+ dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_ASHC
  
 
@@ -566,8 +565,8 @@ df_density_GOLD
 
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_GOLD <- df_density_GOLD %>%
-  group_by(Site, Season, Survival_status) %>%
-  summarize(Total_Density = mean(Density))
+  dplyr::group_by(Site, Season, Survival_status) %>%
+  dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_GOLD
  
 
@@ -667,7 +666,7 @@ df_density_LAUR
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_LAUR <- df_density_LAUR %>%
   dplyr::group_by(Site, Season, Survival_status) %>%
-  summarize(Total_Density = mean(Density))
+  dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_LAUR
  
 
@@ -680,112 +679,11 @@ ggplot(data=df_quadrat_LAUR, aes(x= Survival_status, y = Count, fill = Survival_
   facet_wrap(~ Season, scales = "free")
 ```
 
-#Old code originally for June 2023 survey data format
-```{r}
-#oyster density metrics 
-
-
-#sum total number of oysters counted per quadrat
-quadratdensity$AllCount_Total <- rowSums(quadratdensity[, c("LiveCount_Total", "BoxCount_Total", "GaperCount_Total")])
-
-#summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
-all_density_SE <-summarySE(data = quadratdensity, measurevar = "AllCount_Total", groupvars=c("Site_Name"))
-all_density_SE
-live_density_SE <- summarySE(data = quadratdensity, measurevar = "LiveCount_Total", groupvars=c("Site_Name"))
-box_density_SE <-summarySE(data = quadratdensity, measurevar = "BoxCount_Total", groupvars=c("Site_Name"))
-gaper_density_SE <-summarySE(data = quadratdensity, measurevar = "GaperCount_Total", groupvars=c("Site_Name"))
-
-#calculate percent standard error as 100*se/mean
-all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$AllCount_Total)
-live_density_SE$PSE_live <- 100*(live_density_SE$se/live_density_SE$LiveCount_Total)
-box_density_SE$PSE_box <- 100*(box_density_SE$se/box_density_SE$BoxCount_Total)
-gaper_density_SE$PSE_gaper <- 100*(gaper_density_SE$se/gaper_density_SE$GaperCount_Total)
-
-
-#join into 1 table 
-densitysummary <- subset(all_density_SE, select = -c(sd,se,ci)) %>%
-    left_join(subset(live_density_SE, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
-    left_join(subset(box_density_SE, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
-    left_join(subset(gaper_density_SE, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
-
-#renaming for clarity. need to use dplyr:: because another package is overriding the function
-#densitysummary <- densitysummary %>%
-    dplyr::rename(
-      AllCount_Mean = AllCount_Total,
-      LiveCount_Mean = LiveCount_Total,
-      BoxCount_Mean = BoxCount_Total, 
-      GaperCount_Mean = GaperCount_Total, 
-      NumQuad = N) %>%
-  
-#calculate completeness as 100*N/12, where 12 is the desired number of quadrats per site 
-  mutate(PercentComplete_Quad = ((NumQuad/12)*100) )
-
-
-write.csv(densitysummary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological\\populationdensity_summary.csv", row.names=FALSE)
-#note that PSE is >20 percent at Ash Creek, and at Fence creek in box and gaper categories. This is due to the different levels of sampling. Need to redo with categories 
-
-
-```
 
 
 
-```{r}
 
-#oyster size distribution
 
-#finding the empty values - these are oyster samples collected for lab use I think?
-emptyvalues <- shellsize %>% filter(is.na(Height_mm))
-      
-shellsize_all <- 
-  shellsize %>% group_by(Site_Name) %>%
-  summarise(
-    median_height=median(Height_mm, na.rm = TRUE), 
-    min_height=min(Height_mm, na.rm = TRUE), 
-    max_height=max(Height_mm, na.rm = TRUE), 
-    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
-    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
-  mutate(SpecimenType = "All")
-
-shellsize_live <- 
-  shellsize %>% filter(SpecimenType=="Live") %>%
-   summarise(
-    median_height=median(Height_mm, na.rm = TRUE), 
-    min_height=min(Height_mm, na.rm = TRUE), 
-    max_height=max(Height_mm, na.rm = TRUE), 
-    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
-    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
-  mutate(SpecimenType = "Live")
-
-shellsize_box <- 
-  shellsize %>% filter(SpecimenType=="Box") %>%
-   summarise(
-    median_height=median(Height_mm, na.rm = TRUE), 
-    min_height=min(Height_mm, na.rm = TRUE), 
-    max_height=max(Height_mm, na.rm = TRUE), 
-    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
-    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
-  mutate(SpecimenType = "Box")
-
-shellsize_gaper <- 
-  shellsize %>% filter(SpecimenType=="Gaping") %>%
-   summarise(
-    median_height=median(Height_mm, na.rm = TRUE), 
-    min_height=min(Height_mm, na.rm = TRUE), 
-    max_height=max(Height_mm, na.rm = TRUE), 
-    Q1=quantile(Height_mm,probs = 0.25, na.rm = TRUE),
-    Q3=quantile(Height_mm,probs = 0.75, na.rm = TRUE))%>%
-  mutate(SpecimenType = "Gaper")
-
-#rbind together 
-
-shellsize_summary <- rbind(shellsize_all, shellsize_live, shellsize_box, shellsize_gaper)
-
-#size distribution summary
-#note that calculating PSE and accuracy do not make sense for size distributions. Will need to figure out new metrics for the QAPP
-write.csv(shellsize_summary, "C:/Users/meghana.parikh/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological\\shellsize_summary.csv", row.names=FALSE)
-
-  
-```
 ```{r}
 sessionInfo()
 ```

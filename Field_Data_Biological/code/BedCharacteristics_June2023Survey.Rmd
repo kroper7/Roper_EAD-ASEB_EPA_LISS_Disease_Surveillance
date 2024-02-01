@@ -3,7 +3,7 @@ title: "BedCharacteristics_June2023"
 author: "Meghana Parikh"
 date: "2023-11-17"
 output: html_document
-last updated: 12/11/2023
+last updated: 01/30/2024
 
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's June 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut. The data from this survey was initial input into an Access database (LISS_Database_FieldCollectionData_2023-07-18.accb). The data files input here are from that database. After July 2023 that database was discontinued. Code for Bed Characteristic data from later surveys is in a separate file....
 ---
@@ -12,8 +12,10 @@ description: This R code is used to important and summarize bed characteristics 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological')
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 
+library(ggplot2)
 library(readxl)
 library(dplyr)
 library(Rmisc)
@@ -25,17 +27,17 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-#read in all bed characteristics. Currently setup for Mariah's filepath
+#read in all bed characteristics.
 ```{r}
-#read in all bed characteristics. Currently setup for Mariah's filepath
+#read in all bed characteristics.
 
-quadratdensity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_QuadratDensity.xlsx",
+quadratdensity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-rugosity <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_Rugosity.xlsx",
+rugosity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.xlsx",
                      sheet = 1, col_names = TRUE) 
 
-BedHeight <- read_excel("C:\\Users\\mariah.kachmar\\Documents\\Github\\EAD-ASEB_EPA_LISS_Disease_Surveillance\\Field_Data_Biological\\qry_2023-06_Survey_BedHeight.xlsx",
+BedHeight <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.xlsx",
                      sheet = 1, col_names = TRUE) 
 ```
 
@@ -46,7 +48,7 @@ bedheight_summary <- summarySE(data = BedHeight, measurevar = "BedHeight_cm", gr
 
 bedheight_summary
 
-write.csv(bedheight_summary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
+write.csv(bedheight_summary, "Field_Data_Biological/output/bedheight_summary.csv", row.names=FALSE)
 ```
 
 
@@ -88,7 +90,7 @@ Rugosity_AllSite_Summary <- rbind(ASHCrugosity_final, FENCrugosity_final)
 
 Rugosity_AllSite_Summary
 
-write.csv(Rugosity_AllSite_Summary, "C:/Users/mariah.kachmar/Documents/github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Rugosity_AllSite.csv", row.names=FALSE)
+write.csv(Rugosity_AllSite_Summary, "Field_Data_Biological/output/rugosity_summary.csv", row.names=FALSE)
 
 ```
 
@@ -266,7 +268,7 @@ ggplot(data=FENCdensitysummary4, aes(x= Quadrat_Zone, y= Gaper_Density, fill = Q
 
 Density_AllSite <- rbind(ASHCdensitysummary3, FENCdensitysummary3)
 
-write.csv(Density_AllSite, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/Density_AllSite.csv", row.names=FALSE)
+write.csv(Density_AllSite, "Field_Data_Biological/output/density_summary.csv", row.names=FALSE)
 ```
 
 ```{r}
