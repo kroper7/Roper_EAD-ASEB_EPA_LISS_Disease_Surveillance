@@ -6,9 +6,6 @@ date: "2024-01-22"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
-knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r}
@@ -17,31 +14,114 @@ library("plyr")
 library("readr")             
 library("Rmisc")
 library("ggplot2")
+library("ggpubr")
 library("lubridate")
+library("tidyverse")
+library("broom")
+library("AICcmodavg")
+library("rstatix")
+
 
 #Set Path
-#setwd("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data")
+setwd("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data")
 
-data_all <- read.csv("Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
-as.data.frame(data_all)
-
-data_all <- data_all %>% filter(!is.na(date_collected))
-data_all
-write.csv(data_all, "Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv", row.names=FALSE)
-data_all
-data_all <- data_all %>%
-  mutate(date_collected= as.Date(date_collected), month = month(date_collected))
-data_all<- data_all %>%
-  mutate(condition = recode(condition, 
-                                  "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
-                                  "8_poor"= 8, "9_very_poor"= 9))
+data_all <- read.csv("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
+str(data_all)
 head(data_all)
+
+#Removing unnecessary columns from data (such as light_regime and oyster_zone)
+g <- select(data_all, -light_regime, -oyster_zone, -X.1:-X.12)
+g
+
+#Removing NA rows
+data <- g %>%  filter(!row_number() %in% c(61:998))
+data
+summary(data)
+```
+```{r}
+#Creating size_class column
+newdf <- data %>%
+  mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
+                           height_mm < 121 ~ 'med',
+                           height_mm > 120 ~ 'large'))
+
+ggplot(newdf, aes(x=condition, y=height_mm))+
+  geom_bar(stat = 'identity')+
+  facet_wrap(~sizeclass, ncol = 1)
+
+ggplot(newdf, aes())
+
+```
+
+
+```{r}
+#One-way ANOVA test
+one.way<- aov(height_mm~condition, data = data)
+summary(one.way)  #p-value=0.544
+
+one.way<- aov(condition~sizeclass, data = newdf)
+one.way<- aov(condition~rftm_final, data = data)
+
+```
+
+```{r}
+#height_charac <- as.character(data$height_mm)
+
+```
+
+
+
+```{r}
+#Create bins for class sizes
+#data%>% mutate(new_bin = cut(height_mm, breaks = c(80,120)))
+
+data<- data %>%
+  mutate(condition_score = recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(data)
+```
+
+
+```{r}
+#Scatter Plot weight vs. height with condition fill
+p <- ggplot(data=data, aes(color=condition, x=height_mm, y=ww_total_g ), add = "reg.line") + geom_point()
+p+ scale_color_brewer(palette="Accent")
+
+#Scatter plot with R and p-value height vs. ww
+sp<- ggscatter(data, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(method = "pearson", p.accuracy = 0.001, r.accuracy = 0.01)
+sp
+
+#Scatter plot with R^2 and p-value height vs. ww
+sp.r <- ggscatter(data, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~`,`~")))
+sp.r
+
+#Scatter plot with height vs. weight and condition scores colored. R^2 mentioned for each condition
+sp.f <- ggscatter(data, x = "height_mm", y = "ww_total_g",
+   color = "condition", palette = "jco",
+   add = "reg.line")
+sp.f + stat_cor(aes(color = condition, label = paste(after_stat(rr.label))), label.x = 3)
+
+#Box and whisker plot for height vs. condition
+b <- ggplot(data, aes(x=height_mm, y=condition, fill=condition)) + geom_boxplot()
+b+scale_fill_brewer(palette="Dark2")+coord_flip()
+
 
 ```
 
 
 
 
+```{r}
+w <- ggplot(data, aes(x=condition, y=rftm_final, fill=condition)) + geom_boxplot()
+w
+
+height_bin <- cut(data$height_mm, c(40,80,120,180))
+ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
+
+ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
+
+```
 
 
 
