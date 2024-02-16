@@ -39,17 +39,53 @@ data
 summary(data)
 ```
 ```{r}
+#Changing condition to numeric
+data<- data %>%
+  mutate(condition_score = dplyr::recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(data)
+
 #Creating size_class column
 newdf <- data %>%
   mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
                            height_mm < 121 ~ 'med',
                            height_mm > 120 ~ 'large'))
 
-ggplot(newdf, aes(x=condition, y=height_mm))+
-  geom_bar(stat = 'identity')+
+```
+
+
+```{r}
+ggplot(newdf, aes(x=condition_score))+
+  geom_histogram()+
   facet_wrap(~sizeclass, ncol = 1)
 
-ggplot(newdf, aes())
+ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
+  geom_histogram()
+  
+ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
+  geom_histogram(position="dodge", binwidth = .5)
+```
+
+
+```{r}
+#
+
+ggplot(newdf, aes(x=rftm_final, fill=sizeclass))+
+  geom_histogram(position="dodge", binwidth = .2)
+
+```
+
+
+```{r}
+
+
+hist(newdf$condition)
+condition = as.numeric(newdf$condition)
+condtion
+head(newdf)
+
+dplyr::mutate(condition = as.numeric(condition))
 
 ```
 
