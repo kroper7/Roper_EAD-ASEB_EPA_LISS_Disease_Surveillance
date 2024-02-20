@@ -49,16 +49,19 @@ head(data)
 #Creating size_class column
 newdf <- data %>%
   mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
-                           height_mm < 121 ~ 'med',
+                           height_mm < 121 ~ 'medium',
                            height_mm > 120 ~ 'large'))
 
 ```
 
 
 ```{r}
-ggplot(newdf, aes(x=condition_score))+
-  geom_histogram()+
-  facet_wrap(~sizeclass, ncol = 1)
+
+ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
+  geom_histogram(binwidth = .5)+
+  facet_wrap(~sizeclass, ncol = 1)+
+  scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_y_continuous("Number of Oysters", breaks = c(0,2,4,6,8,10))
 
 ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
   geom_histogram()
@@ -82,7 +85,7 @@ ggplot(newdf, aes(x=rftm_final, fill=sizeclass))+
 
 hist(newdf$condition)
 condition = as.numeric(newdf$condition)
-condtion
+
 head(newdf)
 
 dplyr::mutate(condition = as.numeric(condition))
