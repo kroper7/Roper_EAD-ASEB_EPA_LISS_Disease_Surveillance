@@ -36,7 +36,16 @@ g
 data <- g %>%  filter(!row_number() %in% c(61:998))
 data
 summary(data)
+
+#Adding rftm data
+size_rftm <-read.csv("Size_studyASHC/raw_data/SizeASHC_RFTM.csv")
+size_rftm <- size_rftm %>% filter(!row_number() %in% c(61:999))
+data$X <- size_rftm$rftm_final
+colnames(data)[colnames(data) == "X"] = "rftm_final"
 ```
+
+
+
 ```{r}
 #Changing condition to numeric
 data<- data %>%
@@ -161,7 +170,7 @@ sp.size + stat_cor(aes(color = sizeclass, label = paste(after_stat(rr.label))), 
 w <- ggplot(data, aes(x=condition, y=rftm_final, fill=condition)) + geom_boxplot()
 w
 
-height_bin <- cut(data$height_mm, c(40,80,120,180))
+#height_bin <- cut(data$height_mm, c(40,80,120,180))
 ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
 
 ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
@@ -239,15 +248,71 @@ ggplot(data=subset(df_intensity_proportions_size, condition_score < 4), aes(x=co
    facet_grid(~factor(sizeclass, levels=c('small', 'medium', 'large')))
 ```
 ```{r}
-survey_data <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",                           # Identify all CSV files
-  pattern = "0623ASHC_TissueProcessing - Master.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%                              # Store all files in list
-  bind_rows  
+#Using survey data from 2023 at ASHC to compare
+june_rftm <- read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0623ASHC_RFTM - Master.csv")
+june_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0623ASHC_TissueProcessing - Master.csv")
 
-survey_data
+oct_rftm <-  read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/1023ASHC_RFTM - Master.csv")
+oct_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/1023ASHC_TissueProcessing - Master.csv")
+
+
+#Combining survey data and cleaning it up
+survey_data_cond <- rbind(june_condition, oct_condition)
+survey_data_cond <- select(survey_data_cond, -light_regime, -oyster_zone, -X.1:-X.12)
+survey_data_cond <- survey_data_cond %>%  filter(!row_number() %in% c(31:999, 1030:1998))
+
+
+survey_data_rftm <- rbind(june_rftm, oct_rftm)
+survey_data_rftm <- survey_data_rftm %>%  filter(!row_number() %in% c(61:1029))
+survey_data_rftm
+
+#Adding rftm scores to condition score dataframe
+survey_data_cond$X <- survey_data_rftm$rftm_final
+colnames(survey_data_cond)[colnames(survey_data_cond) == "X"] = "rftm_final"
+
+
+
 ```
 
+```{r}
+#Changing condition to numeric
+survey_data_cond<- survey_data_cond %>%
+  mutate(condition_score = dplyr::recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(data)
 
+#Creating size_class column
+survey_data_cond <- survey_data_cond %>%
+  mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
+                           height_mm < 121 ~ 'medium',
+                           height_mm > 120 ~ 'large'))
+survey_data_cond
+
+#Adding size study data to survey data
+all_data <- rbind(survey_data_cond, newdf)
+```
+
+```{r}
+#Creating height and body condition graphs (first graph does not work)
+ggplot(data=subset(all_data, condition_score < 4), aes(x=condition_score , y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within 1-3 Body Condition Scores by Size Classes", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3))+
+  scale_fill_brewer(palette="Dark2")+
+   facet_grid(~factor(sizeclass, levels=c('small', 'medium', 'large')))
+
+ggplot(data=all_data, aes(x=date_collected, y=height_mm, fill=date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="date collected", y = "Mean Shell Height (mm)")
+```
 
 
 
