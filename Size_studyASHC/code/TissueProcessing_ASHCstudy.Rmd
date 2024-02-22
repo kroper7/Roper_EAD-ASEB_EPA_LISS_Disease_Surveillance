@@ -3,9 +3,11 @@ title: "Tissue_ASHCsizestudy"
 author: "Kyra Lenderman"
 date: "2024-01-22"
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r}
@@ -22,10 +24,7 @@ library("AICcmodavg")
 library("rstatix")
 
 
-#Set Path
-setwd("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data")
-
-data_all <- read.csv("C:/Users/kyra.lenderman/Documents/Github/KL_EAD-ASEB_EPA_LISS_Disease_Surveillance/Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
+data_all <- read.csv("Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
 str(data_all)
 head(data_all)
 
@@ -61,7 +60,8 @@ ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
   geom_histogram(binwidth = .5)+
   facet_wrap(~sizeclass, ncol = 1)+
   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
-  scale_y_continuous("Number of Oysters", breaks = c(0,2,4,6,8,10))
+  scale_y_continuous("Number of Oysters", breaks = c(0,2,4,6,8,10))+
+  scale_fill_brewer(palette="Dark2")
 
 ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
   geom_histogram()
@@ -73,9 +73,10 @@ ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
 
 ```{r}
 #
-
 ggplot(newdf, aes(x=rftm_final, fill=sizeclass))+
-  geom_histogram(position="dodge", binwidth = .2)
+  geom_histogram(position="dodge", binwidth = .2)+
+  scale_fill_brewer(palette="Dark2")+
+  scale_x_continuous("RFTM Score", breaks = c(0,0.5,1,2))
 
 ```
 
@@ -114,7 +115,7 @@ one.way<- aov(condition~rftm_final, data = data)
 #Create bins for class sizes
 #data%>% mutate(new_bin = cut(height_mm, breaks = c(80,120)))
 
-data<- data %>%
+newdf<- newdf %>%
   mutate(condition_score = recode(condition, 
                                      "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
                                      "8_poor"= 8, "9_very_poor"= 9))
@@ -145,6 +146,11 @@ sp.f + stat_cor(aes(color = condition, label = paste(after_stat(rr.label))), lab
 b <- ggplot(data, aes(x=height_mm, y=condition, fill=condition)) + geom_boxplot()
 b+scale_fill_brewer(palette="Dark2")+coord_flip()
 
+#Scatter plot rftm vs. condition scores with regression line for size classes
+sp.size <- ggscatter(newdf, x = "condition_score", y="rftm_final",
+   color = "sizeclass", palette = "jco",
+   add = "reg.line")
+sp.size + stat_cor(aes(color = sizeclass, label = paste(after_stat(rr.label))), label.x = 3)
 
 ```
 
@@ -159,10 +165,87 @@ height_bin <- cut(data$height_mm, c(40,80,120,180))
 ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
 
 ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
+```
+
+
+```{r}
+#Table and graph of proportions for condition scores and rftm scores
+df_intensity_proportions<- newdf %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(condition_score, intensity_bin) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+df_intensity_proportions<- na.omit(df_intensity_proportions)
+
+rftm.bc_table <- table(newdf$condition_score, newdf$rftm_final)
+names(dimnames(rftm.bc_table)) <- c("Condition Score", "RFTM Score")
+rftm.bc_table <- addmargins(rftm.bc_table)
+rftm.bc_table
+
+prop_table <- prop.table(rftm.bc_table)
+prop_table <- addmargins(prop_table)
+prop_table
+
+ggplot(data=df_intensity_proportions, aes(x=condition_score, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within Body Condition Scores", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_fill_brewer(palette="Dark2")
+
 
 ```
 
 
+```{r}
+#Table and graph of proportions for condition scores and rftm scores with sizeclass
+
+df_intensity_proportions_size<- newdf %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(sizeclass, condition_score, intensity_bin) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+df_intensity_proportions_size<- na.omit(df_intensity_proportions_size)
+
+ggplot(data=df_intensity_proportions_size, aes(x=condition_score, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within Body Condition Scores by Size Classes", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_fill_brewer(palette="Dark2")+
+   facet_grid(~factor(sizeclass, levels=c('small', 'medium', 'large')))
+```
+
+
+```{r}
+# Comparing proportions of 3 and above for body condition
+ggplot(data=subset(df_intensity_proportions_size, condition_score < 4), aes(x=condition_score , y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within 1-3 Body Condition Scores by Size Classes", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3))+
+  scale_fill_brewer(palette="Dark2")+
+   facet_grid(~factor(sizeclass, levels=c('small', 'medium', 'large')))
+```
+```{r}
+survey_data <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",                           # Identify all CSV files
+  pattern = "0623ASHC_TissueProcessing - Master.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows  
+
+survey_data
+```
 
 
 
