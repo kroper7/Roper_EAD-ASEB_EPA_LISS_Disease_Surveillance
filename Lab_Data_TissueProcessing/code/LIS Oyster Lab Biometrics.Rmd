@@ -11,27 +11,29 @@ Updated 12/27/23/2023 by M. Kachmar
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+```
 
-```{r, echo=FALSE}
-library("dplyr")                                    
-library("plyr")                                     
-library("readr")             
-library("Rmisc")
+```{r}
 library("ggplot2")
+library("readxl")
+library("plyr")                                     
+library("dplyr")
+library("Rmisc")
+library("readr")  
 library("lubridate")
 ```
 
-```{r setup, include = FALSE}
-#Set Path
-#setwd("C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
-knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing")
-```
+
 
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data frame and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
-data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
+data_all <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>%     # Store all files in list
   bind_rows                                         # Combine data sets into one data set 
@@ -39,22 +41,26 @@ data_all                                            # Print data to RStudio cons
 
 as.data.frame(data_all)  # Convert tibble to data.frame
 
-#Filtering NAs 
+#Filtering NAs and unnecessary columns
 data_all <- data_all %>% filter(!is.na(date_collected))
-data_all
+data_all <- select(data_all, -light_regime, -oyster_zone)
 
-write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\All_tissue_processing_data.csv", row.names=FALSE)
+
+write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
 
 data_all
  
 ```
 
+#A wrong value caliper input was identified for the height of sample 0923GOLD_23. This code is removing that value from the data set as we cannot conclude what this original value was. The value is 8.62. This will cause this individual to fall out of the dataset when standardized to length. This code does not completely remove the individual from the dataset.
+```{r}
+data_all$height_mm[data_all$height_mm == "0"] <- NA
+```
 
 ## adding a month column to the data
 
 ```{r}
-data_all <- data_all %>%
-  mutate(date_collected= as.Date(date_collected), month = month(date_collected))
+data_all <- data_all %>% dplyr::mutate(date_collected= as.Date(date_collected), month = month(date_collected))
 
 data_all
 ```
@@ -80,16 +86,10 @@ data_all
 
 ```
 
-#A wrong value caliper input was identified for the height of sample 0923GOLD_23. This code is removing that value from the data set as we cannot conclude what this original value was. The value is 8.62. This will cause this individual to fall out of the dataset when standardized to length. This code does not completely remove the individual from the dataset.
-```{r}
-data_all$height_mm[data_all$height_mm == "8.62"] <- "NA"
-
-
-
-```
 # Summary of all data - height
 ```{r}
-st_height <- summarySE(data_all, measurevar="height_mm", groupvars=c("site", "date_collected"))
+st_height <- summarySE(data_all%>% filter(!is.na(height_mm)), measurevar="height_mm", groupvars=c("site", "date_collected"))
+
 st_height 
 
 #Calculate completeness for QC
@@ -97,7 +97,7 @@ st_height$Completeness <- st_height$N /30
 
 st_height
 
-write.csv(st_height, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing\\Completeness_tissue_processing_data.csv", row.names=FALSE)
+write.csv(st_height, "Lab_Data_TissueProcessing/output\\Completeness_tissue_processing_data.csv", row.names=FALSE)
 ```
 #Mean Height
 ```{r}
@@ -158,8 +158,7 @@ ggplot(data=data_all, aes(x=month, y=condition_score, group = month, fill = site
 data_all
 df_BCS_proportions<- data_all %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, condition_score_bin) %>%
-  summarise(Count= n()) %>%
+  group_by(site, month, condition_score_bin) %>% dplyr ::summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -176,7 +175,7 @@ BCS_proportion_all<- ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion,
  scale_fill_brewer() +
   facet_wrap(~ site)
 
-pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/BCS_proportion_all.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_all.pdf"), height = 7, width = 13)
 print(BCS_proportion_all)
 dev.off()
 ```
@@ -223,7 +222,7 @@ ASHC_BCS_dist <-ggplot(data=df_ASHC, aes(x= condition)) +
   labs(title="Ash Creek Body Condition Score ", x ="Condition categorization")+
   facet_wrap(~ month, scales = "free")
 
-pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/ASHC_BCS_dist.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/ASHC_BCS_dist.pdf"), height = 7, width = 13)
 print(ASHC_BCS_dist)
 dev.off()
 
@@ -234,12 +233,6 @@ ggplot(data=df_ASHC, aes(x= month, y= condition_score, group = month)) +
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Mean Body Condition Score ", x ="month", y= " condition score (1-9)") + scale_y_reverse()
 
-## Mean body condition per 'Zone'
-ggplot(data=df_ASHC, aes(x= oyster_zone, y= condition_score, group = oyster_zone, fill = oyster_zone)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)") + scale_y_reverse()
 ```
 
 #ASHC Proportions graph Body condition scores
@@ -248,8 +241,7 @@ ggplot(data=df_ASHC, aes(x= oyster_zone, y= condition_score, group = oyster_zone
 
 ASHC_BCS_proportions<- df_ASHC %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, condition_score_bin) %>%
-  summarise(Count= n()) %>%
+  group_by(site, month, condition_score_bin) %>% dplyr::summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -266,7 +258,7 @@ BCS_proportion_ASHC<- ggplot(data=ASHC_BCS_proportions, aes(x=month, y= Proporti
  #scale_fill_brewer() +
   #facet_wrap(~ site)
 
-pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/BCS_proportion_ASHC.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_ASHC.pdf"), height = 7, width = 13)
 print(BCS_proportion_ASHC)
 dev.off()
 ```
@@ -301,7 +293,7 @@ ASHC_BCS_percentage <- ASHC_precent_greater_3
   #ylim(0,60)+ 
   scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
 
-pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing", "/ASHC_BCS_percentage.pdf"),height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/ASHC_BCS_percentage.pdf"),height = 7, width = 13)
 print(ASHC_BCS_percentage)
 dev.off() 
 
@@ -351,7 +343,7 @@ st_height_FENC
 ## Body Condition ##
 #Excludes April and May due to scoring change. These months are scored categorically 'fat, medium, watery'. 
 
-st_condition_FENC<- summarySE(df_FENC, measurevar = "condition_score", groupvars = c("date_collected"))
+st_condition_FENC<- summarySE(df_FENC%>% filter(!is.na(condition_score)), measurevar = "condition_score", groupvars = c("date_collected"))
 st_condition_FENC
 
 ```
@@ -382,19 +374,6 @@ ggplot(data=df_FENC, aes(x= month, y= condition_score, group = month)) +
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Fence Creek Mean Body Condition Score", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
 
-## Mean body condition per 'Zone'
-ggplot(data=df_FENC, aes(x= oyster_zone, y= condition_score, group = oyster_zone, fill = oyster_zone)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")+ scale_y_reverse()
-
-## Mean body condition per 'light regime'
-ggplot(data=df_FENC, aes(x= light_regime, y= condition_score, group = light_regime, fill = light_regime)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Mean Body Condition Score ", x ="Zone", y= " condition score (1-9)")+ scale_y_reverse()
 ```
 #HLW correlation
 ```{r}
@@ -521,8 +500,7 @@ st_condition_GOLD
 
 GOLD_BCS_proportions<- df_GOLD %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, condition_score_bin) %>%
-  summarise(Count= n()) %>%
+  group_by(site, month, condition_score_bin) %>% dplyr::summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -539,7 +517,7 @@ BCS_proportion_GOLD <- ggplot(data=GOLD_BCS_proportions, aes(x=month, y= Proport
  #scale_fill_brewer() +
   #facet_wrap(~ site)
 
-pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing" ,"/BCS_proportion_GOLD.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_GOLD.pdf"), height = 7, width = 13)
 print(BCS_proportion_GOLD)
 dev.off()
 ```
@@ -574,7 +552,7 @@ GOLD_BCS_percentage <- GOLD_precent_greater_3
   #ylim(0,60)+ 
   scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
 
-pdf(paste0(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing", "/GOLD_BCS_percentage.pdf"),height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/GOLD_BCS_percentage.pdf"),height = 7, width = 13)
 print(GOLD_BCS_percentage)
 dev.off() 
 
@@ -613,7 +591,7 @@ ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
 #HLW correlation
 ```{r}
 
-#Correlation coefficients
+#Correlation coefficients #These correlations are effected by NA of the one height sample
 cor(df_GOLD$height_mm, df_GOLD$length_mm) #0.1512438
 cor(df_GOLD$height_mm, df_GOLD$width_mm)  #0.1783578
 
