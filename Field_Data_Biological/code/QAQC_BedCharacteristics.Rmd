@@ -12,7 +12,10 @@ description: This R code is used to important and summarize bed characteristics 
 knitr::opts_chunk$set(echo = TRUE)
 # knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+```
 
+
+```{r}
 library(readr)
 library(dplyr)
 library(Rmisc)
@@ -25,8 +28,7 @@ library(Rmisc)
 
 data_all <- list.files(path = "Field_Data_Biological/raw_data/Characteristics",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>% 
-  bind_rows()
+  lapply(read_csv) %>% dplyr::bind_rows()
 data_all
 
 as.data.frame(data_all)
@@ -48,7 +50,7 @@ bedheight_summary_NY <- summarySE(data = Bed_height_NY, measurevar = "Bed_height
 
 bedheight_summary_NY
 
-#write.csv(bedheight_summary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
+#write.csv(bedheight_summary, "Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
 ```
 
 #oyster density metrics
