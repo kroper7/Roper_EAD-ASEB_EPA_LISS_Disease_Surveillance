@@ -50,7 +50,7 @@ bedheight_summary_NY <- summarySE(data = Bed_height_NY, measurevar = "Bed_height
 
 bedheight_summary_NY
 
-#write.csv(bedheight_summary, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
+#write.csv(bedheight_summary, "Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
 ```
 
 #oyster density metrics

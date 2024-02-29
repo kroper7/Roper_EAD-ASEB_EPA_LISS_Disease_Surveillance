@@ -31,7 +31,7 @@ library(ggplot2)
 ```{r}
 ##Changed working directory for file path, should be able to use now (1/30/24)##
 #### need to work on this chunk to read in all files at once - not ready to use  
-#data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
+#data_all <- list.files(path = "Field_Data_Biological",                                                               
  # pattern = "*.xlsx", full.names = TRUE) %>%         # Identify all xlsx files
  # lapply(read_excel)                           # Store all files in list
 #
