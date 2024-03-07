@@ -1,0 +1,16 @@
+Site_Name,TripDate,Bed_Section,TopMark,BottomMark,Measure_direction,BedHeight_cm,BedHeight_Notes
+Ash Creek,6/12/2023,ASHC_East,bed crest,bed base,S,64,Katy Shoemaker
+Ash Creek,6/12/2023,ASHC_East,bed crest,bed base,E,64,Katy Shoemaker
+Ash Creek,6/12/2023,ASHC_East,bed crest,bed base,N,51.5,Katy Shoemaker
+Ash Creek,6/12/2023,ASHC_East,bed crest,bed base,W,47,Katy Shoemaker
+Ash Creek,6/12/2023,ASHC_West.main,bed crest,bed base,E,63,Katy Shoemaker; hard to determine true base because shelves toward shore
+Ash Creek,6/12/2023,ASHC_West.main,bed crest,bed base,S,54,Katy Shoemaker; hard to determine true base because shelves toward shore
+Fence Creek,6/14/2023,FENC_Sun_Oceanside,bed crest,bed base,NNE,52,Top mark on south side of creek at junction between creek wall and wall spanning out from bridge
+Fence Creek,6/14/2023,FENC_Sun_Oceanside,bed crest,bed base,NE,63.5,Top mark on south side of creek at junction between creek wall and wall spanning out from bridge
+Fence Creek,6/14/2023,FENC_Sun_Oceanside,bed crest,bed base,NEE,103.5,Top mark on south side of creek at junction between creek wall and wall spanning out from bridge
+Fence Creek,6/14/2023,FENC_Shade_UnderBridge,bed crest,bed base,NE,79,Top mark on south side of creek under the bridge; difficult to determine whether bottom was shell  vs rock (underwater).
+Fence Creek,6/14/2023,FENC_Shade_UnderBridge,bed crest,bed base,NNW,100,Top mark on south side of creek under the bridge; difficult to determine whether bottom was shell  vs rock (underwater).
+Fence Creek,6/14/2023,FENC_Shade_UnderBridge,bed crest,bed base,NWW,66,Top mark on south side of creek under the bridge; difficult to determine whether bottom was shell  vs rock (underwater).
+Fence Creek,6/14/2023,FENC_Sun_GilmanLease,bed crest,bed base,NW,115,Top mark on south side of creek where shell bags and stringers are located
+Fence Creek,6/14/2023,FENC_Sun_GilmanLease,bed crest,bed base,NW,107,Top mark on south side of creek where shell bags and stringers are located
+Fence Creek,6/14/2023,FENC_Sun_GilmanLease,bed crest,bed base,NW,104,Top mark on south side of creek where shell bags and stringers are located
