@@ -1,0 +1,28 @@
+Site_Name,TripDate,RUGOS_NUM,ChainType,Bed_Section,Zone,LengthContoured_cm,LengthStraightline_cm,Rugosity,Notes
+Ash Creek,2023-06-12,1,229cm_1cm.links,ASHC_East,IT_up,229.0,162.5,.70961,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,2,229cm_1cm.links,ASHC_East,IT_up,229.0,157.5,.68777,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,3,229cm_1cm.links,ASHC_East,IT_up,229.0,103.0,.44978,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,4,229cm_1cm.links,ASHC_East,IT_up,229.0,116.5,.50873,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,5,229cm_1cm.links,ASHC_East,IT_up,229.0,89.0,.38865,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,6,229cm_1cm.links,ASHC_West.main,IT_up,229.0,87.0,.37991,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,7,229cm_1cm.links,ASHC_West.main,IT_up,229.0,93.5,.4083,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,8,229cm_1cm.links,ASHC_West.main,IT_mid,229.0,99.0,.43231,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,9,229cm_1cm.links,ASHC_West.main,IT_mid,229.0,101.0,.44105,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,10,229cm_1cm.links,ASHC_West.main,IT_low,229.0,184.5,.80568,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,11,229cm_1cm.links,ASHC_West.main,IT_low,229.0,180.0,.78603,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,12,229cm_1cm.links,ASHC_East,IT_mid,229.0,131.5,.57424,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,13,229cm_1cm.links,ASHC_East,IT_mid,229.0,162.0,.70742,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,14,229cm_1cm.links,ASHC_East,IT_low,229.0,166.0,.72489,Steve Arnott & Lisa Guy
+Ash Creek,2023-06-12,15,229cm_1cm.links,ASHC_East,IT_low,229.0,189.0,.82533,Steve Arnott & Lisa Guy
+Fence Creek,2023-06-14,1,229cm_1cm.links,FENC_Sun_Oceanside,IT_up,229.0,103.0,.44978,"Steve Arnott & Lisa Guy. South side of creek, seaward of bridge."
+Fence Creek,2023-06-14,2,229cm_1cm.links,FENC_Sun_Oceanside,IT_up,229.0,124.0,.54148,"Steve Arnott & Lisa Guy. South side of creek, seaward of bridge."
+Fence Creek,2023-06-14,3,229cm_1cm.links,FENC_Sun_Oceanside,IT_low,229.0,112.0,.48908,"Steve Arnott & Lisa Guy. Middle of creek, seaward of bridge."
+Fence Creek,2023-06-14,4,229cm_1cm.links,FENC_Sun_Oceanside,IT_low,229.0,103.0,.44978,"Steve Arnott & Lisa Guy. Middle of creek, seaward of bridge."
+Fence Creek,2023-06-14,5,229cm_1cm.links,FENC_Shade_UnderBridge,IT_up,229.0,92.0,.40175,Steve Arnott & Lisa Guy. South side of creek under bridge.
+Fence Creek,2023-06-14,6,229cm_1cm.links,FENC_Shade_UnderBridge,IT_low,229.0,149.0,.65066,Steve Arnott & Lisa Guy. South side of creek under bridge.
+Fence Creek,2023-06-14,7,229cm_1cm.links,FENC_Shade_UnderBridge,IT_up,229.0,118.5,.51747,Steve Arnott & Lisa Guy. South side of creek under bridge.
+Fence Creek,2023-06-14,8,229cm_1cm.links,FENC_Shade_UnderBridge,IT_low,229.0,151.0,.65939,Steve Arnott & Lisa Guy. South side of creek under bridge.
+Fence Creek,2023-06-14,9,229cm_1cm.links,FENC_Sun_GilmanLease,IT_up,229.0,165.0,.72052,Steve Arnott & Lisa Guy. Small mound of oysters furtherest inland (near data sonde station).
+Fence Creek,2023-06-14,10,229cm_1cm.links,FENC_Sun_GilmanLease,IT_up,229.0,163.0,.71179,Steve Arnott & Lisa Guy. Middle of creek.
+Fence Creek,2023-06-14,11,229cm_1cm.links,FENC_Sun_GilmanLease,IT_up,229.0,146.0,.63755,"Steve Arnott & Lisa Guy. North side of creek, near bridge."
+Fence Creek,2023-06-14,12,229cm_1cm.links,FENC_Sun_GilmanLease,IT_up,229.0,121.0,.52838,"Steve Arnott & Lisa Guy. North side of creek, right next to bridge."
