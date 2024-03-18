@@ -643,6 +643,7 @@ mean_rftm_score$date_collected <- as.Date(mean_rftm_score$date_collected)
 
 ggplot(data = mean_rftm_score, aes(x=date_collected, y=mean_rftm))+
   scale_y_continuous("Mean RFTM Score")+
+ scale_x_continuous("Date Collected", labels = as.character(mean_rftm_score$date_collected), breaks = mean_rftm_score$date_collected)+ 
   geom_line()+
   geom_point()
 ```
