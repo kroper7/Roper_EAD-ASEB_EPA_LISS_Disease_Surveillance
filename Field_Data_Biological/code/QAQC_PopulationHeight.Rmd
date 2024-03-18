@@ -8,13 +8,17 @@ output: html_document
 description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
-Last updated 1/30/24 by K. Lenderman
+Last updated 3/15/24 by K. Lenderman
 
 
 ```{r, setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 # knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+```
 
+
+```{r}
 library(tidyverse)
 library(gtools)
 library(Rmisc)
@@ -98,55 +102,54 @@ shellsize <- shellsize %>% select("Date_collected", "Site", "State", "Quadrat", 
 
 # This chunk is exploritory for fall surveys. Thinking about best way to pull, clean, and merge data and best ways to standardize June and October survey data
 
-#Pulling all length data into single sheet
+#Pulling all height data into single sheet
 ```{r}
 
 ## OCTOBER FALL SURVEY 
 
 
 
-length_all <- list.files(path = "Field_Data_Biological/raw_data/Length",                           # Identify all CSV files
-  pattern = "*.xlsx", full.names = TRUE) %>% 
-  lapply(read_excel) %>%    # Store all files in list
+height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%    # Store all files in list
   bind_rows 
 
- length_all
+ height_all
 
  #Removing 'Count' column
- length_all$Count<- NULL
+ height_all$Count<- NULL
 
 
 ```
 
-#Cleaning up length data
-#Need to fix "length" and change to "height" - using terms incorrectly
+#Cleaning up height data
 ```{r}
 
-# Subset by category length (live, box, gaper)
+# Subset by category height (live, box, gaper)
 
 #Live
 
-length_live <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_live')
-length_live <- na.omit(length_live)
-length_live$Survival_status<- rep("Live", nrow(length_live))
-length_live <- length_live %>% dplyr::rename(Height = Length_live)
-length_live
+height_live <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_live')
+height_live <- na.omit(height_live)
+height_live$Survival_status<- rep("Live", nrow(height_live))
+height_live <- height_live %>% dplyr::rename(Height = Height_live)
+height_live
 
 #Box
 
-length_box <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_box')
-length_box <- na.omit(length_box)
-length_box$Survival_status<- rep("Box", nrow(length_box))
-length_box <- length_box %>% dplyr::rename(Height = Length_box)
+height_box <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_box')
+height_box <- na.omit(height_box)
+height_box$Survival_status<- rep("Box", nrow(height_box))
+height_box <- height_box %>% dplyr::rename(Height = Height_box)
 
 #Gaper
 
-length_gaper <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_gaper')
-length_gaper <- na.omit(length_gaper)
-length_gaper$Survival_status<- rep("Gaping", nrow(length_gaper))
-length_gaper <- length_gaper %>% dplyr::rename(Height = Length_gaper)
+height_gaper <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_gaper')
+height_gaper <- na.omit(height_gaper)
+height_gaper$Survival_status<- rep("Gaping", nrow(height_gaper))
+height_gaper <- height_gaper %>% dplyr::rename(Height = Height_gaper)
 
-Height_all<- rbind(length_live,length_box,length_gaper)
+Height_all<- rbind(height_live,height_box,height_gaper)
 Height_all$Season<- rep("fall", nrow(Height_all))
 Height_all
 
