@@ -504,8 +504,7 @@ all_data_dates_prop<- na.omit(all_data_dates_prop)
 #Changing dates and sizes to align with month
 all_data_dates_prop$date_collected <- factor(all_data_dates_prop$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "8/23/2024", "2023-09-05", "2023-10-03", "2023-11-06"),
         labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
-all_data_dates_prop$sizeclass <- factor(all_data_dates_prop$sizeclass, levels = c("small", "medium", "large"),
-                                        labels = c("Small", "Medium", "Large"))
+
 ```
 
 
@@ -575,7 +574,7 @@ ggplot(data=subset(all_data_dates_prop, condition_score < 4), aes(x=condition_sc
 
 ```{r}
 #Changing dates and sizes to align with month
-all_data_dates$date_collected <- factor(all_data_dates$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "8/23/2024", "2023-09-05", "2023-10-03", "2023-11-06"),
+all_data_dates$date_collected <- factor(all_data_dates$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
         labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
 all_data_dates$sizeclass <- factor(all_data_dates$sizeclass, levels = c("small", "medium", "large"),
                                         labels = c("Small", "Medium", "Large"))
@@ -622,7 +621,6 @@ p <- na.omit(mean_body_condition)
 
 ```{r}
 #Line graph of mean body condition for each month ASHC
-p$date_collected <- as.Date(p$date_collected)
 ggplot(data = p, aes(x=date_collected, y=mean_bsc))+
   scale_y_continuous("Mean Body Condtion Score")+
   geom_line()+
@@ -633,27 +631,27 @@ ggplot(data = p, aes(x=date_collected, y=mean_bsc))+
 #Calculating average rftm score for each month at ASHC
 mean_rftm_score <- all_data_dates %>%
   dplyr::group_by(date_collected)%>%
-  dplyr::summarize(mean_bsc = mean(rftm_final, na.rm = TRUE))
-mean_rftm_score$date_collected <- as.Date(mean_rftm_score$date_collected)
+  dplyr::summarize(mean_rftm = mean(rftm_final, na.rm = TRUE))
 
 ```
 
 ```{r}
-#Line graph of mean body condition for each month ASHC
-mean_rftm_score$date_collected <- factor(mean_rftm_score$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
-        labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
+#Line graph of mean rftm for each month ASHC
+mean_rftm_score$date_collected <- factor(mean_rftm_score$date_collected, levels =c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"),
+        labels= c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"))
 
-ggplot(data = mean_rftm_score, aes(x=date_collected, y=mean_bsc))+
+ggplot(data = mean_rftm_score, aes(x=date_collected, y=mean_rftm))+
   scale_y_continuous("Mean RFTM Score")+
   scale_x_continuous("Date Collected", labels = as.character(mean_rftm_score$date_collected), breaks = mean_rftm_score$date_collected)+ 
   geom_line()+
   geom_point()
 ```
+
 ```{r}
 #Adding mean rftm scores to body condition means
 mean_all <- data.frame(mean_body_condition)
 mean_all[,'empty_column'] = NA
-mean_all$empty_column <- mean_rftm_score$mean_bsc
+mean_all$empty_column <- mean_rftm_score$mean_rftm
 colnames(mean_all)[colnames(mean_all) == "empty_column"] = "rftm_mean"
 mean_all
 ```
