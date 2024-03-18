@@ -56,17 +56,13 @@ library(ggplot2)
 
 
 #June 2023
-shellsize <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_ShellSize.xlsx",
-                     sheet = 1, col_names = TRUE) 
+shellsize <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_ShellSize.csv") 
 
-quadratdensity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+quadratdensity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.csv") 
 
-rugosity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+rugosity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.csv") 
 
-BedHeight <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.xlsx",
-                     sheet = 1, col_names = TRUE) 
+BedHeight <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.csv") 
 ```
 
 #Cleaning up June 2023 survey data to be meragable with other data

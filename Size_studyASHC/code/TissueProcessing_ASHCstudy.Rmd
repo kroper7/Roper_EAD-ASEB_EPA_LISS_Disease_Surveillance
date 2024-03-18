@@ -93,12 +93,7 @@ ggplot(newdf, aes(x=rftm_final, fill=sizeclass))+
 ```{r}
 
 
-hist(newdf$condition)
-condition = as.numeric(newdf$condition)
-
 head(newdf)
-
-dplyr::mutate(condition = as.numeric(condition))
 
 ```
 
@@ -108,8 +103,7 @@ dplyr::mutate(condition = as.numeric(condition))
 one.way<- aov(height_mm~condition, data = data)
 summary(one.way)  #p-value=0.544
 
-one.way<- aov(condition~sizeclass, data = newdf)
-one.way<- aov(condition~rftm_final, data = data)
+
 
 ```
 
@@ -170,10 +164,6 @@ sp.size + stat_cor(aes(color = sizeclass, label = paste(after_stat(rr.label))), 
 w <- ggplot(data, aes(x=condition, y=rftm_final, fill=condition)) + geom_boxplot()
 w
 
-#height_bin <- cut(data$height_mm, c(40,80,120,180))
-ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
-
-ggplot(data, aes(x=height_bin, y= rftm_final, fill=height_bin)) + geom_boxplot()
 ```
 
 
@@ -503,7 +493,7 @@ ggplot(data=all_data_dates, aes(x=date_collected, y=rftm_final, fill=date_collec
 ```
 
 ```{r}
-#Proportion for body condition vs. proportion seperated by size class & date collected
+#Proportion for body condition vs. proportion seperated by date collected
 all_data_dates_prop<- all_data_dates %>%
   mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
   group_by(date_collected, condition_score, rftm_score) %>% dplyr:: summarise(Count= n()) %>%
@@ -512,7 +502,7 @@ all_data_dates_prop<- all_data_dates %>%
 all_data_dates_prop<- na.omit(all_data_dates_prop)
 
 #Changing dates and sizes to align with month
-all_data_dates_prop$date_collected <- factor(all_data_dates_prop$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
+all_data_dates_prop$date_collected <- factor(all_data_dates_prop$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "8/23/2024", "2023-09-05", "2023-10-03", "2023-11-06"),
         labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
 all_data_dates_prop$sizeclass <- factor(all_data_dates_prop$sizeclass, levels = c("small", "medium", "large"),
                                         labels = c("Small", "Medium", "Large"))
@@ -520,7 +510,7 @@ all_data_dates_prop$sizeclass <- factor(all_data_dates_prop$sizeclass, levels = 
 
 
 ```{r}
-#Facet wrap for body condition vs. proportion seperated by size class & date collected
+#Facet wrap for body condition vs. proportion seperated by date collected
 ggplot(all_data_dates_prop, aes(x=condition_score, y=Proportion, fill=rftm_score))+
   geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
   theme(axis.text.x = element_text(angle = 15, vjust = 1, hjust=1, size = 8), plot.title = element_text(size = 10), axis.text.y = element_text(size = 9))+
@@ -543,6 +533,17 @@ ggplot(all_data_dates_prop, aes(x=condition_score, fill=date_collected))+
 ```
 
 ```{r}
+#Proportion for body condition vs. proportion seperated by size class & date collected
+all_data_dates_prop<- all_data_dates %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(date_collected, condition_score, rftm_score, sizeclass) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+all_data_dates_prop<- na.omit(all_data_dates_prop)
+
+all_data_dates_prop$sizeclass <- factor(all_data_dates_prop$sizeclass, levels = c("small", "medium", "large"),
+                                        labels = c("Small", "Medium", "Large"))
+
 #Facet wrap proportion of condition score >3 vs. rftm score by size class and date collected
 ggplot(data=subset(all_data_dates_prop, condition_score < 4), aes(x=condition_score, y=Proportion, fill=rftm_score))+
   geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
@@ -574,7 +575,7 @@ ggplot(data=subset(all_data_dates_prop, condition_score < 4), aes(x=condition_sc
 
 ```{r}
 #Changing dates and sizes to align with month
-all_data_dates$date_collected <- factor(all_data_dates$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
+all_data_dates$date_collected <- factor(all_data_dates$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "8/23/2024", "2023-09-05", "2023-10-03", "2023-11-06"),
         labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
 all_data_dates$sizeclass <- factor(all_data_dates$sizeclass, levels = c("small", "medium", "large"),
                                         labels = c("Small", "Medium", "Large"))
