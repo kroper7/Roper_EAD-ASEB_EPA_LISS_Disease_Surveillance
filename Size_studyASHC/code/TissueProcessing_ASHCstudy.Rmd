@@ -6,8 +6,8 @@ date: "2024-01-22"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r}
@@ -504,8 +504,7 @@ all_data_dates_prop<- na.omit(all_data_dates_prop)
 #Changing dates and sizes to align with month
 all_data_dates_prop$date_collected <- factor(all_data_dates_prop$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "8/23/2024", "2023-09-05", "2023-10-03", "2023-11-06"),
         labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
-all_data_dates_prop$sizeclass <- factor(all_data_dates_prop$sizeclass, levels = c("small", "medium", "large"),
-                                        labels = c("Small", "Medium", "Large"))
+
 ```
 
 
@@ -536,30 +535,14 @@ ggplot(all_data_dates_prop, aes(x=condition_score, fill=date_collected))+
 #Proportion for body condition vs. proportion seperated by size class & date collected
 all_data_dates_prop<- all_data_dates %>%
   mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
-  group_by(date_collected, condition_score, rftm_score, sizeclass) %>% dplyr:: summarise(Count= n()) %>%
+  group_by(date_collected, condition_score, rftm_score) %>% dplyr:: summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 all_data_dates_prop<- na.omit(all_data_dates_prop)
 
-all_data_dates_prop$sizeclass <- factor(all_data_dates_prop$sizeclass, levels = c("small", "medium", "large"),
-                                        labels = c("Small", "Medium", "Large"))
 
-#Facet wrap proportion of condition score >3 vs. rftm score by size class and date collected
-ggplot(data=subset(all_data_dates_prop, condition_score < 4), aes(x=condition_score, y=Proportion, fill=rftm_score))+
-  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
-  theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), plot.title = element_text(size = 10))+ 
-  theme(axis.text.x = element_text(angle = 0, vjust = 1, hjust=1))+
-  labs(title="Proportion of RFTM scores vs. Body Condition Scores by Date Collected & Size Class", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1), angle = 0))+
-  theme(plot.title = element_text(size = 12))+
-  theme(axis.text=element_text(size=7))+
- scale_fill_brewer(palette = "YlOrBr")+
-  scale_y_continuous("Proportion", breaks = c(0.00,0.50,1.00))+
-   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
-  facet_grid(date_collected ~ factor(sizeclass, levels=c('Small', 'Medium', 'Large')))
-
-
-#Facet wrap size class & date collected flipped
-ggplot(data=subset(all_data_dates_prop, condition_score < 4), aes(x=condition_score, y=Proportion, fill=rftm_score))+
+#Facet wrap size class & date collected 
+ggplot(data=all_data_dates_prop, aes(x=condition_score, y=Proportion, fill=rftm_score))+
   geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())+ 
   theme(axis.text.x = element_text(angle = 0, vjust = 1, hjust=1))+
@@ -569,13 +552,13 @@ ggplot(data=subset(all_data_dates_prop, condition_score < 4), aes(x=condition_sc
  scale_fill_brewer(palette = "YlOrBr")+
   scale_y_continuous("Proportion", breaks = c(0.00,0.50,1.00))+
    scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
-  facet_grid(factor(sizeclass, levels=c('Small', 'Medium', 'Large'))~date_collected)
+  facet_grid(~date_collected)
 ```
 
 
 ```{r}
 #Changing dates and sizes to align with month
-all_data_dates$date_collected <- factor(all_data_dates$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "8/23/2024", "2023-09-05", "2023-10-03", "2023-11-06"),
+all_data_dates$date_collected <- factor(all_data_dates$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
         labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
 all_data_dates$sizeclass <- factor(all_data_dates$sizeclass, levels = c("small", "medium", "large"),
                                         labels = c("Small", "Medium", "Large"))
@@ -622,7 +605,6 @@ p <- na.omit(mean_body_condition)
 
 ```{r}
 #Line graph of mean body condition for each month ASHC
-p$date_collected <- as.Date(p$date_collected)
 ggplot(data = p, aes(x=date_collected, y=mean_bsc))+
   scale_y_continuous("Mean Body Condtion Score")+
   geom_line()+
@@ -633,27 +615,28 @@ ggplot(data = p, aes(x=date_collected, y=mean_bsc))+
 #Calculating average rftm score for each month at ASHC
 mean_rftm_score <- all_data_dates %>%
   dplyr::group_by(date_collected)%>%
-  dplyr::summarize(mean_bsc = mean(rftm_final, na.rm = TRUE))
-mean_rftm_score$date_collected <- as.Date(mean_rftm_score$date_collected)
+  dplyr::summarize(mean_rftm = mean(rftm_final, na.rm = TRUE))
 
 ```
 
 ```{r}
-#Line graph of mean body condition for each month ASHC
-mean_rftm_score$date_collected <- factor(mean_rftm_score$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
-        labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
+#Line graph of mean rftm for each month ASHC
+mean_rftm_score$date_collected <- factor(mean_rftm_score$date_collected, levels =c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"),
+        labels= c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"))
+mean_rftm_score$date_collected <- as.Date(mean_rftm_score$date_collected)
 
-ggplot(data = mean_rftm_score, aes(x=date_collected, y=mean_bsc))+
+ggplot(data = mean_rftm_score, aes(x=date_collected, y=mean_rftm))+
   scale_y_continuous("Mean RFTM Score")+
-  scale_x_continuous("Date Collected", labels = as.character(mean_rftm_score$date_collected), breaks = mean_rftm_score$date_collected)+ 
+ scale_x_continuous("Date Collected", labels = as.character(mean_rftm_score$date_collected), breaks = mean_rftm_score$date_collected)+ 
   geom_line()+
   geom_point()
 ```
+
 ```{r}
 #Adding mean rftm scores to body condition means
 mean_all <- data.frame(mean_body_condition)
 mean_all[,'empty_column'] = NA
-mean_all$empty_column <- mean_rftm_score$mean_bsc
+mean_all$empty_column <- mean_rftm_score$mean_rftm
 colnames(mean_all)[colnames(mean_all) == "empty_column"] = "rftm_mean"
 mean_all
 ```
