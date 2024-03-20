@@ -7,15 +7,16 @@ output: html_document
 description: This R code is used to import and summarize RFTM (Rays Fluid Thioglycollate Medium) intensity scoring from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. The scale used to score intensity for individuals is the Mackins Scale (citation). This score can be used to calculate prevalence, weighted prevalence and intensity across the population. 
 ---
 
-Last updated 1/31/2024 by K.Lenderman
-
+Last updated 3/20/24 by M. Kachmar
+  - 2024 files upload 
+  - Accuracy between double reads 76%
 
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 ```{r, echo=FALSE}
@@ -84,8 +85,7 @@ write.csv(st_rftm_final, "Lab_Data_RFTM\\output\\Completeness_RFTM_intensity_dat
 ```
 
 # Comparied reader 1 and reader 2
-  --- THis is not currently working properly -- Currently calling everything with two reads to be TRUE
-  
+
 ```{r}
 data_all$results = ifelse(data_all$rftm_intensity_read1 < data_all$rftm_intensity_read2, 'FALSE',
   ifelse(data_all$rftm_intensity_read1 > data_all$rftm_intensity_read2, 'FALSE',
