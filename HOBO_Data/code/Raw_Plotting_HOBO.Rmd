@@ -7,8 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+ knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 
@@ -38,46 +38,46 @@ path_out <- 'HOBO_Data/output/'
 
 #### Fence Creek ####
 ```{r}
-FENC_HOBO_23 <- read_csv("HOBO_Data\\raw_data\\112023_FENC_HOBO.csv", col_names = TRUE)   
+FENC_HOBO <- read_csv("HOBO_Data\\raw_data\\032024_FENC_HOBO.csv", col_names = TRUE)   
 
-as.data.frame(FENC_HOBO_23)
+as.data.frame(FENC_HOBO)
 
 
 
 #Change column names
 
-FENC_HOBO_23 <- FENC_HOBO_23 %>%
+FENC_HOBO <- FENC_HOBO %>%
   dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
   dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
 FENC_HOBO_23
 
-FENC_HOBO_23$Date_Time <- as.character(FENC_HOBO_23$Date_Time)
-date_time <- strsplit(FENC_HOBO_23$Date_Time, " ")  # Split at the space
-FENC_HOBO_23$Date <- sapply(date_time, "[[", 1)  # Extract date
-FENC_HOBO_23$Time <- sapply(date_time, function(x) {
+FENC_HOBO$Date_Time <- as.character(FENC_HOBO$Date_Time)
+date_time <- strsplit(FENC_HOBO$Date_Time, " ")  # Split at the space
+FENC_HOBO$Date <- sapply(date_time, "[[", 1)  # Extract date
+FENC_HOBO$Time <- sapply(date_time, function(x) {
   if(length(x) >= 2) {
     x[[2]]  # Extract the second element if it exists
   } else {
     NA  # Assign NA if the vector is too short
   }
 })
-print(FENC_HOBO_23)
+print(FENC_HOBO)
 
 ## removing unneeded columns with NAs
 
-FENC_HOBO_23 <- FENC_HOBO_23 %>%
+FENC_HOBO <- FENC_HOBO %>%
   dplyr::select( -c("Host Connected", "Water Detect", "Button Down", "Button Up", "End of File"))
 
-FENC_HOBO_23 <- na.omit(FENC_HOBO_23)
+FENC_HOBO <- na.omit(FENC_HOBO)
 
 #### Lets look at the data 
 
-ggplot(FENC_HOBO_23, aes(Date_Time, Temperature)) + geom_point()
+ggplot(FENC_HOBO, aes(Date_Time, Temperature)) + geom_point()
 
 
 # Hourly Means 
 
-FENC_means <- FENC_HOBO_23 %>%
+FENC_means <- FENC_HOBO %>%
   mutate(Date_Time = as.POSIXct(substr(Date_Time, 1, 13), format = "%m/%d/%Y %H")) %>% # Adjust the date format
   tidyr::pivot_longer(cols = c("Temperature"), names_to = "variable", values_to = "value") %>%
   dplyr::group_by(Date_Time, variable) %>%
@@ -103,6 +103,76 @@ FENC_plot
 
 pdf(paste0(path_out,"FENC_HOBO.pdf"), height = 7, width = 14)
 print(FENC_plot)
+
+```
+
+#### Ash Creek ####
+```{r}
+ASHC_HOBO <- read_csv("HOBO_Data\\raw_data\\032024_ASHC_HOBO.csv", col_names = TRUE)   
+
+as.data.frame(ASHC_HOBO)
+
+
+
+#Change column names
+
+ASHC_HOBO<- ASHC_HOBO %>%
+  dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
+  dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
+ASHC_HOBO
+
+ASHC_HOBO$Date_Time <- as.character(ASHC_HOBO$Date_Time)
+date_time <- strsplit(ASHC_HOBO$Date_Time, " ")  # Split at the space
+ASHC_HOBO$Date <- sapply(date_time, "[[", 1)  # Extract date
+ASHC_HOBO$Time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(ASHC_HOBO)
+
+## removing unneeded columns with NAs
+
+ASHC_HOBO <- ASHC_HOBO %>%
+  dplyr::select( -c("Host Connected", "Button Down", "Button Up", "End of File"))
+
+ASHC_HOBO <- na.omit(ASHC_HOBO)
+
+#### Lets look at the data 
+
+ggplot(ASHC_HOBO, aes(Date_Time, Temperature)) + geom_point()
+
+
+# Hourly Means 
+
+ASHC_means <- ASHC_HOBO %>%
+  mutate(Date_Time = as.POSIXct(substr(Date_Time, 1, 13), format = "%m/%d/%Y %H")) %>% # Adjust the date format
+  tidyr::pivot_longer(cols = c("Temperature"), names_to = "variable", values_to = "value") %>%
+  dplyr::group_by(Date_Time, variable) %>%
+  dplyr::summarise(mean_value = mean(value),sd_value = sd(value),se_value = sd(value) / sqrt(n())) 
+
+ASHC_means
+```
+
+```{r}
+ASHC_plot<- ASHC_means %>%
+    ggplot(aes(Date_Time, mean_value))+ geom_point() + 
+    geom_line(size = 0.2, position=position_dodge(.4))+
+    #scale_color_manual(values = "grey38")+
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+              geom_errorbar(aes(ymin=(mean_value)-(se_value), 
+                                ymax=(mean_value)+(se_value)), 
+                            width=0,position=position_dodge(.4))+
+     ggtitle("Ash Creek HOBO Temperature Data ") +
+              labs(x = "Time", y = "Temperature") +
+              theme_classic() + theme(axis.text= element_text(size=12), axis.title = element_text(size= 12))
+ASHC_plot
+
+pdf(paste0(path_out,"ASHC_HOBO.pdf"), height = 7, width = 14)
+print(ASHC_plot)
 
 ```
 
