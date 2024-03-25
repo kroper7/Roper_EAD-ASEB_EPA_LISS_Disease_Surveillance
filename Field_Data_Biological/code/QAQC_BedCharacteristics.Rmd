@@ -32,6 +32,7 @@ library("lubridate")
 data_all <- list.files(path = "Field_Data_Biological/raw_data/Characteristics",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>% dplyr::bind_rows()
+
 data_all
 
 as.data.frame(data_all)
@@ -39,8 +40,7 @@ as.data.frame(data_all)
 #cleaning up date date
 data_all <- data_all %>%
   dplyr::rename(Date_collected = Date)
-data_all$Date_collected <- factor(data_all$Date_collected, levels = c("10/3/2023","10-5-23", "10/16/2023", "10/17/2023" ),
-                                     labels = c("2023-10-03","2023-10-05","2023-10-16", "2023-10-17" ))
+data_all$Date_collected <- as.Date(data_all$Date_collected, format= "%m/%d/%Y")
 
 #adding season columns
 data_all <- data_all %>%
@@ -175,7 +175,6 @@ write.csv(Rugosity_master, "Master_files/rugosity_all_data.csv", row.names = FAL
 
 rugosity_summary<- data_all %>%
   filter(!is.na(Live_count) & !is.na(Box_count) & !is.na(Gaper_count) & !is.na(Bed_height))
-bedheight_summary 
 
 rugosity_summary <- summarySE(data = Rugosity_master, measurevar = "Rugosity", groupvars = c( "Date_collected", "Site"))
 
@@ -246,6 +245,9 @@ Percentcoverage_master <- rbind(percov_all, percov_june2023)
 write.csv(Percentcoverage_master, "Master_files/percent_coverage_all_data.csv", row.names = FALSE)
 ```
 
+```{r}
+#Summary of percent cover at all sites
+```
 
 
 #oyster density metrics. QAQC_PopulationHeight script implements this code.
