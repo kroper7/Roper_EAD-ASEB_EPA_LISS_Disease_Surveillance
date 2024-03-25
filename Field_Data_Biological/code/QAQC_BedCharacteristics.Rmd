@@ -3,7 +3,7 @@ title: "BedCharacteristics_Oct2023Survey"
 author: "Mariah Kachmar"
 date: "12/13/2023"
 output: html_document
-updated: 1/30/24
+updated: 3/19/2024
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's October 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar Beach and Laurel Hollow subtidal sites in New York. 
 ---
 
@@ -15,46 +15,244 @@ knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-AS
 ```
 
 
-```{r}
-library(readr)
-library(dplyr)
-library(Rmisc)
+```{r, echo=FALSE}
+library("dplyr")                                    
+library("plyr")                                     
+library("readr")             
+library("Rmisc")
+library("ggplot2")
+library("lubridate")
 ```
 
 
 
 
 ```{r}
-
+#Pulling all bed characteristic files
 data_all <- list.files(path = "Field_Data_Biological/raw_data/Characteristics",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
   lapply(read_csv) %>% dplyr::bind_rows()
+
 data_all
 
 as.data.frame(data_all)
 
- 
-data_all <- data_all %>% filter(!is.na(Date))
-data_all
+#cleaning up date date
+data_all <- data_all %>%
+  dplyr::rename(Date_collected = Date)
+data_all$Date_collected <- as.Date(data_all$Date_collected, format= "%m/%d/%Y")
+
+#adding season columns
+data_all <- data_all %>%
+  mutate(Date_collected = as.Date(Date_collected), month = month(Date_collected))
+data_all <- data_all %>%
+  mutate(Season = case_when(between(month, 5,6) ~"Spring",
+                            between(month, 10,11) ~ "Fall"))
+data_all <- select(data_all, -c("month"))
 ```
-#Bed height NY sites
- 
+
+
+##### Bed height #####
+
 ```{r}
-#Summary of bed height at each site - Goldstar & Laurel Hollow
+#Bed Height - creating master file
 
-Bed_height_NY <- data_all %>%
-  filter(!is.na(Live_count) & !is.na(Box_count) & !is.na(Gaper_count) & !is.na(Bed_height))
-Bed_height_NY 
+#removing unnecessary columns
+bed_all <- select(data_all, -c("Field ID", "Quadrat_size", "Percent_coverage", "Live_count",
+                                  "Box_count", "Gaper_count", "Rugosity", "Quadrat"))
 
-bedheight_summary_NY <- summarySE(data = Bed_height_NY, measurevar = "Bed_height", groupvars = c( "Date", "Site"))
+bed_all <- na.omit(bed_all)
+head(bed_all)
 
-bedheight_summary_NY
-
-#write.csv(bedheight_summary, "Field_Data_Biological/Output/BedHeight_AllSite.csv", row.names=FALSE)
+#renaming column
+  bed_all <- bed_all %>% 
+    dplyr::rename(Bed_height_cm =Bed_height)
+  
+#reordering columns
+bed_all <- bed_all %>% select("Date_collected", "Site", "State", "Bed_height_cm", "Season")
 ```
 
-#oyster density metrics
-## Need to fix this somewhere. The output is not giving just a single number for each site. 
+
+#June 2023 (spring) survey for bed height. Changing June 2023 data to match formate of the data later collected. All data pulled form June 2023 is from the original file.
+```{r}
+
+bedheight_june2023 <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.csv") 
+
+#Cleaning up June 2023 data
+#renaming columns
+bedheight_june2023 <- bedheight_june2023 %>%
+  dplyr::rename(Date_collected = TripDate) %>%
+  dplyr::rename(Bed_height_cm = BedHeight_cm)
+  
+bedheight_june2023$Date_collected <- as.Date(bedheight_june2023$Date_collected, format = "%m/%d/%Y")
+
+#adding columns
+bedheight_june2023$Season <- rep("Spring", nrow(bedheight_june2023))
+bedheight_june2023$State <- rep("CT", nrow(bedheight_june2023))
+
+#removing unnecessary columns
+bedheight_june2023 <- select(bedheight_june2023, -c("BedHeight_Notes", "TopMark", "BottomMark", "Measure_direction", "Bed_Section"))
+
+bedheight_june2023<- bedheight_june2023 %>%
+  mutate(Site = recode(Site_Name, "Ash Creek" = "ASHC", "Fence Creek" = "FENC")) %>% 
+  select(-c("Site_Name"))
+
+head(bedheight_june2023)
+
+#reordering columns
+bedheight_june2023 <- bedheight_june2023 %>% select("Date_collected", "Site", "State", "Bed_height_cm", "Season")
+```
+
+```{r}
+#Merging all bed height data into master file
+Bedheight_master <- rbind(bed_all, bedheight_june2023)
+
+write.csv(Bedheight_master, "Master_files/bed_height_all_data.csv", row.names = FALSE)
+```
+
+```{r}
+#Summary of bed height at each site
+
+bedheight_summary<- data_all %>%
+  filter(!is.na(Live_count) & !is.na(Box_count) & !is.na(Gaper_count) & !is.na(Bed_height))
+bedheight_summary 
+
+bedheight_summary <- summarySE(data = Bedheight_master, measurevar = "Bed_height_cm", groupvars = c( "Date_collected", "Site"))
+
+bedheight_summary
+
+write.csv(bedheight_summary, "Field_Data_Biological/output/bedheight_summary.csv", row.names=FALSE)
+```
+
+
+
+#### Rugosity data ####
+```{r}
+#Rugosity - creating master file
+
+#removing unnecessary columns
+rugosity_all <- select(data_all, -c("Field ID", "Quadrat_size", "Percent_coverage", "Live_count",
+                                  "Box_count", "Gaper_count","Bed_height", "Quadrat"))
+
+rugosity_all <- na.omit(rugosity_all)
+head(rugosity_all)
+```
+#June 2023 (spring) survey - rugosity data. Changing June 2023 data to match formate of the data later collected. All data pulled form June 2023 is from the original file.
+```{r}
+rugosity_june2023 <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.csv") 
+
+#Cleaning up June 2023 data
+#renaming columns
+rugosity_june2023 <- rugosity_june2023 %>%
+  dplyr::rename(Date_collected = TripDate)
+rugosity_june2023$Date_collected <- as.Date(rugosity_june2023$Date_collected, format = "%m/%d/%Y")
+
+
+#adding columns
+rugosity_june2023$Season <- rep("Spring", nrow(rugosity_june2023))
+rugosity_june2023$State <- rep("CT", nrow(rugosity_june2023))
+
+#removing unnecessary columns
+rugosity_june2023 <- select(rugosity_june2023, -c("RUGOS_NUM","ChainType", "Bed_Section", "Zone", "LengthContoured_cm", "LengthStraightline_cm","Notes"))
+
+rugosity_june2023<- rugosity_june2023 %>%
+  mutate(Site = recode(Site_Name, "Ash Creek" = "ASHC", "Fence Creek" = "FENC")) %>% 
+  select(-c("Site_Name"))
+
+head(rugosity_june2023)
+
+#reordering columns
+rugosity_june2023 <- rugosity_june2023 %>% select("Date_collected", "Site", "State", "Rugosity", "Season")
+```
+
+```{r}
+#Merging all rugosity data into master file
+Rugosity_master <- rbind(rugosity_all, rugosity_june2023)
+
+write.csv(Rugosity_master, "Master_files/rugosity_all_data.csv", row.names = FALSE)
+```
+
+```{r}
+#Summary of rugosity at each site
+
+rugosity_summary<- data_all %>%
+  filter(!is.na(Live_count) & !is.na(Box_count) & !is.na(Gaper_count) & !is.na(Bed_height))
+
+rugosity_summary <- summarySE(data = Rugosity_master, measurevar = "Rugosity", groupvars = c( "Date_collected", "Site"))
+
+rugosity_summary #Laural Hollow only has one rugosity measurement, so NAs will appear for the summary points
+
+write.csv(rugosity_summary, "Field_Data_Biological/output/rugosity_summary.csv", row.names=FALSE)
+```
+
+
+#### Percent Coverage ####
+
+#changing percent coverage categories
+```{r}
+#Percent Coverage - creating master file
+
+percent_coverage <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.csv") 
+
+
+#Cleaning up June 2023 data
+#renaming columns
+percov_june2023 <- percov_june2023 %>%
+  dplyr::rename(Date_collected = TripDate) %>%
+  dplyr::rename(Bed_height =BedHeight_cm)
+  
+percov_june2023$Date_collected <- factor(percov_june2023$Date_collected, levels = c("6/12/2023","6/14/2023"),
+                                     labels = c("2023-06-12","2023-06-14"))
+#adding columns
+percov_june2023$Season <- rep("Spring", nrow(percov_june2023))
+percov_june2023$State <- rep("CT", nrow(percov_june2023))
+
+#removing unnecessary columns
+percov_june2023 <- select(percov_june2023, -c("BedHeight_Notes", "TopMark", "BottomMark", "Measure_direction", "Bed_Section"))
+
+percov_june2023<- percov_june2023 %>%
+  mutate(Site = recode(Site_Name, "Ash Creek" = "ASHC", "Fence Creek" = "FENC")) %>% 
+  select(-c("Site_Name"))
+
+head(percov_june2023)
+
+#reordering columns
+percov_june2023 <- percov_june2023 %>% select("Date_collected", "Site", "State", "Bed_height", "Season")
+```
+
+```{r}
+#October 2023 (fall) data. This data is in a different format compared to the other dates, where percent coverage is not binned.
+#removing unnecessary columns
+percov_all <- select(percov_all, -c("Field ID", "Quadrat_size", "Rugosity", "Bed_height", "Quadrat"))
+
+percov_all <- percov_all[!is.na(percov_all$Percent_coverage),]
+head(percov_all)
+
+#removing percent coverage < 25% (anything below 25% is considered off the oyster bed)
+percov_all<- subset(percov_all, Percent_coverage>21)
+
+#reordering columns
+percov_all <- percov_all %>% select("Date_collected", "Site", "State", "Percent_coverage", "Live_count",
+                                  "Box_count", "Gaper_count", "Season")
+
+#binning percent coverage
+```
+
+
+```{r}
+#Merging all percent coverage data into master file
+#Density measured in centimeters
+Percentcoverage_master <- rbind(percov_all, percov_june2023)
+
+write.csv(Percentcoverage_master, "Master_files/percent_coverage_all_data.csv", row.names = FALSE)
+```
+
+```{r}
+#Summary of percent cover at all sites
+```
+
+
+#oyster density metrics. QAQC_PopulationHeight script implements this code.
 ```{r}
 
 #data_all <- data_all %>%

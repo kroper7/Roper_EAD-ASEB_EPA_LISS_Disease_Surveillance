@@ -35,14 +35,11 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r}
 #read in all bed characteristics.
 
-quadratdensity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+quadratdensity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.csv") 
 
-rugosity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+rugosity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.csv") 
 
-BedHeight <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.xlsx",
-                     sheet = 1, col_names = TRUE) 
+BedHeight <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.csv") 
 ```
 
 #Summary of bed height at each site 

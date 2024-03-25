@@ -8,8 +8,7 @@ output: html_document
 description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
-Last updated 3/15/24 by K. Lenderman
-
+Last updated 3/22/24 by K. Lenderman. Note: Look at line 112 to change format of dates for it to read it automatically instead of filling.
 
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -68,12 +67,11 @@ BedHeight <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHe
 #Cleaning up June 2023 survey data to be meragable with other data
 ```{r}
 
-
 #renaming columns
 shellsize <- shellsize %>% dplyr::rename(Date_collected = TripDate) %>% dplyr::rename(Quadrat = QUADRAT_NUM) %>% dplyr::rename(Height = Height_mm) %>% dplyr::rename(Survival_status = SpecimenType)
 colnames(shellsize)
 #adding columns
-shellsize$Season<- rep("spring", nrow(shellsize))
+shellsize$Season<- rep("Spring", nrow(shellsize))
 shellsize$State<- rep("CT", nrow(shellsize))
 
 #removing unneeded columns
@@ -91,8 +89,6 @@ shellsize
 #reorder columns
 shellsize <- shellsize %>% select("Date_collected", "Site", "State", "Quadrat", "Height", "Survival_status", "Season")
 
-
-
 ```
 
 
@@ -101,9 +97,7 @@ shellsize <- shellsize %>% select("Date_collected", "Site", "State", "Quadrat", 
 #Pulling all height data into single sheet
 ```{r}
 
-## OCTOBER FALL SURVEY 
-
-
+## Shell Height Data
 
 height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
@@ -115,7 +109,17 @@ height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",        
  #Removing 'Count' column
  height_all$Count<- NULL
 
-
+#adding season columns
+height_all <- height_all %>%
+  dplyr::rename(Date_collected = Date)
+height_all$Date_collected <- factor(height_all$Date_collected, levels = c("10/3/2023","10/5/2023", "10/16/2023", "10/17/2023" ),
+                                     labels = c("2023-10-03","2023-10-05","2023-10-16", "2023-10-17" ))
+ height_all <- height_all %>%
+  mutate(Date_collected = as.Date(Date_collected), month = month(Date_collected))
+height_all <- height_all %>%
+  mutate(Season = case_when(between(month, 5,6) ~"Spring",
+                            between(month, 10,11) ~ "Fall"))
+height_all <- select(height_all, -c("month"))
 ```
 
 #Cleaning up height data
@@ -125,7 +129,7 @@ height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",        
 
 #Live
 
-height_live <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_live')
+height_live <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_live', 'Season')
 height_live <- na.omit(height_live)
 height_live$Survival_status<- rep("Live", nrow(height_live))
 height_live <- height_live %>% dplyr::rename(Height = Height_live)
@@ -133,23 +137,25 @@ height_live
 
 #Box
 
-height_box <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_box')
+height_box <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_box', 'Season')
 height_box <- na.omit(height_box)
 height_box$Survival_status<- rep("Box", nrow(height_box))
 height_box <- height_box %>% dplyr::rename(Height = Height_box)
 
 #Gaper
 
-height_gaper <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_gaper')
+height_gaper <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_gaper', 'Season')
 height_gaper <- na.omit(height_gaper)
 height_gaper$Survival_status<- rep("Gaping", nrow(height_gaper))
 height_gaper <- height_gaper %>% dplyr::rename(Height = Height_gaper)
 
 Height_all<- rbind(height_live,height_box,height_gaper)
-Height_all$Season<- rep("fall", nrow(Height_all))
 Height_all
 
 Height_all$`Field ID`<- NULL
+
+#reorder columns
+Height_all <- Height_all %>% select("Date_collected", "Site", "State", "Quadrat", "Height", "Survival_status", "Season")
 ```
 
 #Merging spring and fall 2023 Height data
