@@ -84,8 +84,8 @@ bedheight_june2023 <- bedheight_june2023 %>%
   dplyr::rename(Date_collected = TripDate) %>%
   dplyr::rename(Bed_height_cm = BedHeight_cm)
   
-bedheight_june2023$Date_collected <- factor(bedheight_june2023$Date_collected, levels = c("6/12/2023","6/14/2023"),
-                                     labels = c("2023-06-12","2023-06-14"))
+bedheight_june2023$Date_collected <- as.Date(bedheight_june2023$Date_collected, format = "%m/%d/%Y")
+
 #adding columns
 bedheight_june2023$Season <- rep("Spring", nrow(bedheight_june2023))
 bedheight_june2023$State <- rep("CT", nrow(bedheight_june2023))
@@ -145,6 +145,8 @@ rugosity_june2023 <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Surv
 #renaming columns
 rugosity_june2023 <- rugosity_june2023 %>%
   dplyr::rename(Date_collected = TripDate)
+rugosity_june2023$Date_collected <- as.Date(rugosity_june2023$Date_collected, format = "%m/%d/%Y")
+
 
 #adding columns
 rugosity_june2023$Season <- rep("Spring", nrow(rugosity_june2023))
