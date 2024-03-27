@@ -16,8 +16,8 @@ Last updated 3/25/24 by M. Kachmar
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 ```{r, echo=FALSE}
@@ -496,6 +496,82 @@ ggplot(data=df_GOLD_proportions, aes(x=month, y= Proportion, fill=intensity_bin)
 
 ```
 
+```{r}
+#Comparing body condition scores to rftm scores
+
+#pulling in body condition score data
+data_cond <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%     # Store all files in list
+  bind_rows               # Combine data sets into one data set 
+data_all   
+
+#removing unnecessary columns and NAs
+data_cond <- select(data_cond, -dissection_notes, -light_regime, -oyster_zone, -...21:-...33)
+data_cond <- data_cond %>% filter(!is.na(date_collected))
+
+#changing body condition score format
+data_cond<- data_cond %>%
+  mutate(condition_score = dplyr::recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+
+#adding rftm final scores to tissue processing data (body condition score included)
+data_rftm.cond <- data_cond %>%
+  mutate(rftm_final = data_all$rftm_final)
+
+#creating proportions of rftm scores compared to body condtion scores
+data_rftm.cond_prop<- data_rftm.cond %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(date_collected, condition_score, rftm_score, site) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+
+#adding column to easily show month collected for graphs
+data_rftm.cond_prop <- data_rftm.cond_prop %>% dplyr::mutate(date_collected= as.Date(date_collected), month = month(date_collected))
+
+data_rftm.cond_prop$date_collected <- factor(data_rftm.cond_prop$month, levels = c("4","5","6","7", "8", "9", "10", "11"),
+        labels=c("April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov"))
+
+#removing month with NA body condition scores
+data_rftm.cond_prop <- data_rftm.cond_prop %>% filter(!is.na(condition_score))
+
+
+```
+```{r}
+#plotting the proportion of rftm scores to body condition (all sites, all months)
+ggplot(data_rftm.cond_prop, aes(x=condition_score, y=Proportion, fill=rftm_score))+
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
+  theme(axis.text.x = element_text(angle = 15, vjust = 1, hjust=1, size = 8), plot.title = element_text(size = 10), axis.text.y = element_text(size = 9))+
+  labs(title="Proportion of RFTM scores within Body Condition Scores by Date Collected", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1), angle =90), axis.title.x = element_text(size = rel(1), angle = 0))+
+  theme(axis.text=element_text(size=7))+
+  theme(legend.title = element_text(size=10))+
+  labs(fill="RFTM Intesity Score")+
+ scale_fill_brewer(palette = "YlOrBr")+
+  scale_y_continuous("Proportion", breaks = c(0.00,0.50,1.00))+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  facet_grid(~site ~date_collected)
+```
+```{r}
+#removing month with NA body condition scores
+data_rftm.cond <- data_rftm.cond %>% filter(!is.na(condition_score))
+
+#making rftm scores a factor
+data_rftm.cond$rftm_final <- as.factor(data_rftm.cond$rftm_final)
+
+#adding column to easily show month collected for graphs
+data_rftm.cond <- data_rftm.cond %>% dplyr::mutate(date_collected= as.Date(date_collected), month = month(date_collected))
+
+data_rftm.cond$date_collected <- factor(data_rftm.cond$month, levels = c("4","5","6","7", "8", "9", "10", "11"),
+        labels=c("April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov"))
+
+#graphing number of oysters with specific body condition scores and rftm scores (all site, all months)
+ggplot(data_rftm.cond, aes(x=condition_score, fill=rftm_final))+
+  geom_histogram(binwidth = .5)+
+  scale_fill_brewer(palette = "YlOrBr")+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  facet_grid(~site ~date_collected)
+```
 
 
 Version
