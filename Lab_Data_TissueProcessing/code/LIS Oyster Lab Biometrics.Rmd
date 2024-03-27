@@ -25,6 +25,7 @@ library("dplyr")
 library("Rmisc")
 library("readr")  
 library("lubridate")
+library("purrr")
 ```
 
 
@@ -33,13 +34,16 @@ library("lubridate")
 ### This code chunk merges all .csv files within the Tissue processing folder into one data frame and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
+
 data_all <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
   pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%     # Store all files in list
-  bind_rows               # Combine data sets into one data set 
+  lapply(read_csv) %>%   # Store all files in list
+  bind_rows          # Combine data sets into one data set 
 data_all                                            # Print data to RStudio console
 
+spec(data_all)
 as.data.frame(data_all)  # Convert tibble to data.frame
+
 
 #Filtering NAs and unnecessary columns
 data_all <- data_all %>% filter(!is.na(date_collected))
@@ -48,7 +52,15 @@ data_all <- select(data_all, -light_regime, -oyster_zone)
 
 write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
 
-data_all
+View(data_all)
+
+
+data_2024 <- list.files(path = "Lab_Data_TissueProcessing/raw_data",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%     # Store all files in list
+  bind_rows               # Combine data sets into one data set 
+spec(data_2024)    
+
  
 ```
 
