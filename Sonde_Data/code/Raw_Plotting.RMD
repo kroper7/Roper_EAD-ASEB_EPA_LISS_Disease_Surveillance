@@ -5,6 +5,9 @@ date: "2023-10-03"
 output: html_document
 ---
 
+Last updated 3/27/24 by M. Kachmar
+  - added "write.csv" for master sheets
+
 
 ## Setup: 
 
@@ -14,8 +17,10 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
 ```
 
@@ -48,7 +53,7 @@ path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_S
 
 ### NOTE: !!! changed to Mariah's path to make graphs for reports - if Sam needs to make edits make sure it is changed back. !!!
 ```{r}
-path.p                   <- "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data" 
+path.p                   <- "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/raw_data" 
 file.names.table         <- data.frame(txt.files = 
                                          (basename(list.files(path = paste(path.p,'/',sep=''), 
                                                               pattern = "csv$", 
@@ -134,6 +139,9 @@ Master_Table_LONG <- Master_Table %>%
                                                      "Total Dissolved Solids" ,"RDO Concentration", "RDO Saturation",
                                                      "Oxygen Partial Pressure", "Chlorophyll-a Fluorescence", "pH", "pH mV", 
                                                      "Temperature"))
+
+write.csv(Master_Table_LONG, "output/Sonde_master.csv", )
+
 # View the blobs! 
 ggplot(Master_Table_LONG,
          aes(x=`Date Time`,
@@ -171,6 +179,8 @@ vars <- as.data.frame(
               unique(
                 Master_Table_LONG_means$variable)))) %>% 
         dplyr::rename(dat = 1)
+
+write.csv(Master_Table_LONG_means, "output/Sonde_hourly_means_master.csv",)
 
 for(i in 1:nrow(vars)) {
   
