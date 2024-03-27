@@ -192,15 +192,15 @@ write.csv(rugosity_summary, "Field_Data_Biological/output/rugosity_summary.csv",
 ```{r}
 #Percent Coverage - creating master file
 
-percent_coverage <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.csv") 
+percov_june2023 <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.csv") 
 
 
 #Cleaning up June 2023 data
 #renaming columns
 percov_june2023 <- percov_june2023 %>%
   dplyr::rename(Date_collected = TripDate) %>%
-  dplyr::rename(Bed_height =BedHeight_cm)
-  
+dplyr::rename(Percent_coverage = Oyster_Cover)
+
 percov_june2023$Date_collected <- factor(percov_june2023$Date_collected, levels = c("6/12/2023","6/14/2023"),
                                      labels = c("2023-06-12","2023-06-14"))
 #adding columns
@@ -208,7 +208,7 @@ percov_june2023$Season <- rep("Spring", nrow(percov_june2023))
 percov_june2023$State <- rep("CT", nrow(percov_june2023))
 
 #removing unnecessary columns
-percov_june2023 <- select(percov_june2023, -c("BedHeight_Notes", "TopMark", "BottomMark", "Measure_direction", "Bed_Section"))
+percov_june2023 <- select(percov_june2023, -c("QUADRAT_NUM", "Quadrat_Type", "Quadrat_Zone", "Light_Zone", "Bed_Section", "LiveCount_Total", "GaperCount_Total", "BoxCount_Total", "Subsample_Measured", "Quadrat_Notes"))
 
 percov_june2023<- percov_june2023 %>%
   mutate(Site = recode(Site_Name, "Ash Creek" = "ASHC", "Fence Creek" = "FENC")) %>% 
@@ -216,34 +216,46 @@ percov_june2023<- percov_june2023 %>%
 
 head(percov_june2023)
 
+#Changing percent coverage categories to the current categories being used. In June 2023 there were different percent coverage categories being used, this change will help merge old and new data.
+percov_june2023 <- percov_june2023 %>%
+  mutate(Percent_coverage = dplyr::recode(Percent_coverage, 
+                                    "0%" = "0-24", "1-25%" = "0-24", "26-50%" = "25-49", "51-75%"= "50-74", "76-99%"= "75-99", "100%"= "100"))
+
 #reordering columns
-percov_june2023 <- percov_june2023 %>% select("Date_collected", "Site", "State", "Bed_height", "Season")
+percov_june2023 <- percov_june2023 %>% select("Date_collected", "Site", "State", "Percent_coverage", "Season")
 ```
 
 ```{r}
 #October 2023 (fall) data. This data is in a different format compared to the other dates, where percent coverage is not binned.
 #removing unnecessary columns
-percov_all <- select(percov_all, -c("Field ID", "Quadrat_size", "Rugosity", "Bed_height", "Quadrat"))
+percent_coverage <- select(data_all, -c("Field ID", "Quadrat_size", "Rugosity", "Bed_height", "Quadrat", "Live_count", "Box_count", "Gaper_count"))
 
-percov_all <- percov_all[!is.na(percov_all$Percent_coverage),]
-head(percov_all)
+percent_coverage <- percent_coverage%>% filter(!is.na(Percent_coverage))
 
-#removing percent coverage < 25% (anything below 25% is considered off the oyster bed)
-percov_all<- subset(percov_all, Percent_coverage>21)
+head(percent_coverage)
+
+#Changing percent coverage to the current categories being used. In October 2023 there single percentages were being assigned, this change will help merge old and new data by putting the data points into categories.
+percent_coverage$Percent_coverage <- as.factor(percent_coverage$Percent_coverage)
+percent_coverage <- percent_coverage %>%
+  mutate(Percent_coverage = dplyr::recode(Percent_coverage, 
+                                    "15" = "0-24", "20" = "0-24", "25" = "25-49", "30" = "25-49", "40" = "25-49", "50"= "50-74", "80"= "75-99", "90"= "75-99", "100"= "100"))
 
 #reordering columns
-percov_all <- percov_all %>% select("Date_collected", "Site", "State", "Percent_coverage", "Live_count",
-                                  "Box_count", "Gaper_count", "Season")
+percent_coverage <- percent_coverage %>% select("Date_collected", "Site", "State", "Percent_coverage", "Season")
 
-#binning percent coverage
 ```
 
 
 ```{r}
 #Merging all percent coverage data into master file
 #Density measured in centimeters
-Percentcoverage_master <- rbind(percov_all, percov_june2023)
+Percentcoverage_master <- rbind(percent_coverage, percov_june2023)
 
+#Removing all data with percent coverage less than 25%, as it is considered off of the oyster reef.
+Percentcoverage_master$Percent_coverage[Percentcoverage_master$Percent_coverage == "0-24"] <- NA
+Percentcoverage_master <- Percentcoverage_master%>% filter(!is.na(Percent_coverage))
+
+#Write csv for master file of all percent coverage data
 write.csv(Percentcoverage_master, "Master_files/percent_coverage_all_data.csv", row.names = FALSE)
 ```
 
