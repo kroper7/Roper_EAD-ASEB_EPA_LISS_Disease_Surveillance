@@ -26,6 +26,8 @@ library("Rmisc")
 library("readr")  
 library("lubridate")
 library("purrr")
+library(reshape2)
+library(stringr)
 ```
 
 
@@ -35,33 +37,54 @@ library("purrr")
 # reading in .csv files from local folder
 ```{r}
 
-data_all <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%   # Store all files in list
-  bind_rows          # Combine data sets into one data set 
-data_all                                            # Print data to RStudio console
+#data_all <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
+# pattern = "*.csv", full.names = TRUE) %>% 
+#lapply(read_csv) %>%   # Store all files in list
+#  bind_rows          # Combine data sets into one data set 
+#data_all                                            # Print data to RStudio console
 
-spec(data_all)
-as.data.frame(data_all)  # Convert tibble to data.frame
+
+#as.data.frame(data_all)  # Convert tibble to data.frame
 
 
 #Filtering NAs and unnecessary columns
+#data_all <- data_all %>% filter(!is.na(date_collected))
+#data_all <- select(data_all, -light_regime, -oyster_zone)
+
+
+#write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
+
+
+
+
+##### USE THIS CODE TO MERGE DATA FILES - some of the files are not the same format (dates specifically), which was causing issues in merging. This code below should solve that problem. #####
+
+
+
+file_paths <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+data_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      date_collected = as.Date(date_collected,format = "%m/%d/%Y"),
+      date_processed = as.Date(date_processed,format = "%m/%d/%Y"),
+      date_davidsons = as.Date(date_davidsons,format = "%m/%d/%Y"),
+      date_etoh = as.Date(date_etoh,format = "%m/%d/%Y")
+    )
+}) %>%
+  bind_rows
+as.data.frame(data_all)  # Convert tibble to data.frame
+
 data_all <- data_all %>% filter(!is.na(date_collected))
 data_all <- select(data_all, -light_regime, -oyster_zone)
 
 
-write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
-
 View(data_all)
 
+write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
 
-data_2024 <- list.files(path = "Lab_Data_TissueProcessing/raw_data",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%     # Store all files in list
-  bind_rows               # Combine data sets into one data set 
-spec(data_2024)    
-
- 
 ```
 
 #A wrong value caliper input was identified for the height of sample 0923GOLD_23. This code is removing that value from the data set as we cannot conclude what this original value was. The value is 8.62. This will cause this individual to fall out of the dataset when standardized to length. This code does not completely remove the individual from the dataset.
