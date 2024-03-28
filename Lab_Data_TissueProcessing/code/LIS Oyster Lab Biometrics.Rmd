@@ -5,7 +5,10 @@ output: html_notebook
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 3/19/24 by M. Kachmar
+Updated 3/28/24 by M. Kachmar
+-got 2024 sheets to merge with 2023 data
+-all code seems to be running 
+-updated code throughout removing unneccessary code and putting LAUR summary code at the end.
 
  
 
@@ -26,6 +29,8 @@ library("Rmisc")
 library("readr")  
 library("lubridate")
 library("purrr")
+library(reshape2)
+library(stringr)
 ```
 
 
@@ -35,33 +40,54 @@ library("purrr")
 # reading in .csv files from local folder
 ```{r}
 
-data_all <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%   # Store all files in list
-  bind_rows          # Combine data sets into one data set 
-data_all                                            # Print data to RStudio console
+#data_all <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
+# pattern = "*.csv", full.names = TRUE) %>% 
+#lapply(read_csv) %>%   # Store all files in list
+#  bind_rows          # Combine data sets into one data set 
+#data_all                                            # Print data to RStudio console
 
-spec(data_all)
-as.data.frame(data_all)  # Convert tibble to data.frame
+
+#as.data.frame(data_all)  # Convert tibble to data.frame
 
 
 #Filtering NAs and unnecessary columns
+#data_all <- data_all %>% filter(!is.na(date_collected))
+#data_all <- select(data_all, -light_regime, -oyster_zone)
+
+
+#write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
+
+
+
+
+##### USE THIS CODE TO MERGE DATA FILES - some of the files have columns that are not the same format (dates specifically), which was causing issues in merging. This code below should solve that problem. It converts all date columns to dates and m/d/y format #####
+
+
+
+file_paths <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+data_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      date_collected = as.Date(date_collected,format = "%m/%d/%Y"),
+      date_processed = as.Date(date_processed,format = "%m/%d/%Y"),
+      date_davidsons = as.Date(date_davidsons,format = "%m/%d/%Y"),
+      date_etoh = as.Date(date_etoh,format = "%m/%d/%Y")
+    )
+}) %>%
+  bind_rows
+as.data.frame(data_all)  # Convert tibble to data.frame
+
 data_all <- data_all %>% filter(!is.na(date_collected))
 data_all <- select(data_all, -light_regime, -oyster_zone)
 
 
-write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
-
 View(data_all)
 
+write.csv(data_all, "Master_files/tissue_processing_all_data.csv", row.names=FALSE)
 
-data_2024 <- list.files(path = "Lab_Data_TissueProcessing/raw_data",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%     # Store all files in list
-  bind_rows               # Combine data sets into one data set 
-spec(data_2024)    
-
- 
 ```
 
 #A wrong value caliper input was identified for the height of sample 0923GOLD_23. This code is removing that value from the data set as we cannot conclude what this original value was. The value is 8.62. This will cause this individual to fall out of the dataset when standardized to length. This code does not completely remove the individual from the dataset.
@@ -69,11 +95,12 @@ spec(data_2024)
 data_all$height_mm[data_all$height_mm == "0"] <- NA
 ```
 
-## adding a month column to the data
+## adding a month & year column to the data
 
 ```{r}
 data_all <- data_all %>% dplyr::mutate(date_collected= as.Date(date_collected), month = month(date_collected))
 
+data_all <- data_all %>% dplyr::mutate(date_collected= as.Date(date_collected), year = year(date_collected))
 data_all
 ```
 
@@ -117,9 +144,9 @@ ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Shell Height ", x ="site", y = "Mean Shell Height (mm)")
+  labs(title="Mean Shell Height ", x ="site", y = "Mean Shell Height (mm)") + facet_wrap(.~year)
 ```
-#Mean length
+#Mean length 2023 - no longer taking data
 ```{r}
 ggplot(data=data_all, aes(x=site, y=length_mm, fill=site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
@@ -129,7 +156,7 @@ ggplot(data=data_all, aes(x=site, y=length_mm, fill=site)) +
 
 ```
 
-#Mean width
+#Mean width 2023 - no longer taking data
 ```{r}
 ggplot(data=data_all, aes(x=site, y=width_mm, fill=site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
@@ -148,7 +175,7 @@ ggplot(data=data_all, aes(x=site, y=condition_score, fill=site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Condition Score ", x ="site", y = "Mean Body Condition Score")+ scale_y_reverse()
+  labs(title="Mean Condition Score ", x ="site", y = "Mean Body Condition Score")+ scale_y_reverse()+ facet_wrap(.~year)
 ```
 
 ```{r}
@@ -162,7 +189,7 @@ ggplot(data=data_all, aes(x=month, y=condition_score, group = month, fill = site
   geom_boxplot()+ 
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Condition Score ", x ="month", y = "Mean Body Condition Score")+ scale_y_reverse()+facet_wrap(~site)
+  labs(title="Mean Condition Score ", x ="month", y = "Mean Body Condition Score")+ scale_y_reverse()+facet_wrap(~site + year)
 ```
 #Proportions graph Body condition scores
 
@@ -170,7 +197,7 @@ ggplot(data=data_all, aes(x=month, y=condition_score, group = month, fill = site
 data_all
 df_BCS_proportions<- data_all %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, condition_score_bin) %>% dplyr ::summarise(Count= n()) %>%
+  group_by(site, date_collected, condition_score_bin) %>% dplyr ::summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -178,14 +205,15 @@ df_BCS_proportions<- na.omit(df_BCS_proportions)
 
 df_BCS_proportions
 
-BCS_proportion_all<- ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+BCS_proportion_all<- ggplot(data=df_BCS_proportions, aes(x=date_collected, y= Proportion, fill=condition_score_bin)) +
   geom_bar(width = .5, stat="identity", position = "fill", colour = "black")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Proportion of body condition scores April- November", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
  scale_fill_brewer() +
-  facet_wrap(~ site)
+  facet_wrap(~ site )
+BCS_proportion_all
 
 pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_all.pdf"), height = 7, width = 13)
 print(BCS_proportion_all)
@@ -222,7 +250,7 @@ ggplot(data=df_ASHC, aes(x=month, y=height_mm, group= month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Ash Creek Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
+  labs(title=" Ash Creek Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")+facet_wrap(.~year)
 ```
 
 ```{r}
@@ -243,7 +271,7 @@ ggplot(data=df_ASHC, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Mean Body Condition Score ", x ="month", y= " condition score (1-9)") + scale_y_reverse()
+  labs(title="Ash Creek Mean Body Condition Score ", x ="month", y= " condition score (1-9)") + scale_y_reverse()+facet_wrap(.~year)
 
 ```
 
@@ -314,32 +342,6 @@ dev.off()
 ```
 
 
-#HLW correlation
-```{r}
-
-#Correlation coefficient 
-cor(df_ASHC$height_mm, df_ASHC$length_mm)
-#0.137179
-
-cor(df_ASHC$height_mm, df_ASHC$width_mm)
-# 0.1754991
-
-#Relationships between height, length, width of shell
-ggplot(data=df_ASHC, aes(x=length_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Ash Creek Mean Shell Height vs Length ", x ="length (mm)", y = " height (mm)")
-
-ggplot(data=df_ASHC, aes(x=width_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Ash Creek Mean Shell Height vs width ", x ="width (mm)", y = " height (mm)")
-
-
-```
-
 
 
 # Fence Creek Summary
@@ -366,7 +368,7 @@ ggplot(data=df_FENC, aes(x=month, y=height_mm, group=month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Fence Creek Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
+  labs(title=" Fence Creek Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")+ facet_wrap(.~year)
 
 ```
 
@@ -385,109 +387,6 @@ ggplot(data=df_FENC, aes(x= month, y= condition_score, group = month)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Fence Creek Mean Body Condition Score", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
-
-```
-#HLW correlation
-```{r}
-
-#Correlation coefficient
-
-cor(df_FENC$height_mm, df_FENC$length_mm) #0.264163
-cor(df_FENC$height_mm, df_FENC$width_mm) #0.2164924
-
-#Relationships between height, length, width of shell
-ggplot(data=df_FENC, aes(x=length_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Fence Creek Mean Shell Height vs Length ", x ="length (mm)", y = " height (mm)")
-
-ggplot(data=df_FENC, aes(x=width_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Fence Creek Mean Shell Height vs width ", x ="width (mm)", y = " height (mm)")
-```
-
-#Fence creek VS Ash Creek 
-```{r}
-df_CTsites <- data_all%>%
-  filter(site=="FENC"| site == "ASHC")
-df_CTsites
-
-#Body condition score
-
-ggplot(data=df_CTsites, aes(x= month, y= condition_score, group = month)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Body Condition Score", x ="month", y= " condition score (1-9)")+ scale_y_reverse() +facet_wrap(~site)
-
-
-#HLW correlation
-cor(df_ASHC$length_mm, df_FENC$length_mm) # 0.01323794
-cor(df_ASHC$height_mm, df_FENC$height_mm) #-0.03727923
-cor(df_ASHC$width_mm, df_FENC$width_mm) # 0.1335442
-
-```
-
-
-# Laurel Hollow Summary
-```{r}
-df_LAUR<- data_all%>%
-  filter(site=="LAUR")
-
-## Shell Height ##
-st_height_LAUR <- summarySE(df_LAUR, measurevar="height_mm", groupvars=c("date_collected"))
-st_height_LAUR 
-
-## Body Condition ##
-## Excludes May due to scoring system change. May scored fat, medium, watery. 
-st_condition_LAUR<- summarySE(df_LAUR, measurevar = "condition_score", groupvars = c("date_collected"))
-st_condition_LAUR
-```
-
-```{r}
-ggplot(data=df_LAUR, aes(x=month, y=height_mm, group= month)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Laurel Hollow Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
-
-
-```
-```{r}
-#Condition distribution across all sample months
-ggplot(data=df_LAUR, aes(x= condition)) +
-  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Laurel Hollow Body Condition index ", x ="Condition categorization")+
-    facet_wrap(~ month, scales = "free")
-
-
-#Mean Body condition per month
-ggplot(data=df_LAUR, aes(x= month, y= condition_score, group = month)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Laurel Hollow Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-```
-#HLW corrlation
-```{r}
-
-#Relationships between height, length, width of shell
-ggplot(data=df_LAUR, aes(x=length_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Laurel Hollow Mean Shell Height vs Length ", x ="length (mm)", y = " height (mm)")
-
-ggplot(data=df_LAUR, aes(x=width_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Laurel Hollow Mean Shell Height vs width ", x ="width (mm)", y = " height (mm)")
 
 ```
 
@@ -534,7 +433,7 @@ print(BCS_proportion_GOLD)
 dev.off()
 ```
 
-# % of scores >3 at ash creek june - november 
+# % of scores >3 at gold june - november 
 ```{r}
 df_GOLD
 
@@ -600,28 +499,47 @@ ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
 
 ```
 
-#HLW correlation
+# Laurel Hollow Summary - NO LONGER A STUDY SITE
 ```{r}
+df_LAUR<- data_all%>%
+  filter(site=="LAUR")
 
-#Correlation coefficients #These correlations are effected by NA of the one height sample
-cor(df_GOLD$height_mm, df_GOLD$length_mm) #0.1512438
-cor(df_GOLD$height_mm, df_GOLD$width_mm)  #0.1783578
+## Shell Height ##
+st_height_LAUR <- summarySE(df_LAUR, measurevar="height_mm", groupvars=c("date_collected"))
+st_height_LAUR 
 
-#Relationships between height, length, width of shell
-ggplot(data=df_GOLD, aes(x=length_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title=" Goldstar Mean Shell Height vs Length ", x ="length (mm)", y = " height (mm)")
-
-ggplot(data=df_GOLD, aes(x=width_mm, y=height_mm, group= month)) +
-  geom_point()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Mean Shell Height vs width ", x ="width (mm)", y = " height (mm)")
-
+## Body Condition ##
+## Excludes May due to scoring system change. May scored fat, medium, watery. 
+st_condition_LAUR<- summarySE(df_LAUR, measurevar = "condition_score", groupvars = c("date_collected"))
+st_condition_LAUR
 ```
 
+```{r}
+ggplot(data=df_LAUR, aes(x=month, y=height_mm, group= month)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title=" Laurel Hollow Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)")
+
+
+```
+```{r}
+#Condition distribution across all sample months
+ggplot(data=df_LAUR, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Laurel Hollow Body Condition index ", x ="Condition categorization")+
+    facet_wrap(~ month, scales = "free")
+
+
+#Mean Body condition per month
+ggplot(data=df_LAUR, aes(x= month, y= condition_score, group = month)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  labs(title="Laurel Hollow Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+```
 
 
 

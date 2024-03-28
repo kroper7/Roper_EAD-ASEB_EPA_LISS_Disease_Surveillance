@@ -182,6 +182,11 @@ vars <- as.data.frame(
 
 write.csv(Master_Table_LONG_means, "output/Sonde_hourly_means_master.csv",)
 
+CT_means<- Master_Table_LONG_means[Master_Table_LONG_means$Site == "ASHC" | Master_Table_LONG_means$Site =="FENC", ]
+
+
+write.csv(CT_means, "output/Sonde_hourly_means_CT.csv")
+
 for(i in 1:nrow(vars)) {
   
   # filter table for each variable

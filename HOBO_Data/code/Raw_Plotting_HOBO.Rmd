@@ -96,9 +96,11 @@ FENC_plot<- FENC_means %>%
               geom_errorbar(aes(ymin=(mean_value)-(se_value), 
                                 ymax=(mean_value)+(se_value)), 
                             width=0,position=position_dodge(.4))+
-     ggtitle("Fence Creek HOBO Temperature Data ") +
-              labs(x = "Time", y = "Temperature") +
-              theme_classic() + theme(axis.text= element_text(size=12), axis.title = element_text(size= 12))
+     ggtitle("Fence Creek, CT ") +
+              #labs(x = "Time", y = "Temperature") +
+               labs(x = "", y = "") + 
+              theme_classic() + theme(axis.text= element_text(size=12), axis.title = element_text(size= 12))+
+   scale_x_datetime(date_labels = "%b/%Y", date_breaks = "1 month")
 FENC_plot
 
 pdf(paste0(path_out,"FENC_HOBO.pdf"), height = 7, width = 14)
@@ -166,13 +168,25 @@ ASHC_plot<- ASHC_means %>%
               geom_errorbar(aes(ymin=(mean_value)-(se_value), 
                                 ymax=(mean_value)+(se_value)), 
                             width=0,position=position_dodge(.4))+
-     ggtitle("Ash Creek HOBO Temperature Data ") +
-              labs(x = "Time", y = "Temperature") +
-              theme_classic() + theme(axis.text= element_text(size=12), axis.title = element_text(size= 12))
+     ggtitle("Ash Creek, CT ") +
+              #labs(x = "Time", y = "Temperature") +
+               labs(x = "", y = "") + 
+              theme_classic() + theme(axis.text= element_text(size=12), axis.title = element_text(size= 12))+
+   scale_x_datetime(date_labels = "%b/%Y", date_breaks = "1 month")
 ASHC_plot
 
 pdf(paste0(path_out,"ASHC_HOBO.pdf"), height = 7, width = 14)
 print(ASHC_plot)
+
+```
+
+```{r}
+CT_plot<-ggarrange(ASHC_plot, FENC_plot,nrow=2 ) %>%
+  annotate_figure(left=text_grob("Temperature", rot=90, size = 15), bottom = text_grob("Time", size = 15))
+CT_plot
+
+pdf(paste0(path_out,"CT_HOBO.pdf"), height = 12, width = 14)
+print(CT_plot)
 
 ```
 
