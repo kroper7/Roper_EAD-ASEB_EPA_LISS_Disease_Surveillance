@@ -57,7 +57,7 @@ library(stringr)
 
 
 
-##### USE THIS CODE TO MERGE DATA FILES - some of the files are not the same format (dates specifically), which was causing issues in merging. This code below should solve that problem. #####
+##### USE THIS CODE TO MERGE DATA FILES - some of the files have columns that are not the same format (dates specifically), which was causing issues in merging. This code below should solve that problem. It converts all date columns to dates and m/d/y format #####
 
 
 
