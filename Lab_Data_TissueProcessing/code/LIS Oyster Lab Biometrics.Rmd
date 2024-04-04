@@ -5,10 +5,10 @@ output: html_notebook
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 3/28/24 by M. Kachmar
--got 2024 sheets to merge with 2023 data
--all code seems to be running 
--updated code throughout removing unneccessary code and putting LAUR summary code at the end.
+Updated 04/04/24 by M. Kachmar
+  - QAQC 0424FENC - height smaller than March
+  - removed length, width code since no longer taking data
+
 
  
 
@@ -145,25 +145,6 @@ ggplot(data=data_all, aes(x=site, y=height_mm, fill=site)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Mean Shell Height ", x ="site", y = "Mean Shell Height (mm)") + facet_wrap(.~year)
-```
-#Mean length 2023 - no longer taking data
-```{r}
-ggplot(data=data_all, aes(x=site, y=length_mm, fill=site)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Shell Length ", x ="site", y = "Mean Shell Length (mm)")
-
-```
-
-#Mean width 2023 - no longer taking data
-```{r}
-ggplot(data=data_all, aes(x=site, y=width_mm, fill=site)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Shell Width ", x ="site", y = "Mean Shell Width (mm)")
-
 ```
 
 
@@ -386,7 +367,7 @@ ggplot(data=df_FENC, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Mean Body Condition Score", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
+  labs(title="Fence Creek Mean Body Condition Score", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~ year, scales = "free")
 
 ```
 
