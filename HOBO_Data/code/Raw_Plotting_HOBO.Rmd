@@ -38,7 +38,7 @@ path_out <- 'HOBO_Data/output/'
 
 #### Fence Creek ####
 ```{r}
-FENC_HOBO <- read_csv("HOBO_Data\\raw_data\\032024_FENC_HOBO.csv", col_names = TRUE)   
+FENC_HOBO <- read_csv("HOBO_Data\\raw_data\\042024_FENC_HOBO.csv", col_names = TRUE)   
 
 as.data.frame(FENC_HOBO)
 
