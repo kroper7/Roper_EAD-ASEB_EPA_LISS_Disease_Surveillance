@@ -5,8 +5,8 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 3/27/24 by M. Kachmar
-  - added "write.csv" for master sheets
+Last updated 4/05/24 by M. Kachmar
+  - 042024_FENC_Sonde added to repository but having issues with the date format - this code below does not seem to help fix it no matter where I move the sheet. Thoughts?
 
 
 ## Setup: 
@@ -114,7 +114,7 @@ for (m in 1:nrow(file.names.table)) {
   
   Master_Table <- rbind(raw_df,Master_Table) #bind to a cumulative list dataframe
 }
-# View(Master_Table)
+ View(Master_Table)
 unique(Master_Table$Site)
 
 
@@ -227,7 +227,7 @@ for(i in 1:nrow(vars)) {
 # a clean plot for Genevieve's NACE 2024 presentation
 Sonde_Temp_2023 <- Table_by_var %>% 
     dplyr::filter(variable %in% vars[11,]) %>% 
-    dplyr::filter(`Date Time` > '2023-06-15 00:00:00' & `Date Time` < '2023-10-01 00:00:00') %>% 
+    dplyr::filter(`Date Time` > '2023-06-15 00:00:00' & `Date Time` < '2024-05-01 00:00:00') %>% 
               ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
@@ -1420,7 +1420,7 @@ FENC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlor
 # pH 
 
 FENC_pH_all <- FENC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1456,7 +1456,7 @@ dev.off()
 # Salinity 
 
 FENC_Salinity_all <- FENC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1490,7 +1490,7 @@ dev.off()
 # Temperature 
 
 FENC_Temperature_all <-FENC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1523,7 +1523,7 @@ dev.off()
 # DO 
 
 FENC_DO_all <- FENC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1553,7 +1553,7 @@ dev.off()
 #Chlorophyll-a
 
 FENC_CHLA_all <- FENC_CHLA %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
