@@ -17,8 +17,8 @@ Last updated 3/25/24 by M. Kachmar
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 #knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
-knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r, echo=FALSE}
@@ -42,6 +42,8 @@ data_all                                            # Print data to RStudio cons
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
 tail(data_all)
+
+data_all <- data_all %>% filter(!is.na(lab_id))
 
 write.csv(data_all, "Master_files\\RFTM_all_data.csv", row.names=FALSE)
 ```
@@ -257,9 +259,11 @@ ggplot(data=df_intensity_proportions, aes(x=month, y= Proportion, fill=intensity
   geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(fill ="Dermo Intensity")+
   labs(title="Proportion of Intensity scores of Dermo infection", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
- scale_fill_brewer() +
+scale_fill_brewer(palette = "YlOrBr")+
+   scale_x_continuous("Month", breaks = c(3,4,5,6,7,8,9,10))+ 
   facet_wrap(~ site)
 
 ```
@@ -501,14 +505,24 @@ ggplot(data=df_GOLD_proportions, aes(x=month, y= Proportion, fill=intensity_bin)
 #Comparing body condition scores to rftm scores
 
 #pulling in body condition score data
-data_cond <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%     # Store all files in list
-  bind_rows               # Combine data sets into one data set 
-data_all   
+file_paths <- list.files(path = "Lab_Data_TissueProcessing/raw_data/Files_by_Month",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+data_cond <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      date_collected = as.Date(date_collected,format = "%m/%d/%Y"),
+      date_processed = as.Date(date_processed,format = "%m/%d/%Y"),
+      date_davidsons = as.Date(date_davidsons,format = "%m/%d/%Y"),
+      date_etoh = as.Date(date_etoh,format = "%m/%d/%Y")
+    )
+}) %>%
+  bind_rows
+as.data.frame(data_cond)   
 
 #removing unnecessary columns and NAs
-data_cond <- select(data_cond, -dissection_notes, -light_regime, -oyster_zone, -...21:-...33)
+data_cond <- select(data_cond,-lab_sample, -sample_notes, -dissection_notes, -light_regime, -oyster_zone, -...21:-...33)
 data_cond <- data_cond %>% filter(!is.na(date_collected))
 
 #changing body condition score format
@@ -539,6 +553,7 @@ data_rftm.cond_prop <- data_rftm.cond_prop %>% filter(!is.na(condition_score))
 
 
 ```
+
 ```{r}
 #plotting the proportion of rftm scores to body condition (all sites, all months)
 ggplot(data_rftm.cond_prop, aes(x=condition_score, y=Proportion, fill=rftm_score))+
@@ -574,6 +589,31 @@ ggplot(data_rftm.cond, aes(x=condition_score, fill=rftm_final))+
   facet_grid(~site ~date_collected)
 ```
 
+```{r}
+#Coding graphs for LIS Confrence - only 2023 data
+data_2023 <- data_all%>%  filter(!year=="2024")
+
+df_intensity_proportions<- data_2023 %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(site, month, intensity_bin) %>%
+  summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+
+df_intensity_proportions<- na.omit(df_intensity_proportions)
+df_intensity_proportions$month <- factor(df_intensity_proportions$month, levels = c("4","5","6","7", "8", "9", "10", "11"),
+        labels=c("April","May", "June", "July", "Aug", "Sept", "Oct", "Nov"))
+
+ggplot(data=df_intensity_proportions, aes(x=month, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = rel(.9)))+
+  labs(fill ="Dermo Intensity")+
+  labs(title="Proportion of Intensity scores of Dermo infection - 2023", x ="Month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+scale_fill_brewer(palette = "YlOrBr")+
+  facet_wrap(~ site)
+```
 
 Version
 ```{r}
