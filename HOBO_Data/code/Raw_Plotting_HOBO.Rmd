@@ -3,7 +3,11 @@ title: "Raw_plotting_HOBO"
 author: "Mariah Kachmar"
 date: "1/19/2024"
 output: html_document
+
 ---
+
+Last updated: 4/15/2024 by M. Kachmar 
+-FENC & ASHC up to date & graphs produced
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -129,7 +133,7 @@ print(FENC_plot)
 
 #### Ash Creek ####
 ```{r}
-ASHC_HOBO <- read_csv("HOBO_Data\\raw_data\\032024_ASHC_HOBO.csv", col_names = TRUE)   
+ASHC_HOBO <- read_csv("HOBO_Data\\raw_data\\042024_ASHC_HOBO.csv", col_names = TRUE)   
 
 as.data.frame(ASHC_HOBO)
 
