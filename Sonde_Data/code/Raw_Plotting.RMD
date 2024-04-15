@@ -5,8 +5,9 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 4/05/24 by M. Kachmar
+Last updated 4/15/24 by M. Kachmar
   - 042024_FENC_Sonde added to repository but having issues with the date format - this code below does not seem to help fix it no matter where I move the sheet. Thoughts?
+  - same issue with ASHC. It appears that the data is merging but the dates are NA 
 
 
 ## Setup: 
