@@ -261,6 +261,13 @@ write.csv(Percentcoverage_master, "Master_files/percent_coverage_all_data.csv", 
 
 ```{r}
 #Summary of percent cover at all sites
+percentcover_summary <-  Percentcoverage_master %>%
+  dplyr::group_by(Site, Season, Percent_coverage) %>%
+  dplyr::summarize(Count = n())
+percentcover_summary
+
+write.csv(percentcover_summary, "Field_Data_Biological/output/percentcoverage_summary.csv", row.names=FALSE)
+
 ```
 
 

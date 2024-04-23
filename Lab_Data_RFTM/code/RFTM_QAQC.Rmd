@@ -16,8 +16,8 @@ Last updated 4/15/24 by M. Kachmar
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -245,9 +245,9 @@ ggplot(data=df_intensity_summary, aes(x=month, y=intensity, color=site)) +
 
 
 df_intensity_proportions<- data_all %>%
-  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
-  group_by(site, month, intensity_bin) %>%
-  summarise(Count= n()) %>%
+  mutate(rftm_final_numeric = as.factor(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(site, month,year, intensity_bin) %>%
+  dplyr::summarise(Count= n()) %>%
   ungroup() %>%
   dplyr::mutate(Proportion = Count/sum(Count))
 
@@ -264,7 +264,7 @@ ggplot(data=df_intensity_proportions, aes(x=month, y= Proportion, fill=intensity
   theme(axis.text=element_text(size=12))+
 scale_fill_brewer(palette = "YlOrBr")+
    scale_x_continuous("Month", breaks = c(3,4,5,6,7,8,9,10))+ 
-  facet_wrap(~ site)
+  facet_wrap(~ year ~site)
 
 ```
 
@@ -524,6 +524,10 @@ as.data.frame(data_cond)
 #removing unnecessary columns and NAs
 data_cond <- select(data_cond,-lab_sample, -sample_notes, -dissection_notes, -light_regime, -oyster_zone, -...21:-...33)
 data_cond <- data_cond %>% filter(!is.na(date_collected))
+data_cond <- data_cond %>%
+  subset(lab_id != "0723LAUR_20") %>%
+  subset(lab_id != "0723LAUR_26") %>%
+  subset(lab_id != "1023GOLD_23")
 
 #changing body condition score format
 data_cond<- data_cond %>%
@@ -545,8 +549,8 @@ data_rftm.cond_prop<- data_rftm.cond %>%
 #adding column to easily show month collected for graphs
 data_rftm.cond_prop <- data_rftm.cond_prop %>% dplyr::mutate(date_collected= as.Date(date_collected), month = month(date_collected))
 
-data_rftm.cond_prop$date_collected <- factor(data_rftm.cond_prop$month, levels = c("4","5","6","7", "8", "9", "10", "11"),
-        labels=c("April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov"))
+data_rftm.cond_prop$date_collected <- factor(data_rftm.cond_prop$month, levels = c("3", "4","5","6","7", "8", "9", "10", "11"),
+        labels=c("March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov"))
 
 #removing month with NA body condition scores
 data_rftm.cond_prop <- data_rftm.cond_prop %>% filter(!is.na(condition_score))
@@ -595,7 +599,7 @@ data_2023 <- data_all%>%  filter(!year=="2024")
 
 df_intensity_proportions<- data_2023 %>%
   mutate(intensity_bin = as.factor(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
-  group_by(intensity_bin , site, month) %>% dplyr:: summarise(Count= n()) %>%
+  group_by(intensity_bin, site, month) %>% dplyr:: summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -611,6 +615,24 @@ ggplot(data=df_intensity_proportions, aes(x=month, y= Proportion, fill=intensity
   labs(title="Proportion of Intensity scores of Dermo infection - 2023", x ="Month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+scale_fill_brewer(palette = "YlOrBr")+
   facet_wrap(~ site)
+```
+
+
+```{r}
+#Coding graphs for LIS Confrence - only 2023 data (continued)
+#look at 3-5 scores rftm; look into bcs code
+
+df_3_prop<- select(data_2023, -c("site"))
+
+#Count and proportion table for 2023 rftm scores by month
+rftm_table <- table(data_2023$rftm_final, data_2023$month)
+names(dimnames(rftm_table)) <- c("RFTM Score", "Month")
+rftm_table
+
+rftm_proportion_table <- prop.table(rftm_table)
+rftm_proportion_table <- addmargins(rftm_proportion_table)
+rftm_proportion_table
+
 
 ```
 

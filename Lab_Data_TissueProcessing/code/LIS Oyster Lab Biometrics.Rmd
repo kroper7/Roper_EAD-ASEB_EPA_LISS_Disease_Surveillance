@@ -16,8 +16,8 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -554,6 +554,22 @@ BCS_proportion_all+scale_fill_manual(values = c("#003C30","#01665E","#80CDC1","#
 
 f <- function(pal) brewer.pal(brewer.pal.info[pal, "maxcolors"], pal)
 (cols <- f("BrBG"))
+```
+
+```{r}
+#Coding graphs for LIS Conference - only 2023 data (continued)
+
+df_3_prop<- select(data_2023, -c("site"))
+
+#Count and proportion table for 2023 rftm scores by month
+bcs_table <- table(data_2023$condition_score, data_2023$month, data_2023$site)
+names(dimnames(bcs_table)) <- c("Body Condition Score", "Month", "Site")
+bcs_table <- addmargins(bcs_table)
+bcs_table
+
+rftm_proportion_table <- prop.table(rftm_table)
+rftm_proportion_table <- addmargins(rftm_proportion_table)
+rftm_proportion_table
 ```
 
 
