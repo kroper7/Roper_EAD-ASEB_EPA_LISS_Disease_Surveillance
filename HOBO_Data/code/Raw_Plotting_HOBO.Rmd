@@ -233,8 +233,83 @@ print(CT_plot)
 
 ```
 
+
+## Gold Star Beach
+```{r}
+GOLD_HOBO <- read_csv("HOBO_Data\\raw_data\\042024_GOLD_HOBO.csv", col_names = TRUE)   
+
+as.data.frame(GOLD_HOBO)
+
+
+
+#Change column names
+
+GOLD_HOBO <- GOLD_HOBO %>%
+  dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
+  dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
+GOLD_HOBO
+
+GOLD_HOBO$Date_Time <- as.character(GOLD_HOBO$Date_Time)
+date_time <- strsplit(GOLD_HOBO$Date_Time, " ")  # Split at the space
+GOLD_HOBO$Date <- sapply(date_time, "[[", 1)  # Extract date
+GOLD_HOBO$Time <- sapply(date_time, function(x) {
+  if(length(x) >= 2) {
+    x[[2]]  # Extract the second element if it exists
+  } else {
+    NA  # Assign NA if the vector is too short
+  }
+})
+print(GOLD_HOBO)
+
+## removing unneeded columns with NAs
+
+GOLD_HOBO <- GOLD_HOBO %>%
+  dplyr::select( -c("Host Connected", "Water Detect", "Button Down", "Button Up", "End of File"))
+
+GOLD_HOBO <- na.omit(GOLD_HOBO)
+
+#### Lets look at the data 
+
+ggplot(GOLD_HOBO, aes(Date_Time, Temperature)) + geom_point()
+
+
+# Hourly Means 
+
+GOLD_means <- GOLD_HOBO %>%
+  mutate(Date_Time = as.POSIXct(substr(Date_Time, 1, 13), format = "%m/%d/%Y %H")) %>% # Adjust the date format
+  tidyr::pivot_longer(cols = c("Temperature"), names_to = "variable", values_to = "value") %>%
+  dplyr::group_by(Date_Time, variable) %>%
+  dplyr::summarise(mean_value = mean(value),sd_value = sd(value),se_value = sd(value) / sqrt(n())) 
+
+GOLD_means
 ## Including Plots
 
+```
+```{r}
+
+
+GOLD_plot <- GOLD_means %>%
+    mutate(Date_Time = as.POSIXct(Date_Time)) %>%
+    ggplot(aes(Date_Time, mean_value)) + 
+    geom_point() + 
+    geom_line(size = 0.2, position = position_dodge(.4)) +
+    scale_shape_manual(values = c(21, 22, 24, 25)) + 
+    scale_fill_manual(values = c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+    geom_errorbar(aes(ymin = mean_value - se_value, 
+                      ymax = mean_value + se_value), 
+                  width = 0, position = position_dodge(.4)) +
+    ggtitle("Gold Star Beach") +
+    labs(x = "", y = "") + 
+    theme_classic() + 
+    theme(axis.text = element_text(size = 12), axis.title = element_text(size = 12)) +
+    scale_x_datetime(date_labels = "%b/%Y", 
+                     date_breaks = "1 month", 
+                     limits = as.POSIXct(c('2023-06-01', '2024-05-01')))
+GOLD_plot
+
+pdf(paste0(path_out,"GOLD_HOBO.pdf"), height = 7, width = 14)
+print(GOLD_plot)
+```
 You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}

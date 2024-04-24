@@ -16,8 +16,8 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -180,7 +180,7 @@ ggplot(data=data_all, aes(x=month, y=condition_score, group = month, fill = site
 data_all
 df_BCS_proportions<- data_all %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, condition_score_bin) %>% dplyr ::summarise(Count= n()) %>%
+  group_by(site, month, year, condition_score_bin) %>% dplyr ::summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -193,7 +193,7 @@ BCS_proportion_all<- ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion,
   labs(title="Proportion of body condition scores April- November 2023", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
   scale_fill_brewer(palette = "Blues", direction = -1)+
-  facet_wrap(~ site )
+  facet_wrap(~ site + year )
 BCS_proportion_all
 
 pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_all.pdf"), height = 7, width = 13)
@@ -392,7 +392,7 @@ st_condition_GOLD
 
 GOLD_BCS_proportions<- df_GOLD %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, condition_score_bin) %>% dplyr::summarise(Count= n()) %>%
+  group_by(site, month, year, condition_score_bin) %>% dplyr::summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -419,7 +419,7 @@ dev.off()
 df_GOLD
 
 GOLD_precent_greater_3 <- df_GOLD %>%
-  dplyr::group_by(month, site) %>%
+  dplyr::group_by(month, site, year) %>%
   dplyr::summarise(Percentage = mean(condition_score <= 3)*100)
 GOLD_precent_greater_3
 
@@ -442,7 +442,7 @@ GOLD_BCS_percentage <- GOLD_precent_greater_3
     y = "Percentage of body condition scores >= 3"
   )+ scale_x_continuous( breaks = seq(5,12, by =1) )+
   #ylim(0,60)+ 
-  scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
+  scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10)) + facet_wrap(~year)
 
 pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/GOLD_BCS_percentage.pdf"),height = 7, width = 13)
 print(GOLD_BCS_percentage)
@@ -469,13 +469,13 @@ ggplot(data=df_GOLD, aes(x= condition)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Goldstar Beach Body Condition Score ", x ="Condition categorization")+
-    facet_wrap(~ month, scales = "free")
+    facet_wrap(~ month + year, scales = "free")
 
 #Mean Body condition per month
 ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Goldstar Beach Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse()
+  labs(title="Goldstar Beach Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~year)
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 
 ```
