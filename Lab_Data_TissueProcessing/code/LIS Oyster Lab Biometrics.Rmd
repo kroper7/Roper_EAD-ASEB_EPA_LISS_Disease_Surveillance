@@ -16,8 +16,8 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -542,17 +542,23 @@ df_BCS_proportions$month <- factor(df_BCS_proportions$month, levels = c("5","6",
 df_BCS_proportions$site <- factor(df_BCS_proportions$site, levels = c("ASHC","FENC","GOLD", "LAUR"),
         labels=c("Ash Creek", "Fence Creek", "Gold Star", "Laurel Hollow"))
 
-ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+bcs.prop.2023 <- ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
   geom_bar(width = .5, stat="identity", position = "fill", colour = "black")+  
    theme_bw() +  theme(panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = rel(.9)))+
   theme(panel.grid.major.x =element_blank())+
-  labs(title="Body Condition Scores in 2023", x ="Month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+ scale_fill_brewer(palette = "Blues") +
-  theme(axis.text=element_text(size=12))+
+  labs(title="Body condition scores in 2023", x ="Month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.2), angle =90), axis.title.x = element_text(size = rel(1.2), angle = 0))+ scale_fill_brewer(palette = "Blues") +
+  theme(strip.text = element_text(size = 15))+
+  theme (legend.title = element_text(size = 18))+
+  theme(title = element_text(size = 17))+
+  theme(axis.text=element_text(size=17))+
   labs(fill ="Body Condition Score")+
   facet_wrap(~ site )
+bcs.prop.2023
 
-
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_2023.pdf"), height = 7, width = 13)
+print(bcs.prop.2023)
+dev.off()
 
 #BCS_proportion_all+scale_fill_manual(values = c("#003C30","#01665E","#80CDC1","#C7EAE5","#F6E8C3","#DFC27D","#BF812D", "#8C510A","#543005" ))
 #scale_fill_manual(values = c("#003C30","#01665E","#80CDC1","#C7EAE5","azure1","slategray1","slategray3", "slategray4", "gray25" )) 
