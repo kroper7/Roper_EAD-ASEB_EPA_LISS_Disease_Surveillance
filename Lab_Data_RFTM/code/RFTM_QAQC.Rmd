@@ -7,11 +7,9 @@ output: html_document
 description: This R code is used to import and summarize RFTM (Rays Fluid Thioglycollate Medium) intensity scoring from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. The scale used to score intensity for individuals is the Mackins Scale (citation). This score can be used to calculate prevalence, weighted prevalence and intensity across the population. 
 ---
 
-Last updated 4/15/24 by M. Kachmar
+Last updated 4/29/24 by M. Kachmar
   - CT April uploaded & QAQC complete
-  - Accuracy %77.25
-
-
+  - Having mergine issue similar to tissue processing with date formatting. Troubleshooting. For some reason the new gold star data sheet will not merge - code is working?
 
 
 ```{r setup, include=FALSE}
@@ -24,7 +22,6 @@ knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-AS
 ```{r}
 library("dplyr")                                    
 library("plyr")   
-library(dplyr)
 library("readr")             
 library("Rmisc")
 library("ggplot2")
@@ -52,12 +49,10 @@ file_paths <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",
 
 data_all <- lapply(file_paths, function(file_path) {
   read_csv(file_path) %>%
-    mutate(
+   mutate(
       date_collected = as.Date(date_collected,format = "%m/%d/%Y"),
       date_rftmread1 = as.Date(date_rftmread1,format = "%m/%d/%Y"),
-      date_rftmread2 = as.Date(date_rftmread2,format = "%m/%d/%Y")
-     
-    )
+      date_rftmread2 = as.Date(date_rftmread2,format = "%m/%d/%Y"))
 }) %>%
   bind_rows
 as.data.frame(data_all)  # Convert tibble to data.frame
@@ -85,7 +80,7 @@ data_all
 
 #Filtering NAs 
 ```{r}
-data_all <- data_all %>% filter(!is.na(date_collected))
+data_all <- data_all %>% filter(!is.na(lab_id))
 data_all
 
 ```
