@@ -12,6 +12,7 @@ Updated: 04/29/24 M. Kachmar
     - Combining Nanodrop files with Qubit files
     - Changing date from chr to date format
     - column names and uniformity
+    - removing all of the NAs in the masterfile
     
 ---
 
@@ -53,10 +54,9 @@ data_all                                            # Print data to RStudio cons
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
 
-
 data_all <- data_all %>% filter(!is.na('Sample ID'))
 
-write.csv(data_all, "Master_files\\DNA_quanitifcation.csv", row.names=FALSE)
+write.csv(data_all, "Master_files\\DNA_quant_all_data.csv", row.names=FALSE)
 ```
 
 ```{r}
