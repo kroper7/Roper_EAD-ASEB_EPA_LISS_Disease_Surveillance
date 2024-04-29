@@ -3,28 +3,62 @@ title: "DNA quanitifcation QAQC"
 author: "Mariah Kachmar"
 date: "4/29/2024"
 output: html_document
+
+Description: This code is used for molecular sample DNA quanitification quality control and assurance for the LISS funded Oyster Health Project. This samples were extracted using a Qiagen blood and tissue extraction kit. Quanitify of nucleic acids were determined using a Nanodrop2000 and dsDNA using a Qubit Flex. 
+
+
+Updated: 04/29/24 M. Kachmar
+  - Things to think about: 
+    - Combining Nanodrop files with Qubit files
+    - Changing date from chr to date format
+    - column names and uniformity
+    
 ---
 
+
+
+#Set working directory
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+#run packages
+```{r}
+library("ggplot2")
+library("readxl")
+library("plyr")                                     
+library("dplyr")
+library("Rmisc")
+library("readr")  
+library("lubridate")
+library("purrr")
+library(reshape2)
+library(stringr)
+library("RColorBrewer")
 ```
 
-## Including Plots
+#### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+# reading in .csv files from local folder
+```{r}
 
-You can also embed plots, for example:
+data_all <- list.files(path = "Lab_Data_DNAQuantification/raw_data",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows                                         # Combine data sets into one data set 
+data_all                                            # Print data to RStudio console
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+as.data.frame(data_all)                            # Convert tibble to data.frame
+
+
+
+data_all <- data_all %>% filter(!is.na('Sample ID'))
+
+write.csv(data_all, "Master_files\\DNA_quanitifcation.csv", row.names=FALSE)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+sessionInfo()
+```
