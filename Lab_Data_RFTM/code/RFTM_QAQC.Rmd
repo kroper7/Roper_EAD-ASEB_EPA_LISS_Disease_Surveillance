@@ -16,14 +16,15 @@ Last updated 4/15/24 by M. Kachmar
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r}
 library("dplyr")                                    
-library("plyr")                                     
+library("plyr")   
+library(dplyr)
 library("readr")             
 library("Rmisc")
 library("ggplot2")
@@ -33,14 +34,33 @@ library("lubridate")
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
-data_all <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%                              # Store all files in list
-  bind_rows                                         # Combine data sets into one data set 
-data_all                                            # Print data to RStudio console
+#data_all <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",                           # Identify all CSV files
+#  pattern = "*.csv", full.names = TRUE) %>% 
+#  lapply(read_csv) %>%                              # Store all files in list
+#  bind_rows                                         # Combine data sets into one data set 
+#data_all                                            # Print data to RStudio console
 
-as.data.frame(data_all)                            # Convert tibble to data.frame
+#as.data.frame(data_all)     # Convert tibble to data.frame
 
+##### USE THIS CODE TO MERGE DATA FILES - some of the files have columns that are not the same format (dates specifically), which was causing issues in merging. This code below should solve that problem. It converts all date columns to dates and m/d/y format #####
+
+
+
+file_paths <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+data_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      date_collected = as.Date(date_collected,format = "%m/%d/%Y"),
+      date_rftmread1 = as.Date(date_rftmread1,format = "%m/%d/%Y"),
+      date_rftmread2 = as.Date(date_rftmread2,format = "%m/%d/%Y")
+     
+    )
+}) %>%
+  bind_rows
+as.data.frame(data_all)  # Convert tibble to data.frame
 tail(data_all)
 
 data_all <- data_all %>% filter(!is.na(lab_id))
