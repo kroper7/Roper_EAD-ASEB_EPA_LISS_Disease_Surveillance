@@ -70,6 +70,9 @@ BedHeight <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHe
 #renaming columns
 shellsize <- shellsize %>% dplyr::rename(Date_collected = TripDate) %>% dplyr::rename(Quadrat = QUADRAT_NUM) %>% dplyr::rename(Height = Height_mm) %>% dplyr::rename(Survival_status = SpecimenType)
 colnames(shellsize)
+shellsize$Date_collected <- factor(shellsize$Date_collected, levels = c("6/12/2023","6/14/2023"),
+                                     labels = c("2023-06-12","2023-06-14"))
+
 #adding columns
 shellsize$Season<- rep("Spring", nrow(shellsize))
 shellsize$State<- rep("CT", nrow(shellsize))
@@ -110,8 +113,7 @@ height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",        
  height_all$Count<- NULL
 
 #adding season columns
-height_all <- height_all %>%
-  dplyr::rename(Date_collected = Date)
+
 height_all$Date_collected <- factor(height_all$Date_collected, levels = c("10/3/2023","10/5/2023", "10/16/2023", "10/17/2023" ),
                                      labels = c("2023-10-03","2023-10-05","2023-10-16", "2023-10-17" ))
  height_all <- height_all %>%
@@ -187,9 +189,9 @@ all_density_SE
 #calculate percent standard error as 100*se/mean
 all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
 
-#calculate completeness as 100*N/12, where 12 is the desired number of quadrats per site 
+#calculate completeness as 100*N/4, where 4 is the desired number of quadrats per site. 2023 surveys had 12 quadrates measured. 
   densitysummary <- all_density_SE %>%
-    mutate(PercentComplete_Quad = ((N/12)*100))
+    mutate(PercentComplete_Quad = ((N/4)*100))
 densitysummary
 
 
