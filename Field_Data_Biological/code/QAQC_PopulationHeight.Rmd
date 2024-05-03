@@ -12,8 +12,8 @@ Last updated 3/22/24 by K. Lenderman. Note: Look at line 112 to change format of
 
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 
@@ -102,26 +102,44 @@ shellsize <- shellsize %>% select("Date_collected", "Site", "State", "Quadrat", 
 
 ## Shell Height Data
 
-height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%    # Store all files in list
-  bind_rows 
+# Use this code to reformat the dates to match
 
- height_all
+file_paths <- list.files(path = "Field_Data_Biological/raw_data/Height",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+height_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      Date_collected = as.Date(Date_collected,format = "%m/%d/%Y")
+    )
+}) %>%
+  bind_rows
+as.data.frame(height_all) 
+
+#height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",                           # Identify all CSV files
+#  pattern = "*.csv", full.names = TRUE) %>% 
+#  lapply(read_csv) %>%    # Store all files in list
+#  bind_rows 
+
+ 
 
  #Removing 'Count' column
  height_all$Count<- NULL
 
 #adding season columns
 
-height_all$Date_collected <- factor(height_all$Date_collected, levels = c("10/3/2023","10/5/2023", "10/16/2023", "10/17/2023" ),
-                                     labels = c("2023-10-03","2023-10-05","2023-10-16", "2023-10-17" ))
+#height_all$Date_collected <- factor(height_all$Date_collected, levels = c("10/3/2023","10/5/2023", "10/16/2023", "10/17/2023" ),
+#                                     labels = c("2023-10-03","2023-10-05","2023-10-16", "2023-10-17" ))
  height_all <- height_all %>%
   mutate(Date_collected = as.Date(Date_collected), month = month(Date_collected))
+ 
 height_all <- height_all %>%
   mutate(Season = case_when(between(month, 5,6) ~"Spring",
                             between(month, 10,11) ~ "Fall"))
 height_all <- select(height_all, -c("month"))
+
+View(height_all)
 ```
 
 #Cleaning up height data
@@ -158,6 +176,7 @@ Height_all$`Field ID`<- NULL
 
 #reorder columns
 Height_all <- Height_all %>% select("Date_collected", "Site", "State", "Quadrat", "Height", "Survival_status", "Season")
+
 ```
 
 #Merging spring and fall 2023 Height data
@@ -167,6 +186,8 @@ Height_master<- rbind(Height_all, shellsize)
 Height_master
 
 Height_master<-na.omit(Height_master)
+
+View(Height_master)
 
 # Output to repository
 write.csv(Height_master, "Master_files/height_all_data.csv", row.names=FALSE)
