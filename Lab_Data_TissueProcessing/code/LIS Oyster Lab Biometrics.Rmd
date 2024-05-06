@@ -103,6 +103,11 @@ data_all$height_mm[data_all$height_mm == "0"] <- NA
 data_all <- data_all %>% dplyr::mutate(date_collected= as.Date(date_collected), month = month(date_collected))
 
 data_all <- data_all %>% dplyr::mutate(date_collected= as.Date(date_collected), year = year(date_collected))
+
+#changing numeric month to month name
+data_all$month <- factor(data_all$month, levels = c("1","2","3","4","5","6","7", "8", "9", "10", "11", "12"),
+        labels=c("Jan","Feb", "March","April","May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"))
+
 data_all
 ```
 
@@ -171,14 +176,16 @@ mean_body_condition
 ggplot(data=data_all, aes(x=month, y=condition_score, group = month, fill = site)) +
   geom_boxplot()+ 
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  theme(axis.text.x = element_text(angle = -35, vjust = 0.5, hjust=1))+
   labs(title="Mean Condition Score ", x ="month", y = "Mean Body Condition Score")+ scale_y_reverse()+facet_wrap(~site + year)
 ```
 #Proportions graph Body condition scores
 
 ```{r}
-data_all
-df_BCS_proportions<- data_all %>%
+#Proportions graph Body condition scores - 2023
+data_2023 <- data_all%>%  filter(!year=="2024")
+
+df_BCS_proportions2023<- data_2023 %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
 
   group_by(site, month, year, condition_score_bin) %>% dplyr ::summarise(Count= n()) %>%
@@ -186,23 +193,53 @@ df_BCS_proportions<- data_all %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
-df_BCS_proportions<- na.omit(df_BCS_proportions)
+df_BCS_proportions2023<- na.omit(df_BCS_proportions2023)
 
-BCS_proportion_all<- ggplot(data=df_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+BCS_proportion_all_2023<- ggplot(data=df_BCS_proportions2023, aes(x=month, y= Proportion, fill=condition_score_bin)) +
   geom_bar(width = .5, stat="identity", position = "fill", colour = "black")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Proportion of body condition scores April- November 2023", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
   scale_fill_brewer(palette = "Blues", direction = -1)+
-  facet_wrap(~ site ~ year )
+  facet_wrap(~ site)
 
-BCS_proportion_all
+BCS_proportion_all_2023
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_all.pdf"), height = 7, width = 13)
-print(BCS_proportion_all)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_all_2023.pdf"), height = 7, width = 13)
+print(BCS_proportion_all_2023)
 dev.off()
 ```
+```{r}
+#Proportions graph Body condition scores - 2024
+data_2024 <- data_all%>%  filter(!year=="2023")
+
+df_BCS_proportions2024<- data_2024 %>%
+  mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
+
+  group_by(site, month, year, condition_score_bin) %>% dplyr ::summarise(Count= n()) %>%
+
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+
+df_BCS_proportions2024<- na.omit(df_BCS_proportions2024)
+
+BCS_proportion_all_2024<- ggplot(data=df_BCS_proportions2024, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill", colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of body condition scores April- November 2023", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+  scale_fill_brewer(palette = "Blues", direction = -1)+
+  facet_wrap(~ site)
+
+BCS_proportion_all_2024
+
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_all_2024.pdf"), height = 7, width = 13)
+print(BCS_proportion_all_2024)
+dev.off()
+```
+
 
 # Ash Creek Summary
 ```{r}
@@ -238,18 +275,40 @@ ggplot(data=df_ASHC, aes(x=month, y=height_mm, group= month)) +
 ```
 
 ```{r}
-#Condition distribution across all sample months
-ASHC_BCS_dist <-ggplot(data=df_ASHC, aes(x= condition)) +
+#Condition distribution across all sample months - 2023
+df_ASHC_2023 <- df_ASHC%>%  filter(!year=="2024")
+
+ASHC_BCS_dist2023 <-ggplot(data=df_ASHC_2023, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Body Condition Score ", x ="Condition categorization")+
+  labs(title="Ash Creek Body Condition Score - 2023", x ="Condition categorization")+
   facet_wrap(~ month, scales = "free")
+ASHC_BCS_dist2023
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/ASHC_BCS_dist.pdf"), height = 7, width = 13)
-print(ASHC_BCS_dist)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/ASHC_BCS_dist_2023.pdf"), height = 7, width = 13)
+print(ASHC_BCS_dist2023)
 dev.off()
 
+#Condition distribution across all sample months - 2024
+df_ASHC_2024 <- df_ASHC%>%  filter(!year=="2023")
+
+ASHC_BCS_dist2024 <-ggplot(data=df_ASHC_2024, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Ash Creek Body Condition Score - 2024", x ="Condition categorization")+
+  facet_wrap(~ month, scales = "free")
+ASHC_BCS_dist2024
+
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/ASHC_BCS_dist_2024.pdf"), height = 7, width = 13)
+print(ASHC_BCS_dist2024)
+dev.off()
+
+```
+
+
+```{r}
 #Mean Body condition per month
 ggplot(data=df_ASHC, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
@@ -259,13 +318,13 @@ ggplot(data=df_ASHC, aes(x= month, y= condition_score, group = month)) +
 
 ```
 
-#ASHC Proportions graph Body condition scores
+#ASHC Proportions graph Body condition scores - all years
 
 ```{r}
 
 ASHC_BCS_proportions<- df_ASHC %>%
   mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, condition_score_bin) %>% dplyr::summarise(Count= n()) %>%
+  group_by(site, month, condition_score_bin, year) %>% dplyr::summarise(Count= n()) %>%
   ungroup() %>%
   mutate(Proportion = Count/sum(Count))
 
@@ -279,25 +338,27 @@ BCS_proportion_ASHC<- ggplot(data=ASHC_BCS_proportions, aes(x=month, y= Proporti
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Ash Creek Proportion of body condition scores June- November", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
+  facet_wrap(~ year)
  #scale_fill_brewer() +
   #facet_wrap(~ site)
 
+BCS_proportion_ASHC
+  
 pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_ASHC.pdf"), height = 7, width = 13)
 print(BCS_proportion_ASHC)
 dev.off()
 ```
 
-# % of scores >3 at ash creek june - november 
+# % of scores >3 at ash creek - all years
 ```{r}
 df_ASHC
 
 ASHC_precent_greater_3 <- df_ASHC %>%
-  dplyr::group_by(month, site) %>%
+  dplyr::group_by(month, site, year) %>%
   dplyr::summarise(Percentage = mean(condition_score <= 3)*100)
 ASHC_precent_greater_3
 
-ASHC_BCS_percentage <- ASHC_precent_greater_3 
-  ggplot(ASHC_precent_greater_3,aes(x = month, y = Percentage)) +
+ASHC_BCS_percentage <- ggplot(ASHC_precent_greater_3,aes(x = month, y = Percentage)) +
   #geom_bar(width = 0.5, stat = "identity", position = "fill") +
     geom_col()+
   theme_bw() +
@@ -310,12 +371,15 @@ ASHC_BCS_percentage <- ASHC_precent_greater_3
     axis.text = element_text(size = 12)
   ) +
   labs(
-    title = "Ash Creek % of body condition scores >= 3 June- November",
+    title = "Ash Creek % of body condition scores >= 3",
     x = "month",
     y = "Percentage of body condition scores >= 3"
-  )+ scale_x_continuous( breaks = seq(5,12, by =1) )+
+  ) +
+    facet_wrap(~year)
+  #scale_x_continuous( breaks = seq(5,12, by =1) )+
   #ylim(0,60)+ 
-  scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
+  #scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
+ASHC_BCS_percentage
 
 pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/ASHC_BCS_percentage.pdf"),height = 7, width = 13)
 print(ASHC_BCS_percentage)
@@ -357,12 +421,24 @@ ggplot(data=df_FENC, aes(x=month, y=height_mm, group=month)) +
 ```
 
 ```{r}
-#Condition distribution across all sample months
-ggplot(data=df_FENC, aes(x= condition)) +
+#Condition distribution across all sample months - 2023
+df_FENC.2023 <- df_FENC%>%  filter(!year=="2024")
+
+ggplot(data=df_FENC.2023, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Body Condition index ", x ="Condition categorization")+
+  labs(title="Fence Creek Body Condition index - 2023", x ="Condition categorization")+
+    facet_wrap(~ month, scales = "free")
+
+#Condition distribution across all sample months - 2024
+df_FENC.2024 <- df_FENC%>%  filter(!year=="2023")
+
+ggplot(data=df_FENC.2024, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Fence Creek Body Condition index - 2024", x ="Condition categorization")+
     facet_wrap(~ month, scales = "free")
 
 #Mean Body condition per month
@@ -401,17 +477,16 @@ GOLD_BCS_proportions<- df_GOLD %>%
 
 GOLD_BCS_proportions<- na.omit(GOLD_BCS_proportions)
 
-GOLD_BCS_proportions
-
 BCS_proportion_GOLD <- ggplot(data=GOLD_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
   geom_bar(width = .5, stat="identity", position = "fill")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Gold Star Beach Proportion of body condition scores June- November", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Gold Star Beach Proportion of body condition scores - 2023", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
  #scale_fill_brewer() +
-  #facet_wrap(~ site)
-
+  facet_wrap(~ year)
+BCS_proportion_GOLD
+  
 pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/BCS_proportion_GOLD.pdf"), height = 7, width = 13)
 print(BCS_proportion_GOLD)
 dev.off()
