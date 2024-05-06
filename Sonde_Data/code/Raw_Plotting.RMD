@@ -5,8 +5,8 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 3/27/24 by M. Kachmar
-  - added "write.csv" for master sheets
+Last updated 4/17/24 by M. Kachmar
+  2024 data can merge to itself but it is still a character. When I try to convert it to a date in a specific format it either changes the year to 2019 - why? idk? or causes NA. SOS. 
 
 
 ## Setup: 
@@ -51,14 +51,15 @@ path_out = 'C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disea
 path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output'
 ```
 
-### NOTE: !!! changed to Mariah's path to make graphs for reports - if Sam needs to make edits make sure it is changed back. !!!
+
 ```{r}
 path.p                   <- "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/raw_data" 
 file.names.table         <- data.frame(txt.files = 
                                          (basename(list.files(path = paste(path.p,'/',sep=''), 
                                                               pattern = "csv$", 
                                                               recursive = FALSE)))) 
-Master_Table             <- data.frame() 
+   
+Master_Table1             <- data.frame() 
 
 
 # Notes on formatting datas 
@@ -110,14 +111,68 @@ for (m in 1:nrow(file.names.table)) {
   filename      <- file.names.table[m,1]
   raw_df        <- raw_df %>% 
                     dplyr::mutate(Site = sub(".*_(.*)_.*","\\1",filename),
-                    Date = gsub("_.*","",filename))
+                    Date = gsub("_.*","",filename)) 
   
-  Master_Table <- rbind(raw_df,Master_Table) #bind to a cumulative list dataframe
+  Master_Table1 <- rbind(raw_df,Master_Table1) #bind to a cumulative list dataframe
 }
-# View(Master_Table)
+ View(Master_Table)
 unique(Master_Table$Site)
 
+########################## 2024 data only##################################
+# Individually pulling in data to troubleshoot date issue - dates are coming in as characters which is why they are not merging above. Pull in yearly data seperately?
 
+
+
+file.names.2024<- data.frame(txt.files = 
+                                         (basename(list.files(path = "raw_data/2024", 
+                                                              pattern = "csv$", 
+                                                              recursive = FALSE))))
+
+Master_Table2 <- data.frame()
+
+for (m in 1:nrow(file.names.2024)) {
+  # call the dir of the csv file in loop
+  raw_Sonde_rootdir2        <- paste(path= "raw_data/2024",'/',file.names.2024[m,1], sep='') #reads in the data files
+  
+  # read it and fix dates and whatnot yay
+  D2        <- readLines(raw_Sonde_rootdir2) 
+  ind2      <- grep('Date Time',D2) # the line where the data stars (theres a lot of junk beforehand)
+  # raw      <- read.csv(paste(path.p,'/',file.names.table[m,1], sep=''),skip=ind-1)
+  raw2      <- read_csv(raw_Sonde_rootdir2,skip=ind2-1,col_types = cols())
+  columns  <- names(raw2) # what are the column names?  - youll see why
+  raw_df_2024   <- as.data.frame(raw2) # ocnvert the dataframe now that you skipped the crappola 
+  raw_df_2024[2:(ncol(raw_df_2024))] <- lapply(raw_df_2024[2:(ncol(raw_df_2024))],as.numeric) # convert all data  to numeric
+  # ommit all numeric data, also the format of the units does not pair between datasets, cannot rbind later
+  raw_df_2024$`Date Time` <- mdy_hm(raw_df_2024$`Date Time`)
+  names(raw_df_2024) <- sapply(strsplit(names(raw_df_2024), '\\s*[()]'), `[`, 1) 
+  raw_df_2024[,1]
+
+# Add site information
+filename2 <- file.names.2024[m, 1]
+raw_df_2024 <- raw_df_2024 %>%
+  dplyr::mutate(Site = sub(".*_(.*)_.*", "\\1", filename2),
+                Date = gsub("_.*", "", filename2))
+
+# Combine with Master_Table2
+Master_Table2 <- rbind(raw_df_2024, Master_Table2)
+
+#Master_Table2[,1] <- mdy_hms(Master_Table2[,1])
+
+} 
+
+Master_Table2$
+
+str(Master_Table2)
+
+str(raw2)
+
+x <- mdy_hm(raw2$`Date Time`)
+
+
+
+######### Merging 2023 and 2024 for a master sheet
+Master_Table <- rbind(Master_Table1, Master_Table2)
+View(Master_Table)
 
 ```
 
@@ -227,7 +282,7 @@ for(i in 1:nrow(vars)) {
 # a clean plot for Genevieve's NACE 2024 presentation
 Sonde_Temp_2023 <- Table_by_var %>% 
     dplyr::filter(variable %in% vars[11,]) %>% 
-    dplyr::filter(`Date Time` > '2023-06-15 00:00:00' & `Date Time` < '2023-10-01 00:00:00') %>% 
+    dplyr::filter(`Date Time` > '2023-06-15 00:00:00' & `Date Time` < '2024-05-01 00:00:00') %>% 
               ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
@@ -1420,7 +1475,7 @@ FENC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlor
 # pH 
 
 FENC_pH_all <- FENC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1456,7 +1511,7 @@ dev.off()
 # Salinity 
 
 FENC_Salinity_all <- FENC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1490,7 +1545,7 @@ dev.off()
 # Temperature 
 
 FENC_Temperature_all <-FENC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1523,7 +1578,7 @@ dev.off()
 # DO 
 
 FENC_DO_all <- FENC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1553,7 +1608,7 @@ dev.off()
 #Chlorophyll-a
 
 FENC_CHLA_all <- FENC_CHLA %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values

@@ -10,8 +10,8 @@ description: This R code is used to important and summarize bed characteristics 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 
@@ -29,13 +29,30 @@ library("lubridate")
 
 ```{r}
 #Pulling all bed characteristic files
-data_all <- list.files(path = "Field_Data_Biological/raw_data/Characteristics",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>% dplyr::bind_rows()
+#data_all <- list.files(path = "Field_Data_Biological/raw_data/Characteristics",                           # Identify all CSV files
+#  pattern = "*.csv", full.names = TRUE) %>% 
+#  lapply(read_csv) %>% dplyr::bind_rows()
+
+#data_all
+
+#as.data.frame(data_all)
+
+file_paths <- list.files(path = "Field_Data_Biological/raw_data/Characteristics",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+data_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      Percent_coverage = as.character(Percent_coverage)
+    )
+}) %>%
+  bind_rows
+as.data.frame(data_all) 
+
+data_all <- data_all%>% filter(!is.na('Field ID'))
 
 data_all
-
-as.data.frame(data_all)
 
 #cleaning up date date
 data_all <- data_all %>%
@@ -261,6 +278,13 @@ write.csv(Percentcoverage_master, "Master_files/percent_coverage_all_data.csv", 
 
 ```{r}
 #Summary of percent cover at all sites
+percentcover_summary <-  Percentcoverage_master %>%
+  dplyr::group_by(Site, Season, Percent_coverage) %>%
+  dplyr::summarize(Count = n())
+percentcover_summary
+
+write.csv(percentcover_summary, "Field_Data_Biological/output/percentcoverage_summary.csv", row.names=FALSE)
+
 ```
 
 
