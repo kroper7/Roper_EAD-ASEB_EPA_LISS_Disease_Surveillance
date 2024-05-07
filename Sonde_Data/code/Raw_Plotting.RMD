@@ -5,8 +5,9 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 4/17/24 by M. Kachmar
-  2024 data can merge to itself but it is still a character. When I try to convert it to a date in a specific format it either changes the year to 2019 - why? idk? or causes NA. SOS. 
+Last updated 5/6/24 by M. Kachmar
+   - all data currently up to date and merged to master file
+   - when making graphs will want to seperate by year moving forward - code needs to be updated
 
 
 ## Setup: 
@@ -54,12 +55,12 @@ path_out <-'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_S
 
 ```{r}
 path.p                   <- "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/raw_data" 
-file.names.table         <- data.frame(txt.files = 
+file.names.2023         <- data.frame(txt.files = 
                                          (basename(list.files(path = paste(path.p,'/',sep=''), 
                                                               pattern = "csv$", 
                                                               recursive = FALSE)))) 
    
-Master_Table1             <- data.frame() 
+Master_2023             <- data.frame() 
 
 
 # Notes on formatting datas 
@@ -69,9 +70,9 @@ Master_Table1             <- data.frame()
 
 # for loop to merge all csv files to one dataframe
 
-for (m in 1:nrow(file.names.table)) {
+for (m in 1:nrow(file.names.2023)) {
   # call the dir of the csv file in loop
-  raw_Sonde_rootdir        <- paste(path.p,'/',file.names.table[m,1], sep='') #reads in the data files
+  raw_Sonde_rootdir        <- paste(path.p,'/',file.names.2023[m,1], sep='') #reads in the data files
   
   # read it and fix dates and whatnot yay
   D        <- readLines(raw_Sonde_rootdir) 
@@ -113,22 +114,21 @@ for (m in 1:nrow(file.names.table)) {
                     dplyr::mutate(Site = sub(".*_(.*)_.*","\\1",filename),
                     Date = gsub("_.*","",filename)) 
   
-  Master_Table1 <- rbind(raw_df,Master_Table1) #bind to a cumulative list dataframe
+  Master_2023 <- rbind(raw_df,Master_2023) #bind to a cumulative list dataframe
 }
- View(Master_Table)
-unique(Master_Table$Site)
+
+write.csv(Master_2023, "output/Sonde_2023_Master.csv",)
 
 ########################## 2024 data only##################################
 # Individually pulling in data to troubleshoot date issue - dates are coming in as characters which is why they are not merging above. Pull in yearly data seperately?
 
 
 
-file.names.2024<- data.frame(txt.files = 
-                                         (basename(list.files(path = "raw_data/2024", 
+file.names.2024<- data.frame(txt.files = (basename(list.files(path = "raw_data/2024", 
                                                               pattern = "csv$", 
                                                               recursive = FALSE))))
 
-Master_Table2 <- data.frame()
+Master_2024 <- data.frame()
 
 for (m in 1:nrow(file.names.2024)) {
   # call the dir of the csv file in loop
@@ -147,6 +147,7 @@ for (m in 1:nrow(file.names.2024)) {
   names(raw_df_2024) <- sapply(strsplit(names(raw_df_2024), '\\s*[()]'), `[`, 1) 
   raw_df_2024[,1]
 
+
 # Add site information
 filename2 <- file.names.2024[m, 1]
 raw_df_2024 <- raw_df_2024 %>%
@@ -154,26 +155,22 @@ raw_df_2024 <- raw_df_2024 %>%
                 Date = gsub("_.*", "", filename2))
 
 # Combine with Master_Table2
-Master_Table2 <- rbind(raw_df_2024, Master_Table2)
+Master_2024 <- rbind(raw_df_2024, Master_2024)
 
 #Master_Table2[,1] <- mdy_hms(Master_Table2[,1])
 
 } 
 
-Master_Table2$
 
-str(Master_Table2)
-
-str(raw2)
-
-x <- mdy_hm(raw2$`Date Time`)
-
+class( raw_df_2024$`Date Time`)
 
 
 ######### Merging 2023 and 2024 for a master sheet
-Master_Table <- rbind(Master_Table1, Master_Table2)
-View(Master_Table)
+Master_Table <- rbind(Master_2023, Master_2024)
 
+
+
+View(Master_Table)
 ```
 
 # Visualize data 
