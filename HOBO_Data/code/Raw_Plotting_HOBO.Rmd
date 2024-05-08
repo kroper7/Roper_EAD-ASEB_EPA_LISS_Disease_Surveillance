@@ -178,7 +178,7 @@ ASHC_means <- ASHC_HOBO %>%
   dplyr::group_by(Date_Time, variable) %>%
   dplyr::summarise(mean_value = mean(value),sd_value = sd(value),se_value = sd(value) / sqrt(n())) 
 
-ASHC_means
+View(ASHC_means)
 ```
 
 ```{r}

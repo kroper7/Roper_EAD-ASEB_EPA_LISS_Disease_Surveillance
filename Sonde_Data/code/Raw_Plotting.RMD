@@ -117,7 +117,7 @@ for (m in 1:nrow(file.names.2023)) {
   Master_2023 <- rbind(raw_df,Master_2023) #bind to a cumulative list dataframe
 }
 
-write.csv(Master_2023, "output/Sonde_2023_Master.csv",)
+
 
 ########################## 2024 data only##################################
 # Individually pulling in data to troubleshoot date issue - dates are coming in as characters which is why they are not merging above. Pull in yearly data seperately?
