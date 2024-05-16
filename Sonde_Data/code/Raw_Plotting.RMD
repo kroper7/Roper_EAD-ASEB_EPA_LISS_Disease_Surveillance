@@ -5,7 +5,7 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 5/8/24 by M. Kachmar
+Last updated 5/16/24 by M. Kachmar
    - all data currently up to date and merged to master file
    - when graphing for 2023 and 2024 make sure to change the date ranged. these are labeled as a reminder. 
 
@@ -314,7 +314,7 @@ CT_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinit
 CT_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC', 'ASHC'))
 CT_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC', 'ASHC'))
 
-
+View(CT_Temperature)
 # pH 
 
 CT_pH_all <- CT_pH %>% na.omit() %>%
@@ -545,6 +545,8 @@ CT_DO_callout <- CT_DO %>% na.omit() %>%
 pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_DO.pdf"), height = 6, width = 11)
 ggarrange(CT_DO_all, CT_DO_callout, ncol = 2, widths = c(2, 1))
 dev.off()
+
+
 
 ```
 
@@ -906,6 +908,7 @@ GOLD_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Tempe
 GOLD_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('GOLD'))
 GOLD_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('GOLD'))
 
+View(GOLD_Temperature)
 # pH 
 
 GOLD_pH_all <- GOLD_pH %>% na.omit() %>%
