@@ -9,6 +9,7 @@ description: This R code is used to important and summarize shell height data fr
 ---
 
 Last updated 5/16/24 M. Kachmar
+- having issues getting the summary files to push to repository
 
 
 ```{r, setup, include=FALSE}
