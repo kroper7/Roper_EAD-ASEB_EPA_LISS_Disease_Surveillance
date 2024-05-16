@@ -14,8 +14,8 @@ Last updated 4/29/24 by M. Kachmar
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -28,20 +28,21 @@ library("Rmisc")
 library("readr")  
 library("lubridate")
 library("purrr")
+library("tidyr")
 ```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
-data_all <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",                           # Identify all CSV files
-  pattern = "*.csv", full.names = TRUE) %>% 
-  lapply(read_csv) %>%                              # Store all files in list
-bind_rows                                         # Combine data sets into one data set 
-data_all                                            # Print data to RStudio console
+#data_all <- list.files(path = "Lab_Data_RFTM/raw_data/Files_by_Month",                           # Identify all CSV files
+  #pattern = "*.csv", full.names = TRUE) %>% 
+  #lapply(read_csv) %>%                              # Store all files in list
+#bind_rows                                         # Combine data sets into one data set 
+#data_all                                            # Print data to RStudio console
 
-as.data.frame(data_all)     # Convert tibble to data.frame
+#as.data.frame(data_all)     # Convert tibble to data.frame
 
-##### USE THIS CODE TO MERGE DATA FILES - some of the files have columns that are not the same format (dates specifically), which was causing issues in merging. This code below should solve that problem. It converts all date columns to dates and m/d/y format #####
+##### USE THE FOLLOWING CODE TO MERGE DATA FILES - some of the files have columns that are not the same format (dates specifically), which was causing issues in merging. This code below should solve that problem. It converts all date columns to dates and m/d/y format #####
 
 
 
@@ -83,7 +84,7 @@ data_all
 #Filtering NAs 
 ```{r}
 data_all <- data_all %>% filter(!is.na(lab_id))
-data_all
+data_all <- data_all %>% drop_na(rftm_final)
 
 ```
 
@@ -150,13 +151,25 @@ Accuracy
 #Graphing Weighted prevalence(= Sum of individual intensity scores / total number of oyster sampled)
 
 ```{r, echo=FALSE}
-ggplot(data=data_all, aes(x=month, y=rftm_final, fill=site)) +
+#Weighted prevalence of dermo infection in 2023
+data_2023 <- data_all %>% filter(!year=="2024")
+ggplot(data=data_2023, aes(x=month, y=rftm_final, fill=site)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Weighted prevalence of Dermo infection", x ="Date", y = "Weighted prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Weighted prevalence of Dermo infection in 2023", x ="Date", y = "Weighted prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
-  facet_wrap(~site + year)
+  facet_wrap(~site)
+
+#Weighted prevalence of dermo infection in 2024
+data_2024 <- data_all %>% filter(!year=="2023")
+ggplot(data=data_2024, aes(x=month, y=rftm_final, fill=site)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Weighted prevalence of Dermo infection in 2024", x ="Date", y = "Weighted prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+  facet_wrap(~site)
 
 ```
 
@@ -260,7 +273,6 @@ ggplot(data=df_intensity_summary, aes(x=month, y=intensity, color=site)) +
 ## Not letting be add a 5 category - need to figure out why
 ## Also gold star is missing data? 
 
-
 df_intensity_proportions<- data_all %>%
   mutate(rftm_final_numeric = as.factor(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
   group_by(site, month,year, intensity_bin) %>%
@@ -272,16 +284,33 @@ df_intensity_proportions<- na.omit(df_intensity_proportions)
 
 df_intensity_proportions
 
-ggplot(data=df_intensity_proportions, aes(x=month, y= Proportion, fill=intensity_bin)) +
+# Proportion per month of intensity scores in 2023
+df_intensity_proportions2023<- df_intensity_proportions %>% filter(!year=="2024")
+
+ggplot(data=df_intensity_proportions2023, aes(x=month, y= Proportion, fill=intensity_bin)) +
   geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(fill ="Dermo Intensity")+
-  labs(title="Proportion of Intensity scores of Dermo infection", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Proportion of Intensity scores of Dermo infection in 2023", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
 scale_fill_brewer(palette = "YlOrBr")+
    scale_x_continuous("Month", breaks = c(3,4,5,6,7,8,9,10))+ 
-  facet_wrap(~ year ~site)
+  facet_wrap(~site)
+
+# Proportion per month of intensity scores in 2024
+df_intensity_proportions2024<- df_intensity_proportions %>% filter(!year=="2023")
+
+ggplot(data=df_intensity_proportions2024, aes(x=month, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(fill ="Dermo Intensity")+
+  labs(title="Proportion of Intensity scores of Dermo infection in 2024", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+scale_fill_brewer(palette = "YlOrBr")+
+   scale_x_continuous("Month", breaks = c(3,4,5,6,7,8,9,10))+ 
+  facet_wrap(~site)
 
 ```
 
@@ -510,11 +539,12 @@ ggplot(data=df_GOLD_proportions, aes(x=month, y= Proportion, fill=intensity_bin)
   geom_bar(width = .5, stat="identity", position = "fill", colour = "black")+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Proportion of Intensity scores of Dermo infection", x ="month", y = "Proportion", fill = "Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Proportion of Intensity scores of Dermo infection at Gold Star", x ="month", y = "Proportion", fill = "Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
    scale_fill_brewer() +
-   scale_x_continuous( breaks = seq(5,12, by =1) )
-#+facet_wrap(~ site)
+   scale_x_continuous( breaks = seq(4,12, by =1) )+
+  facet_wrap(~year)
+
 
 ```
 
