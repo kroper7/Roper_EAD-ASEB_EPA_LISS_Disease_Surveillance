@@ -451,7 +451,7 @@ ggplot(data=height_FENC_Live, aes(x= Height)) +
  facet_wrap(~ Month, scales = "free", ncol = 1)
 
 #Distribution Dead
-ggplot(data=height_ASHC_Dead, aes(x= Height)) +
+ggplot(data=height_FENC_Dead, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
