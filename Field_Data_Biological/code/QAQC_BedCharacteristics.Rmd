@@ -50,18 +50,19 @@ data_all <- lapply(file_paths, function(file_path) {
   bind_rows
 as.data.frame(data_all) 
 
-data_all <- data_all%>% filter(!is.na('Field ID'))
+data_all <- data_all%>% filter(!is.na(Site))
 
-data_all
+View(data_all)
 
 #cleaning up date date
 data_all <- data_all %>%
   dplyr::rename(Date_collected = Date)
+
 data_all$Date_collected <- as.Date(data_all$Date_collected, format= "%m/%d/%Y")
 
 #adding season columns
 data_all <- data_all %>%
-  mutate(Date_collected = as.Date(Date_collected), month = month(Date_collected))
+  mutate( month = month(Date_collected))
 data_all <- data_all %>%
   mutate(Season = case_when(between(month, 5,6) ~"Spring",
                             between(month, 10,11) ~ "Fall"))
@@ -87,6 +88,8 @@ head(bed_all)
   
 #reordering columns
 bed_all <- bed_all %>% select("Date_collected", "Site", "State", "Bed_height_cm", "Season")
+
+
 ```
 
 
