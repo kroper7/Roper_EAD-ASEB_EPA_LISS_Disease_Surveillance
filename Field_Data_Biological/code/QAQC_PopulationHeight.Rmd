@@ -141,7 +141,6 @@ height_all <- height_all %>%
                             between(month, 10,11) ~ "Fall"))
 height_all <- select(height_all, -c("month"))
 
-View(height_all)
 ```
 
 #Cleaning up height data
@@ -189,7 +188,6 @@ Height_master
 
 Height_master<-na.omit(Height_master)
 
-View(Height_master)
 Height_master$Year<- year(Height_master$Date_collected)
 
 
