@@ -253,7 +253,6 @@ df_intensity_summary <- data_all %>%
   dplyr::summarize( intensity = sum(rftm_final, na.rm= TRUE)/sum(prevalent, na.rm = TRUE))
 df_intensity_summary
 
-# Need to fix 0823GOLD? Looked at the raw data sheet and the scores were all 0. 
 ```
 ```{r}
 
