@@ -8,7 +8,7 @@ output: html_document
 description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
-Last updated 5/17/24 M. Kachmar
+Last updated 5/20/24 M. Kachmar
 
 
 ```{r, setup, include=FALSE}
@@ -29,6 +29,7 @@ library(dplyr)
 library(lubridate)
 library(Rmisc)
 library(ggplot2)
+library(readr)
 
 ```
 
@@ -133,12 +134,13 @@ as.data.frame(height_all)
 #height_all$Date_collected <- factor(height_all$Date_collected, levels = c("10/3/2023","10/5/2023", "10/16/2023", "10/17/2023" ),
 #                                     labels = c("2023-10-03","2023-10-05","2023-10-16", "2023-10-17" ))
  height_all <- height_all %>%
-  mutate(Date_collected = as.Date(Date_collected), month = month(Date_collected))
+  mutate(month = month(Date_collected))
  
 height_all <- height_all %>%
   mutate(Season = case_when(between(month, 5,6) ~"Spring",
                             between(month, 10,11) ~ "Fall"))
 height_all <- select(height_all, -c("month"))
+
 
 ```
 
@@ -154,6 +156,7 @@ height_live <- na.omit(height_live)
 height_live$Survival_status<- rep("Live", nrow(height_live))
 height_live <- height_live %>% dplyr::rename(Height = Height_live)
 height_live
+
 
 #Box
 
@@ -189,9 +192,10 @@ Height_master<-na.omit(Height_master)
 
 Height_master$Year<- year(Height_master$Date_collected)
 
-
+View(Height_master)
 # Output to repository
-write.csv(Height_master, "Master_files/height_all_data.csv", row.names=FALSE)
+write_csv(Height_master, path= "Master_files/height_all_data.csv") #row.names=FALSE)
+
 
 ```
 #Oyster density metrics
@@ -217,7 +221,7 @@ all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
 densitysummary
 
 
-write.csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv", row.names=FALSE)
+write_csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv") #, row.names=FALSE)
 
 ```
 #oyster size distribution
@@ -274,7 +278,7 @@ shellsize_summary
 
 #size distribution summary
 #note that calculating PSE and accuracy do not make sense for size distributions. Will need to figure out new metrics for the QAPP
-write.csv(shellsize_summary, "Field_Data_Biological/output/shellsize_summary.csv", row.names=FALSE)
+write_csv(shellsize_summary, "Field_Data_Biological/output/shellsize_summary.csv") #, row.names=FALSE)
 ```
 
 #graphing shell height all sites
