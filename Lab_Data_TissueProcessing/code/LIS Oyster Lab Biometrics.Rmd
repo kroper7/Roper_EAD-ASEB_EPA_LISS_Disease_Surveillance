@@ -16,8 +16,8 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -531,16 +531,16 @@ dev.off()
 ```
 
 
-# Gold Star Beach Summary
+# Gold Star Beach 2022 planting Summary
 ```{r}
 df_GOLD<- data_all%>%
   filter(site=="GOLD")
 
 #2023 data
-df_GOLD2023 <- df_GOLD%>%  filter(!year=="2024")
+df_GOLD2023 <- df_GOLD%>%  filter(!year=="2023")
 
 #2024 data
-df_GOLD2024 <- df_GOLD%>%  filter(!year=="2023")
+df_GOLD2024 <- df_GOLD%>%  filter(!year=="2024")
 
 
 ## Shell Height ##
@@ -637,7 +637,7 @@ ggplot(data=df_GOLD2023, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Beach Body Condition Score - 2023 ", x ="Condition categorization")+
+  labs(title="Goldstar Beach  Body Condition Score - 2023 ", x ="Condition categorization")+
     facet_wrap(~ month, scales = "free")
 
 #Condition distribution across all sample months - 2024
@@ -645,17 +645,154 @@ ggplot(data=df_GOLD2024, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Beach Body Condition Score - 2024", x ="Condition categorization")+
+  labs(title="Goldstar Beach  Body Condition Score - 2024", x ="Condition categorization")+
     facet_wrap(~ month, scales = "free")
 
 #Mean Body condition per month
 ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Goldstar Beach Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~year)
+  labs(title="Goldstar Beach  Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~year)
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 
 ```
+
+
+# STAR 2023 planting (GSB) Beach Summary
+```{r}
+df_STAR<- data_all%>%
+  filter(site=="STAR")
+
+
+
+#2024 data
+df_STAR2024 <- df_STAR%>%  filter(!year=="2024")
+
+
+## Shell Height ##
+st_height_STAR <- summarySE(df_STAR, measurevar="height_mm", groupvars=c("date_collected"))
+st_height_STAR 
+
+## Body Condition ##
+st_condition_STAR<- summarySE(df_STAR, measurevar = "condition_score", groupvars = c("date_collected"))
+st_condition_STAR
+
+```
+#GOLD Proportions graph Body condition scores
+
+```{r}
+
+STAR_BCS_proportions<- df_STAR %>%
+  mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
+  group_by(site, month, year, condition_score_bin) %>% dplyr::summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+
+STAR_BCS_proportions<- na.omit(STAR_BCS_proportions)
+
+BCS_proportion_STAR <- ggplot(data=STAR_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Gold Star Beach 2023 planting Proportion of body condition scores", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ #scale_fill_brewer() +
+  facet_wrap(~ year)
+BCS_proportion_GOLD
+  
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/STAR_BCS_proportion.pdf"), height = 7, width = 13)
+print(BCS_proportion_GOLD)
+dev.off()
+```
+
+# % of scores >3 at gold  
+```{r}
+df_STAR
+
+STAR_precent_greater_3 <- df_GOLD %>%
+  dplyr::group_by(month, site, year) %>%
+  dplyr::summarise(Percentage = mean(condition_score <= 3)*100)
+STAR_precent_greater_3
+
+STAR_BCS_percentage <- GOLD_precent_greater_3 %>%
+  ggplot(aes(x = month, y = Percentage)) +
+  #geom_bar(width = 0.5, stat = "identity", position = "fill") +
+    geom_col()+
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+    axis.title.y = element_text(size = rel(1.3), angle = 90),
+    axis.title.x = element_text(size = rel(1.3), angle = 0),
+    axis.text = element_text(size = 12)
+  ) +
+  labs(
+    title = "Gold Star Beach (STAR) % of body condition scores >= 3",
+    x = "month",
+    y = "Percentage of body condition scores >= 3"
+  ) +facet_wrap(~year)
+  #+ scale_x_continuous( breaks = seq(5,12, by =1) )+
+  #ylim(0,60)+ 
+  #scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10)) 
+
+    
+STAR_BCS_percentage
+
+pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/STAR_BCS_percentage.pdf"),height = 7, width = 13)
+print(GOLD_BCS_percentage)
+dev.off() 
+
+
+
+```
+
+```{r}
+ggplot(data=df_STAR, aes(x=month, y=height_mm, group= month)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Goldstar Beach (STAR) Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)") + #scale_x_continuous(limits= c(4,11), breaks = seq(5,10, by =1))+
+  geom_smooth(method = "lm", se = FALSE)
+
+```
+
+```{r}
+
+
+#Condition distribution across all sample months - 2024
+ggplot(data=df_STAR, aes(x= condition)) +
+  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Goldstar Beach (STAR) Body Condition Score - 2024", x ="Condition categorization")+
+    facet_wrap(~ month, scales = "free")
+
+#Mean Body condition per month
+ggplot(data=df_STAR, aes(x= month, y= condition_score, group = month)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  labs(title="Goldstar Beach (STAR) Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~year)
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+
+```
+#Size distribution comparison of samples collected in May 2024 from the 2022 and 2023 gold star beach plantings (GOLD & STAR)
+```{r}
+df_GSB_0524<- data_all%>%
+  filter(date_collected =="2024-05-23")
+
+ggplot(data=df_GSB_0524, aes(x= height_mm)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="height comparison GOLD vs STAR ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
+ facet_wrap(~ site, scales = "free", ncol = 1)
+
+
+
+```
+
 
 # Laurel Hollow Summary - NO LONGER A STUDY SITE
 ```{r}
