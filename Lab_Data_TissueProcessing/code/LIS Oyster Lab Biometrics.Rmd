@@ -16,8 +16,8 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -248,6 +248,20 @@ BCS_proportion_all_2024
 pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2024.pdf"), height = 7, width = 13)
 print(BCS_proportion_all_2024)
 dev.off()
+```
+
+#Shell Pathology - all data
+#Includes 2023 data and all data that is in the 2024 format
+```{r}
+shell_path <- list.files(path = "Lab_Data_TissueProcessing/raw_data/shell_pathology",                           # Identify all CSV files
+ pattern = "*.csv", full.names = TRUE) %>% 
+lapply(read_csv) %>%   # Store all files in list
+  bind_rows          # Combine data sets into one data set 
+
+shell_path <- shell_path %>% filter(!is.na(lab_id))
+
+write.csv(shell_path, "Master_files/shell_pathology_all_data.csv", row.names=FALSE)
+
 ```
 
 
