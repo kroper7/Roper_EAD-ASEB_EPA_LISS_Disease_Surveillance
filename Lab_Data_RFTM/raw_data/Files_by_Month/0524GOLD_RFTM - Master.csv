@@ -1,0 +1,17 @@
+lab_id,date_collected,site,lab_sample,date_rftmread1,rftm_reader1,rftm_intensity_read1,duplicate_read,date_rftmread2,rftm_reader2,rftm_intensity_read2,rftm_notes,rftm_final
+0524GOLD_01,5/23/2024,GOLD,1,5/30/2024,Isaiah Mayo,0,FALSE,,,,,0
+0524GOLD_02,5/23/2024,GOLD,2,5/30/2024,Isaiah Mayo,0,FALSE,,,,,0
+0524GOLD_03,5/23/2024,GOLD,3,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_04,5/23/2024,GOLD,4,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_05,5/23/2024,GOLD,5,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_06,5/23/2024,GOLD,6,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_07,5/23/2024,GOLD,7,5/30/2024,Kyra Lenderman,0,FALSE,,,,,0
+0524GOLD_08,5/23/2024,GOLD,8,5/30/2024,Kyra Lenderman,0,FALSE,,,,,0
+0524GOLD_09,5/23/2024,GOLD,9,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_10,5/23/2024,GOLD,10,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_11,5/23/2024,GOLD,11,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_12,5/23/2024,GOLD,12,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_13,5/23/2024,GOLD,13,5/30/2024,Kyra Lenderman,0,TRUE,5/30/2024,Kelly Roper,0,,0
+0524GOLD_14,5/23/2024,GOLD,14,5/30/2024,Kyra Lenderman,0,TRUE,5/30/2024,Kelly Roper,0,,0
+0524GOLD_15,5/23/2024,GOLD,15,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
+0524GOLD_16,5/23/2024,GOLD,16,5/30/2024,Kennedy Mcgrath,0,FALSE,,,,,0
