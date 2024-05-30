@@ -236,7 +236,7 @@ print(CT_plot)
 
 ## Gold Star Beach
 ```{r}
-GOLD_HOBO <- read_csv("HOBO_Data\\raw_data\\042024_GOLD_HOBO.csv", col_names = TRUE)   
+GOLD_HOBO <- read_csv("HOBO_Data\\raw_data\\052024_GOLD_HOBO.csv", col_names = TRUE)   
 
 as.data.frame(GOLD_HOBO)
 
