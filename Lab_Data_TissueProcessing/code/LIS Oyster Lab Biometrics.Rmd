@@ -17,7 +17,7 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 #knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -261,6 +261,53 @@ lapply(read_csv) %>%   # Store all files in list
 shell_path <- shell_path %>% filter(!is.na(lab_id))
 
 write.csv(shell_path, "Master_files/shell_pathology_all_data.csv", row.names=FALSE)
+
+#Writing summary for shell pathology
+shell_path_summary <- shell_path%>% separate(lab_id, c('Date', 'ID'))
+
+shell_path_summary <- select(shell_path_summary, -c("pathology_notes","ID", "...14":"...26",))
+
+shell_path_summary$boring_sponge <- as.integer(as.logical(shell_path_summary$boring_sponge))
+shell_path_summary$polydora <- as.integer(as.logical(shell_path_summary$polydora))
+shell_path_summary$conchiolin_mod_severe <- as.integer(as.logical(shell_path_summary$conchiolin_mod_severe))
+shell_path_summary$mud_blister <- as.integer(as.logical(shell_path_summary$mud_blister))
+shell_path_summary$pea_crab <- as.integer(as.logical(shell_path_summary$pea_crab))
+shell_path_summary$gill_erosion <- as.integer(as.logical(shell_path_summary$gill_erosion))
+shell_path_summary$pale_digestive <- as.integer(as.logical(shell_path_summary$pale_digestive))
+shell_path_summary$discoloration <- as.integer(as.logical(shell_path_summary$discoloration))
+shell_path_summary$horn_add <- as.integer(as.logical(shell_path_summary$horn_add))
+shell_path_summary$cyst_abscess <- as.integer(as.logical(shell_path_summary$cyst_abscess))
+shell_path_summary$tumor <- as.integer(as.logical(shell_path_summary$tumor))
+shell_path_summary$oyster_drill <- as.integer(as.logical(shell_path_summary$oyster_drill))
+shell_path_summary$boring_snail <- as.integer(as.logical(shell_path_summary$boring_snail))
+shell_path_summary$shell_scarring <- as.integer(as.logical(shell_path_summary$shell_scarring))
+
+
+shell_path_count<- shell_path_summary %>%
+  dplyr::group_by(Date) %>%
+  dplyr::summarize(Sample_count = n(),
+              Boring_sponge =sum(boring_sponge),
+              Polydora = sum(polydora),
+              Conchiolin =sum(conchiolin_mod_severe),
+              Mud_blister =sum(mud_blister),
+              Pea_crab =sum(pea_crab),
+              Gill_erosion =sum(gill_erosion),
+              Pale_digestive =sum(pale_digestive),
+              Discoloration =sum(discoloration),
+              Horn =sum(horn_add),
+              Cyst =sum(cyst_abscess),
+              Tumor =sum(tumor),
+              Oyster_drill =sum(oyster_drill),
+              Boring_snail =sum(boring_snail),
+              Shell_scarring =sum(shell_scarring),
+              Pathogen_count = sum(boring_sponge,polydora,conchiolin_mod_severe, mud_blister, pea_crab,
+                                    gill_erosion, pale_digestive, discoloration, horn_add, cyst_abscess,
+                                    tumor, oyster_drill, boring_snail, shell_scarring, na.rm = TRUE)) %>%
+  ungroup()
+
+all_shellpath_SE <-summarySE(data = shell_path_count, measurevar = "Sample_count", groupvars=c("Date", "Pathogen_count"))
+
+data_all <- data_all %>% dplyr::mutate(date_collected= as.Date(date_collected), year = year(date_collected))
 
 ```
 
