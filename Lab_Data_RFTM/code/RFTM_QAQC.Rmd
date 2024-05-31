@@ -6,8 +6,9 @@ output: html_document
 
 description: This R code is used to import and summarize RFTM (Rays Fluid Thioglycollate Medium) intensity scoring from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. The scale used to score intensity for individuals is the Mackins Scale (citation). This score can be used to calculate prevalence, weighted prevalence and intensity across the population. 
 ---
-Last updated 5/30/24 by M. Kachmar
-  - Accuracy 78.4%
+Last updated 5/31/24 by M. Kachmar
+  - Accuracy 78.5%
+  - All data up to date. STAR vs GOLD look the same. While STAR has ~10% 0.5 it has a bigger sample set. I would not consider this significantly different. 
 
 
 ```{r setup, include=FALSE}
@@ -207,7 +208,7 @@ absent <- nrow(data_all %>% filter(prevalent == '0'))
 
 prevalence_all <- present/(present+absent)
 prevalence_all
-# 67.9%
+
 
 str(data_all$prevalent)
 data_all$prevalent <- as.numeric(data_all$prevalent)
