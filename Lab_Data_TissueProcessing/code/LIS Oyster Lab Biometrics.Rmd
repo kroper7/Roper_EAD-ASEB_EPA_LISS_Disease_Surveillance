@@ -5,8 +5,9 @@ output: html_notebook
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 05/29/24 by M. Kachmar
+Updated 06/05/24 by M. Kachmar
 - all code up to date & graphs generated
+- Fixed 0524GOLD data to remove 'STAR'
  
 
 
@@ -16,8 +17,8 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -259,57 +260,8 @@ lapply(read_csv) %>%   # Store all files in list
   bind_rows          # Combine data sets into one data set 
 
 shell_path <- shell_path %>% filter(!is.na(lab_id))
-shell_path <- shell_path %>% select(-c("...14":"...26"))
 
 write.csv(shell_path, "Master_files/shell_pathology_all_data.csv", row.names=FALSE)
-```
-
-
-```{r}
-#Writing summary for shell pathology
-shell_path_summary <- shell_path%>% separate(lab_id, c('Date_Site', 'ID'))
-
-shell_path_summary <- select(shell_path_summary, -c("pathology_notes","ID",))
-
-shell_path_summary$boring_sponge <- as.integer(as.logical(shell_path_summary$boring_sponge))
-shell_path_summary$polydora <- as.integer(as.logical(shell_path_summary$polydora))
-shell_path_summary$conchiolin_mod_severe <- as.integer(as.logical(shell_path_summary$conchiolin_mod_severe))
-shell_path_summary$mud_blister <- as.integer(as.logical(shell_path_summary$mud_blister))
-shell_path_summary$pea_crab <- as.integer(as.logical(shell_path_summary$pea_crab))
-shell_path_summary$gill_erosion <- as.integer(as.logical(shell_path_summary$gill_erosion))
-shell_path_summary$pale_digestive <- as.integer(as.logical(shell_path_summary$pale_digestive))
-shell_path_summary$discoloration <- as.integer(as.logical(shell_path_summary$discoloration))
-shell_path_summary$horn_add <- as.integer(as.logical(shell_path_summary$horn_add))
-shell_path_summary$cyst_abscess <- as.integer(as.logical(shell_path_summary$cyst_abscess))
-shell_path_summary$tumor <- as.integer(as.logical(shell_path_summary$tumor))
-shell_path_summary$oyster_drill <- as.integer(as.logical(shell_path_summary$oyster_drill))
-shell_path_summary$boring_snail <- as.integer(as.logical(shell_path_summary$boring_snail))
-shell_path_summary$shell_scarring <- as.integer(as.logical(shell_path_summary$shell_scarring))
-
-
-shell_path_count<- shell_path_summary %>%
-  dplyr::group_by(Date_Site) %>%
-  dplyr::summarize(Sample_count = n(),
-              Boring_sponge =sum(boring_sponge),
-              Polydora = sum(polydora),
-              Conchiolin =sum(conchiolin_mod_severe),
-              Mud_blister =sum(mud_blister),
-              Pea_crab =sum(pea_crab),
-              Gill_erosion =sum(gill_erosion),
-              Pale_digestive =sum(pale_digestive),
-              Discoloration =sum(discoloration),
-              Horn =sum(horn_add),
-              Cyst =sum(cyst_abscess),
-              Tumor =sum(tumor),
-              Oyster_drill =sum(oyster_drill),
-              Boring_snail =sum(boring_snail),
-              Shell_scarring =sum(shell_scarring),
-              Pathogen_count = sum(boring_sponge,polydora,conchiolin_mod_severe, mud_blister, pea_crab,
-                                    gill_erosion, pale_digestive, discoloration, horn_add, cyst_abscess,
-                                    tumor, oyster_drill, boring_snail, shell_scarring, na.rm = TRUE)) %>%
-  ungroup()
-
-write.csv(shell_path_count, "Lab_Data_TissueProcessing/output/shell_pathology_counts.csv", row.names=FALSE)
 
 ```
 
@@ -594,7 +546,9 @@ dev.off()
 ```
 
 
-# Gold Star Beach 2022 planting Summary
+# Gold Star Beach Summary
+# 0524GOLD has 45 samples - we attempted to sample from 2022 and 2023 planting and consider them seperate but it appeared that due to a storm the plantings mixed together. 
+
 ```{r}
 df_GOLD<- data_all%>%
   filter(site=="GOLD")
@@ -721,140 +675,6 @@ ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
 ```
 
 
-# STAR 2023 planting (GSB) Beach Summary
-```{r}
-df_STAR<- data_all%>%
-  filter(site=="STAR")
-
-
-
-#2024 data
-df_STAR2024 <- df_STAR%>%  filter(!year=="2024")
-
-
-## Shell Height ##
-st_height_STAR <- summarySE(df_STAR, measurevar="height_mm", groupvars=c("date_collected"))
-st_height_STAR 
-
-## Body Condition ##
-st_condition_STAR<- summarySE(df_STAR, measurevar = "condition_score", groupvars = c("date_collected"))
-st_condition_STAR
-
-```
-#GOLD Proportions graph Body condition scores
-
-```{r}
-
-STAR_BCS_proportions<- df_STAR %>%
-  mutate(condition_score_numeric = as.numeric(condition_score),condition_score_bin = case_when(condition_score == 1 ~ "1", condition_score == 2 ~"2",condition_score == 3 ~ "3", condition_score == 4 ~"4",condition_score == 5 ~ "5", condition_score == 6 ~"6",condition_score == 7 ~ "7", condition_score == 8 ~"8", condition_score ==9 ~"9", TRUE ~ as.character(condition_score))) %>%
-  group_by(site, month, year, condition_score_bin) %>% dplyr::summarise(Count= n()) %>%
-  ungroup() %>%
-  mutate(Proportion = Count/sum(Count))
-
-STAR_BCS_proportions<- na.omit(STAR_BCS_proportions)
-
-BCS_proportion_STAR <- ggplot(data=STAR_BCS_proportions, aes(x=month, y= Proportion, fill=condition_score_bin)) +
-  geom_bar(width = .5, stat="identity", position = "fill")+  
-   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Gold Star Beach 2023 planting Proportion of body condition scores", x ="month", y = "Proportion of body condition scores ")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))+
- #scale_fill_brewer() +
-  facet_wrap(~ year)
-BCS_proportion_GOLD
-  
-pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/STAR_BCS_proportion.pdf"), height = 7, width = 13)
-print(BCS_proportion_GOLD)
-dev.off()
-```
-
-# % of scores >3 at gold  
-```{r}
-df_STAR
-
-STAR_precent_greater_3 <- df_GOLD %>%
-  dplyr::group_by(month, site, year) %>%
-  dplyr::summarise(Percentage = mean(condition_score <= 3)*100)
-STAR_precent_greater_3
-
-STAR_BCS_percentage <- GOLD_precent_greater_3 %>%
-  ggplot(aes(x = month, y = Percentage)) +
-  #geom_bar(width = 0.5, stat = "identity", position = "fill") +
-    geom_col()+
-  theme_bw() +
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
-    axis.title.y = element_text(size = rel(1.3), angle = 90),
-    axis.title.x = element_text(size = rel(1.3), angle = 0),
-    axis.text = element_text(size = 12)
-  ) +
-  labs(
-    title = "Gold Star Beach (STAR) % of body condition scores >= 3",
-    x = "month",
-    y = "Percentage of body condition scores >= 3"
-  ) +facet_wrap(~year)
-  #+ scale_x_continuous( breaks = seq(5,12, by =1) )+
-  #ylim(0,60)+ 
-  #scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10)) 
-
-    
-STAR_BCS_percentage
-
-pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/STAR_BCS_percentage.pdf"),height = 7, width = 13)
-print(GOLD_BCS_percentage)
-dev.off() 
-
-
-
-```
-
-```{r}
-ggplot(data=df_STAR, aes(x=month, y=height_mm, group= month)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Beach (STAR) Mean Shell Height ", x ="month", y = "Mean Shell Height (mm)") + #scale_x_continuous(limits= c(4,11), breaks = seq(5,10, by =1))+
-  geom_smooth(method = "lm", se = FALSE)
-
-```
-
-```{r}
-
-
-#Condition distribution across all sample months - 2024
-ggplot(data=df_STAR, aes(x= condition)) +
-  geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Beach (STAR) Body Condition Score - 2024", x ="Condition categorization")+
-    facet_wrap(~ month, scales = "free")
-
-#Mean Body condition per month
-ggplot(data=df_STAR, aes(x= month, y= condition_score, group = month)) +
-  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Goldstar Beach (STAR) Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~year)
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-
-```
-#Size distribution comparison of samples collected in May 2024 from the 2022 and 2023 gold star beach plantings (GOLD & STAR)
-```{r}
-df_GSB_0524<- data_all%>%
-  filter(date_collected =="2024-05-23")
-
-ggplot(data=df_GSB_0524, aes(x= height_mm)) +
-  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="height comparison GOLD vs STAR ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
-  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
- facet_wrap(~ site, scales = "free", ncol = 1)
-
-
-
-```
 
 
 # Laurel Hollow Summary - NO LONGER A STUDY SITE
