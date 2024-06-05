@@ -547,7 +547,7 @@ dev.off()
 
 
 # Gold Star Beach Summary
-# 0524GOLD has 45 samples - we attempted to sample from 2022 and 2023 planting and consider them seperate but it appeared that due to a storm the plantings mixed together. 
+# 0524GOLD has 46 samples - we attempted to sample from 2022 and 2023 planting and consider them seperate but it appeared that due to a storm the plantings mixed together. 
 
 ```{r}
 df_GOLD<- data_all%>%
