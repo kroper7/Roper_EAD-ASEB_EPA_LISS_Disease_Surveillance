@@ -22,9 +22,9 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
 ```
 
@@ -38,8 +38,12 @@ knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EA
 Master_table <- read.csv("output/Sonde_master.csv",check.names=FALSE) %>% dplyr::select(-1) # check.names = F allows with col names with spaces (opthwise fills with a '.' )
 
 Master_table$`Date Time` <- lubridate::ymd_hms(Master_table$`Date Time`)
+
 ```
 
+```{r}
+pathout <- 'Sonde_Data/output'
+```
 # Visualize data 
 
 
@@ -131,7 +135,7 @@ for(i in 1:nrow(vars)) {
               theme_bw()
   
   # print plots and name them as the var    
-  pdf(paste0(path_out,"/raw_plots/",gsub(" ", "_", vars[i,]),".pdf"), height = 12, width = 15)
+  pdf(paste0(pathout,"/raw_plots/",gsub(" ", "_", vars[i,]),".pdf"), height = 12, width = 15)
   print(plot) 
   dev.off()
 

@@ -7,12 +7,9 @@ output: html_document
 Description: This code is used for molecular sample DNA quanitification quality control and assurance for the LISS funded Oyster Health Project. This samples were extracted using a Qiagen blood and tissue extraction kit. Quanitify of nucleic acids were determined using a Nanodrop2000 and dsDNA using a Qubit Flex. 
 
 
-Updated: 04/29/24 M. Kachmar
-  - Things to think about: 
-    - Combining Nanodrop files with Qubit files
-    - Changing date from chr to date format
-    - column names and uniformity
-    - removing all of the NAs in the masterfile
+Updated: 06/05/24 M. Kachmar
+  - combine new Qubit Files
+  - Implemented datasheet clean up
     
 ---
 
@@ -54,7 +51,13 @@ data_all                                            # Print data to RStudio cons
 as.data.frame(data_all)                            # Convert tibble to data.frame
 
 
-data_all <- data_all %>% filter(!is.na('Sample ID'))
+data_all <- data_all %>% filter(!is.na('Sample Name'))
+
+data_all<- data_all %>% select(c('Test Date', 'Sample Name', 'Original Sample Conc.', 'Original sample conc. units'))
+
+data_all <- data_all %>% rename(Date = 'Test Date', Sample_ID = 'Sample Name', Concentration = 'Original Sample Conc.', Units = 'Original sample conc. units')
+
+data_all
 
 write.csv(data_all, "Master_files\\DNA_quant_all_data.csv", row.names=FALSE)
 ```
