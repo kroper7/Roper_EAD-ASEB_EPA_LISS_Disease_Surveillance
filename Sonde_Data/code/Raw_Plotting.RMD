@@ -5,11 +5,9 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 6/6/2024 by M.Kachmar
-- creating script for 2023 and 2024 to be able to pull years seperately. 
-- pdf() recieving errors that it "cannot open file". It appears it is connecting to the HOBO output file vs Sonde data outputs
-    - (6/7/24): fixed error by replacing code with "path =" and adding output to the path.
-
+Last updated 6/7/2024 by M.Kachmar
+- creating script for 2023 and 2024 to be able to pull years seperately. All CT sites finished. 
+- 
 ## Setup: 
 
 * call your root directory, using opts_knit assigns for the entire script so your paths will alwyas be from this start point!
@@ -1181,7 +1179,6 @@ ASHC_CHLA_2024
 pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_CHLA_2024.pdf"), height = 7, width = 14)
 print(ASHC_CHLA_2024)
 ```
-## Stopped splitting by year here
 ```{r}
 
 ## DAILY AVERAGES OF DO - ASHC###
@@ -1201,11 +1198,14 @@ ASHC_DO_avg <- ASHC_DO %>% na.omit() %>%
   dplyr::summarize(Daily_mean = mean(mean))
 ASHC_DO_avg
 
+ 
 
 class(ASHC_DO_avg$Date)
 ASHC_DO_avg$date <- as.Date(ASHC_DO_avg$date)
 
-ASHC_DAILY_DO <- ASHC_DO_avg %>% ggplot(aes(x= date, 
+ASHC_DAILY_DO_2023 <- ASHC_DO_avg %>% 
+   dplyr::filter(date() > '2023-06-01 00:00:00' & date < '2023-11-30 00:00:00' ) %>%
+    ggplot(aes(x= date, 
                        y=Daily_mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1221,7 +1221,7 @@ ASHC_DAILY_DO <- ASHC_DO_avg %>% ggplot(aes(x= date,
                                 #ymax=(mean)+(se)), 
                            # width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("DO Concentration") +
+              ggtitle("DO Concentration 2023") +
               labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
@@ -1229,10 +1229,41 @@ ASHC_DAILY_DO <- ASHC_DO_avg %>% ggplot(aes(x= date,
 
 
 
-ASHC_DAILY_DO
+ASHC_DAILY_DO_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_daily_DO.pdf"), height = 7, width = 14)
-print(ASHC_DAILY_DO)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_daily_DO_2023.pdf"), height = 7, width = 14)
+print(ASHC_DAILY_DO_2023)
+
+
+ASHC_DAILY_DO_2024 <- ASHC_DO_avg %>% 
+   dplyr::filter(date() > '2024-03-01 00:00:00' & date < '2024-11-30 00:00:00' ) %>%
+    ggplot(aes(x= date, 
+                       y=Daily_mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              #geom_errorbar(aes(ymin=(mean)-(se), 
+                                #ymax=(mean)+(se)), 
+                           # width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration 2024") +
+              labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
+  scale_y_continuous(limits= c(2,10), breaks = seq(2,10, by= 1))
+
+
+ASHC_DAILY_DO_2024
+
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_daily_DO_2024.pdf"), height = 7, width = 14)
+print(ASHC_DAILY_DO_2024)
 
 # Monthly mean temperatures ASHC
 ASHC_Temperature$`Date Time` <- as.character(ASHC_Temperature$`Date Time`)
@@ -1247,8 +1278,11 @@ print(ASHC_Temperature)
 ASHC_Temperature$Month <- month(ASHC_Temperature$date, label = TRUE)
 head(ASHC_Temperature)
 
+ASHC_Temperature$Year <- year(ASHC_Temperature$date)
+head(ASHC_Temperature)
+
 ASHC_Monthly_Temperature <- ASHC_Temperature %>% na.omit() %>%
-  dplyr::group_by(Month , Site)%>%
+  dplyr::group_by(Month , Year, Site)%>%
   dplyr::summarize(Monthly_mean = mean(mean))
 ASHC_Monthly_Temperature
 
@@ -1265,8 +1299,8 @@ FENC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlor
 
 # pH 
 
-FENC_pH_all <- FENC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
+FENC_pH_2023 <- FENC_pH %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1284,25 +1318,55 @@ FENC_pH_all <- FENC_pH %>% na.omit() %>%
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("pH ") +
+              ggtitle("pH 2023") +
               labs(x = "Time", y = "pH") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
 
-FENC_pH_all
+FENC_pH_2023
 
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/FENC_pH.pdf"), height = 7, width = 14)
-print(FENC_pH_all)
+pdf(paste0(path = "output/raw_plots/Report_plots/FENC_pH_2023.pdf"), height = 7, width = 14)
+print(FENC_pH_2023)
 dev.off()
   
+FENC_pH_2024 <- FENC_pH %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("pH 2024 ") +
+              labs(x = "Time", y = "pH") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
 
+
+FENC_pH_2024
+
+
+pdf(paste0(path= "output/raw_plots/Report_plots/FENC_pH_.pdf"), height = 7, width = 14)
+print(FENC_pH_2024)
+dev.off()
 
 # Salinity 
 
-FENC_Salinity_all <- FENC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
+FENC_Salinity_2023 <- FENC_Salinity %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1320,23 +1384,83 @@ FENC_Salinity_all <- FENC_Salinity %>% na.omit() %>%
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("Salinity") +
+              ggtitle("Salinity 2023") +
               labs(x = "Time", y = "Salinity") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))+
               scale_y_continuous(breaks = seq(0,30, by = 2))
 
-FENC_Salinity_all
+FENC_Salinity_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/FENC_Salinity.pdf"), height = 7, width = 14)
-print(FENC_Salinity_all)
+pdf(paste0(path = "output/raw_plots/Report_plots/FENC_Salinity_2023.pdf"), height = 7, width = 14)
+print(FENC_Salinity_2023)
 dev.off()
 
+FENC_Salinity_2024 <- FENC_Salinity %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity 2024") +
+              labs(x = "Time", y = "Salinity") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))+
+              scale_y_continuous(breaks = seq(0,30, by = 2))
+
+FENC_Salinity_2024
+
+pdf(paste0(path = "output/raw_plots/Report_plots/FENC_Salinity_2024.pdf"), height = 7, width = 14)
+print(FENC_Salinity_2024)
+dev.off()
 
 # Temperature 
 
-FENC_Temperature_all <-FENC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
+FENC_Temperature_2023 <-FENC_Temperature %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature 2023") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+FENC_Temperature_2023
+
+
+pdf(paste0(path="output/raw_plots/Report_plots/FENC_Temperature_2023.pdf"), height = 7, width = 14)
+print(FENC_Temperature_2023)
+dev.off()
+
+FENC_Temperature_2024 <-FENC_Temperature %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1358,18 +1482,17 @@ FENC_Temperature_all <-FENC_Temperature %>% na.omit() %>%
               labs(x = "Time", y = "Temperature (Celcius)") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))
-FENC_Temperature_all
+FENC_Temperature_2024
 
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/FENC_Temperature.pdf"), height = 7, width = 14)
-print(FENC_Temperature_all)
+pdf(paste0(path="output/raw_plots/Report_plots/FENC_Temperature_2024.pdf"), height = 7, width = 14)
+print(FENC_Temperature_2024)
 dev.off()
-
 
 # DO 
 
-FENC_DO_all <- FENC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
+FENC_DO_2023 <- FENC_DO %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1387,19 +1510,17 @@ FENC_DO_all <- FENC_DO %>% na.omit() %>%
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("DO Concentration") +
+              ggtitle("DO Concentration 2023") +
               labs(x = "Time", y = "DO Concentration (mg/L)") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/FENC_DO.pdf"), height = 7, width = 14)
-print(FENC_DO_all)
+pdf(paste0(path = "output/raw_plots/Report_plots/FENC_DO_2023.pdf"), height = 7, width = 14)
+print(FENC_DO_2023)
 dev.off()
 
-#Chlorophyll-a
-
-FENC_CHLA_all <- FENC_CHLA %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2024-05-01 00:00:00' ) %>% 
+FENC_DO_2024 <- FENC_DO %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
@@ -1417,15 +1538,74 @@ FENC_CHLA_all <- FENC_CHLA %>% na.omit() %>%
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("Chlorophyll-a flourescences ") +
+              ggtitle("DO Concentration 2024") +
+              labs(x = "Time", y = "DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+pdf(paste0(path = "output/raw_plots/Report_plots/FENC_DO_2024.pdf"), height = 7, width = 14)
+print(FENC_DO_2024)
+dev.off()
+
+#Chlorophyll-a
+
+FENC_CHLA_2023 <- FENC_CHLA %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Chlorophyll-a flourescences 2023") +
               labs(x = "Time", y = "Chlorophyll-a (RFU)") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
-FENC_CHLA_all
+FENC_CHLA_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/FENC_CHLA.pdf"), height = 7, width = 14)
-print(FENC_CHLA_all)
+pdf(paste0(path="output/raw_plots/Report_plots/FENC_CHLA_2023.pdf"), height = 7, width = 14)
+print(FENC_CHLA_2023)
+
+FENC_CHLA_2024 <- FENC_CHLA %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% 
+             dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Chlorophyll-a flourescences 2024") +
+              labs(x = "Time", y = "Chlorophyll-a (RFU)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 15))
+
+FENC_CHLA_2024
+
+pdf(paste0(path="output/raw_plots/Report_plots/FENC_CHLA_2024.pdf"), height = 7, width = 14)
+print(FENC_CHLA_2024)
 
 ```
 
@@ -1460,7 +1640,7 @@ FENC_DO_avg$date <- as.Date(FENC_DO_avg$date)
 
 FENC_DO_avg
 
-FENC_DAILY_DO <- FENC_DO_avg %>% dplyr::filter(`date` > '2023-06-01 00:00:00' & `date` < '2023-10-15 00:00:00' ) %>% 
+FENC_DAILY_DO_2023 <- FENC_DO_avg %>% dplyr::filter(`date` > '2023-06-01 00:00:00' & `date` < '2023-10-15 00:00:00' ) %>% 
   ggplot(aes(x= date, 
                        y=Daily_mean, # the mean values
                        group=Site)) + # call the new mean
@@ -1477,16 +1657,44 @@ FENC_DAILY_DO <- FENC_DO_avg %>% dplyr::filter(`date` > '2023-06-01 00:00:00' & 
                                 #ymax=(mean)+(se)), 
                            # width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("DO Concentration") +
+              ggtitle("DO Concentration 2023") +
               labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d")  +  scale_y_continuous(limits = c(0,10), breaks = seq(0,10, by = 1))
 
 
-FENC_DAILY_DO
+FENC_DAILY_DO_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/FENC_daily_DO.pdf"), height = 7, width = 14)
-print(FENC_DAILY_DO)
+pdf(paste0(path="output/raw_plots/Report_plots/FENC_daily_DO_2023.pdf"), height = 7, width = 14)
+print(FENC_DAILY_DO_2023)
+
+FENC_DAILY_DO_2024 <- FENC_DO_avg %>% dplyr::filter(`date` > '2024-03-01 00:00:00' & `date` < '2024-11-30 00:00:00' ) %>% 
+  ggplot(aes(x= date, 
+                       y=Daily_mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              #geom_errorbar(aes(ymin=(mean)-(se), 
+                                #ymax=(mean)+(se)), 
+                           # width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO Concentration 2024") +
+              labs(x = "Time", y = "Daily Mean DO Concentration (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none", axis.text= element_text(size= 10),axis.text.x = element_text(angle = 45, hjust = 1))+scale_x_date(date_breaks = "1 week", date_labels = "%b %d")  +  scale_y_continuous(limits = c(0,10), breaks = seq(0,10, by = 1))
+
+
+FENC_DAILY_DO_2024
+
+pdf(paste0(path="output/raw_plots/Report_plots/FENC_daily_DO_2024.pdf"), height = 7, width = 14)
+print(FENC_DAILY_DO_2024)
 
 # Monthly mean temperatures ASHC
 FENC_Temperature$`Date Time` <- as.character(FENC_Temperature$`Date Time`)
@@ -1507,8 +1715,11 @@ print(FENC_Temperature)
 FENC_Temperature$Month <- month(FENC_Temperature$date, label = TRUE)
 head(FENC_Temperature)
 
+FENC_Temperature$Year <- year(FENC_Temperature$date)
+head(FENC_Temperature)
+
 FENC_Monthly_Temperature <-FENC_Temperature %>% na.omit() %>%
-  dplyr::group_by(Month , Site)%>%
+  dplyr::group_by(Month , Year, Site)%>%
   dplyr::summarize(Monthly_mean = mean(mean))
 FENC_Monthly_Temperature
 
@@ -1531,13 +1742,16 @@ print(FENC_Salinity)
 FENC_Salinity$Month <- month(FENC_Salinity$date, label = TRUE)
 head(FENC_Salinity)
 
+FENC_Salinity$Year <- year(FENC_Salinity$date)
+head(FENC_Salinity)
+
 FENC_Monthly_Salinity <- FENC_Salinity %>% na.omit() %>%
-  dplyr::group_by(Month , Site)%>%
+  dplyr::group_by(Month , Year, Site)%>%
   dplyr::summarize(Monthly_mean = mean(mean))
 FENC_Monthly_Salinity
 
 ```
-
+### STOPPED YEAR SLIT HERE
 # Clean GOLD for the LISS stakeholder reports (NEW YORK)
 ```{r, figs for LISS stakeholder reports}
 
@@ -1820,8 +2034,10 @@ GOLD_Monthly_Salinity
 ```
 
 
+#NO LONGER STUDYING THIS SITE - LAUR
+
 # Clean LAUR for the LISS stakeholder reports
-#NO LONGER STUDYING THIS SITE
+
 ```{r, figs for LISS stakeholder reports}
 
 LAUR_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('LAUR'))
