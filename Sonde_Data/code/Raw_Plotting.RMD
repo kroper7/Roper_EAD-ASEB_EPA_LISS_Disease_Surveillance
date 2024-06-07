@@ -20,9 +20,9 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
 ```
 
@@ -54,7 +54,7 @@ Master_table$`Date Time` <- lubridate::ymd_hms(Master_table$`Date Time`)
 ```
 
 ```{r}
-pathout <- 'Sonde_Data/output'
+#pathout <- 'Sonde_Data/output'
 ```
 # Visualize data 
 
@@ -148,7 +148,7 @@ for(i in 1:nrow(vars)) {
               theme_bw()
   
   # print plots and name them as the var    
-  pdf(paste0(pathout,"/raw_plots/",gsub(" ", "_", vars[i,]),".pdf"), height = 12, width = 15)
+  pdf(paste0(path= "/raw_plots",gsub(" ", "_", vars[i,]),".pdf"), height = 12, width = 15)
   print(plot) 
   dev.off()
 
@@ -180,7 +180,7 @@ Sonde_Temp_2023 <- Table_by_var %>%
               ggtitle(vars[11,]) +
               theme_bw()
  
-pdf(paste0(path_out,"output/raw_plots/Temperature_JuneOct_2023.pdf"), height = 12, width = 15)
+pdf(paste0(path ="output/raw_plots/Temperature_JuneOct_2023.pdf"), height = 12, width = 15)
 print(Sonde_Temp_2023) 
 dev.off()
   
@@ -772,7 +772,7 @@ ASHC_pH_callout_2024 <- ASHC_pH %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 ASHC_pH_2024
-ASHC_pH_callout_2024
+#ASHC_pH_callout_2024
 
 pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_pH_2024.pdf"), height = 7, width = 14)
 print(ASHC_pH_2024)
@@ -891,7 +891,7 @@ ASHC_Salinity_callout_2024 <- ASHC_Salinity %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 
-ASHC_Salinity_callout_2024
+#ASHC_Salinity_callout_2024
 
 pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_Salinity_2024.pdf"), height = 7, width = 14)
 print(ASHC_Salinity_2024)
@@ -1005,7 +1005,7 @@ ASHC_Temperature_callout_2024 <- ASHC_Temperature %>% na.omit() %>%
               labs(x = "Time") +
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
-ASHC_Temperature_callout_2024
+#ASHC_Temperature_callout_2024
 
 pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_Temperature_2024.pdf"), height = 7, width = 14)
 print(ASHC_Temperature_2024)
