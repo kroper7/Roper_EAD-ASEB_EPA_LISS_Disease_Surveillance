@@ -8,7 +8,7 @@ output: html_document
 Last updated 6/6/2024 by M.Kachmar
 - creating script for 2023 and 2024 to be able to pull years seperately. 
 - pdf() recieving errors that it "cannot open file". It appears it is connecting to the HOBO output file vs Sonde data outputs
-
+    - (6/7/24): fixed error by replacing code with "path =" and adding output to the path.
 
 ## Setup: 
 
@@ -20,9 +20,9 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
 ```
 
@@ -180,7 +180,7 @@ Sonde_Temp_2023 <- Table_by_var %>%
               ggtitle(vars[11,]) +
               theme_bw()
  
-pdf(paste0(path_out,"/raw_plots/Temperature_JuneOct_2023.pdf"), height = 12, width = 15)
+pdf(paste0(path_out,"output/raw_plots/Temperature_JuneOct_2023.pdf"), height = 12, width = 15)
 print(Sonde_Temp_2023) 
 dev.off()
   
@@ -223,8 +223,9 @@ CT_pH_2023 <- CT_pH %>% na.omit() %>%
 
 CT_pH_2023
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_pH_2023.pdf"), height = 6, width = 11)
-ggarrange(CT_pH_2023, CT_pH_callout_2023, ncol = 2, widths = c(2, 1))
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots","/CT_pH_2023.pdf"), height = 6, width = 11)
+#ggarrange(CT_pH_2024, CT_pH_callout_2024, ncol = 2, widths = c(2, 1))
+print(CT_pH_2023)
 dev.off()
 
 CT_pH_2024 <- CT_pH %>% na.omit() %>%
@@ -305,8 +306,9 @@ CT_pH_callout_2024 <- CT_pH %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 #CT_pH_callout_2024
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_pH_2024.pdf"), height = 6, width = 11)
-ggarrange(CT_pH_2024, CT_pH_callout_2024, ncol = 2, widths = c(2, 1))
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots","/CT_pH_2024.pdf"), height = 6, width = 11)
+#ggarrange(CT_pH_2024, CT_pH_callout_2024, ncol = 2, widths = c(2, 1))
+print(CT_pH_2024)
 dev.off()
   
 
@@ -364,8 +366,9 @@ CT_Salinity_callout_2023 <- CT_Salinity %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 CT_Salinity_callout_2023
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_Salinity_2023.pdf"), height = 6, width = 11)
-ggarrange(CT_Salinity_2023, CT_Salinity_callout_2023, ncol = 2, widths = c(2, 1))
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Salinity_2023.pdf"), height = 6, width = 11)
+#ggarrange(CT_Salinity_2023, CT_Salinity_callout_2023, ncol = 2, widths = c(2, 1))
+print(CT_Salinity_2023)
 dev.off()
 
 CT_Salinity_2024 <- CT_Salinity %>% na.omit() %>%
@@ -419,8 +422,9 @@ CT_Salinity_callout_2024 <- CT_Salinity %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 CT_Salinity_callout_2024
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_Salinity_2024.pdf"), height = 6, width = 11)
-ggarrange(CT_Salinity_2024, CT_Salinity_callout_2024, ncol = 2, widths = c(2, 1))
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Salinity_2024.pdf"), height = 6, width = 11)
+#ggarrange(CT_Salinity_2024, CT_Salinity_callout_2024, ncol = 2, widths = c(2, 1))
+print(CT_Salinity_2024)
 dev.off()
 
 # Temperature 
@@ -476,8 +480,9 @@ CT_Temperature_callout_2023 <- CT_Temperature %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 CT_Temperature_callout_2023
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_Temperature_2023.pdf"), height = 6, width = 11)
-ggarrange(CT_Temperature_2023, CT_Temperature_callout_2023, ncol = 2, widths = c(2, 1))
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Temperature_2023.pdf"), height = 6, width = 11)
+#ggarrange(CT_Temperature_2023, CT_Temperature_callout_2023, ncol = 2, widths = c(2, 1))
+print(CT_Temperature_2023)
 dev.off()
 
 CT_Temperature_2024 <- CT_Temperature %>% na.omit() %>%
@@ -531,8 +536,9 @@ CT_Temperature_callout_2024 <- CT_Temperature %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 CT_Temperature_callout_2024
 
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_Temperature_2024.pdf"), height = 6, width = 11)
-ggarrange(CT_Temperature_2024, CT_Temperature_callout_2024, ncol = 2, widths = c(2, 1))
+pdf(paste0(path ="output/raw_plots/LISS_proposal_plots/CT_Temperature_2024.pdf"), height = 6, width = 11)
+#ggarrange(CT_Temperature_2024, CT_Temperature_callout_2024, ncol = 2, widths = c(2, 1))
+print(CT_Temperature_2024)
 dev.off()
 
 # DO (Dissolved Oxygen) 
@@ -587,8 +593,9 @@ CT_DO_callout_2023 <- CT_DO %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 CT_DO_callout_2023
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_DO_2023.pdf"), height = 6, width = 11)
-ggarrange(CT_DO_2023, CT_DO_callout_2023, ncol = 2, widths = c(2, 1))
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_DO_2023.pdf"), height = 6, width = 11)
+#ggarrange(CT_DO_2023, CT_DO_callout_2023, ncol = 2, widths = c(2, 1))
+print(CT_DO_2023)
 dev.off()
 
 CT_DO_2024 <- CT_DO %>% na.omit() %>%
@@ -641,8 +648,9 @@ CT_DO_callout_2024 <- CT_DO %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 CT_DO_callout_2024
-pdf(paste0(path_out,"/raw_plots/LISS_proposal_plots/CT_DO_2024.pdf"), height = 6, width = 11)
-ggarrange(CT_DO_2024, CT_DO_callout_2024, ncol = 2, widths = c(2, 1))
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_DO_2024.pdf"), height = 6, width = 11)
+#ggarrange(CT_DO_2024, CT_DO_callout_2024, ncol = 2, widths = c(2, 1))
+print(CT_DO_2024)
 dev.off()
 
 
@@ -710,7 +718,7 @@ ASHC_pH_callout_2023 <- ASHC_pH %>% na.omit() %>%
 ASHC_pH_2023
 ASHC_pH_callout_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_pH_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_pH_2023.pdf"), height = 7, width = 14)
 print(ASHC_pH_2023)
 #ggarrange(ASHC_pH_all,ASHC_pH_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -766,7 +774,7 @@ ASHC_pH_callout_2024 <- ASHC_pH %>% na.omit() %>%
 ASHC_pH_2024
 ASHC_pH_callout_2024
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_pH_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_pH_2024.pdf"), height = 7, width = 14)
 print(ASHC_pH_2024)
 #ggarrange(ASHC_pH_all,ASHC_pH_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -827,7 +835,7 @@ ASHC_Salinity_2023 <- ASHC_Salinity %>% na.omit() %>%
 
 ASHC_Salinity_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Salinity_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_Salinity_2023.pdf"), height = 7, width = 14)
 print(ASHC_Salinity_2023)
 #ggarrange(ASHC_Salinity_all,ASHC_Salinity_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -885,7 +893,7 @@ ASHC_Salinity_callout_2024 <- ASHC_Salinity %>% na.omit() %>%
 
 ASHC_Salinity_callout_2024
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Salinity_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_Salinity_2024.pdf"), height = 7, width = 14)
 print(ASHC_Salinity_2024)
 #ggarrange(ASHC_Salinity_all,ASHC_Salinity_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -943,7 +951,7 @@ ASHC_Temperature_callout_2023 <- ASHC_Temperature %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 ASHC_Temperature_callout_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Temperature_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_Temperature_2023.pdf"), height = 7, width = 14)
 print(ASHC_Temperature_2023)
 #ggarrange(ASHC_Temperature_all, ASHC_Temperature_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -999,7 +1007,7 @@ ASHC_Temperature_callout_2024 <- ASHC_Temperature %>% na.omit() %>%
               theme(legend.position = "none", axis.title.y = element_blank())
 ASHC_Temperature_callout_2024
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_Temperature_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_Temperature_2024.pdf"), height = 7, width = 14)
 print(ASHC_Temperature_2024)
 #ggarrange(ASHC_Temperature_all, ASHC_Temperature_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -1055,7 +1063,7 @@ ASHC_DO_callout_2023 <- ASHC_DO %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_DO_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_DO_2023.pdf"), height = 7, width = 14)
 print(ASHC_DO_2023)
 #ggarrange(ASHC_DO_all, ASHC_DO_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -1108,7 +1116,7 @@ ASHC_DO_callout_2024 <- ASHC_DO %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_DO_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_DO_2024.pdf"), height = 7, width = 14)
 print(ASHC_DO_2024)
 #ggarrange(ASHC_DO_all, ASHC_DO_callout, ncol = 2, widths = c(2, 1))
 dev.off()
@@ -1141,7 +1149,7 @@ ASHC_CHLA_2023 <- ASHC_CHLA %>% na.omit() %>%
 
 ASHC_CHLA_2023
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_CHLA_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_CHLA_2023.pdf"), height = 7, width = 14)
 print(ASHC_CHLA_all)
 
 ASHC_CHLA_2024 <- ASHC_CHLA %>% na.omit() %>%
@@ -1170,7 +1178,7 @@ ASHC_CHLA_2024 <- ASHC_CHLA %>% na.omit() %>%
 
 ASHC_CHLA_2024
 
-pdf(paste0(path_out,"/raw_plots/Report_plots/ASHC_CHLA_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_CHLA_2024.pdf"), height = 7, width = 14)
 print(ASHC_CHLA_2024)
 ```
 ## Stopped splitting by year here
