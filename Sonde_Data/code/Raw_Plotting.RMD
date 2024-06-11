@@ -5,9 +5,9 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 6/7/2024 by M.Kachmar
-- creating script for 2023 and 2024 to be able to pull years seperately. All CT sites finished. 
-- 
+Last updated 6/11/2024 by M.Kachmar
+-Ash creek updated
+
 ## Setup: 
 
 * call your root directory, using opts_knit assigns for the entire script so your paths will alwyas be from this start point!
@@ -645,7 +645,7 @@ CT_DO_callout_2024 <- CT_DO %>% na.omit() %>%
               labs(x = "Time") +
               theme_classic() +
               theme(legend.position = "none", axis.title.y = element_blank())
-CT_DO_callout_2024
+#CT_DO_callout_2024
 pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_DO_2024.pdf"), height = 6, width = 11)
 #ggarrange(CT_DO_2024, CT_DO_callout_2024, ncol = 2, widths = c(2, 1))
 print(CT_DO_2024)

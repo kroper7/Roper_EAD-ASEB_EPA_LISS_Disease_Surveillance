@@ -22,9 +22,9 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
 ```
 
