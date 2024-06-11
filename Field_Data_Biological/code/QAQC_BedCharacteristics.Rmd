@@ -329,6 +329,28 @@ density_summary
 
 ```{r}
 #Bed area calcualtions
+# Load library 
+library(leaflet)
+library(dplyr)
+library(gapminder)
+# Draw map
+leaflet() %>%
+  # Add first tile
+  addTiles(group="One") %>%
+  # Add second tile
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  # Add first marker
+  addMarkers(lng=-72.5863, lat=41.2719, group="Fence Creek",popup="Fence Creek, Madison") %>%
+  # Add second marker
+  addMarkers(lng=-73.2355, lat=41.1465, group="Ash Creek", popup = "Ash Creek, Fairfield") %>%
+  # Add a third marker
+  addMarkers(lng =-73.435313, lat = 40.89795, group = "Goldstar", popup = "Goldstar, Port Jeff")  %>%
+  # Add Layer controls
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Fence Creek", "Ash Creek", "Goldstar"), 
+                   options=layersControlOptions(collapsed=FALSE))
+
+
 
 ```
 
