@@ -7,6 +7,8 @@ updated: 3/19/2024
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's October 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar Beach and Laurel Hollow subtidal sites in New York. 
 ---
 
+Last updated: 6/11/2024 by M. Kachmar
+- updated ASH height measurements for spring 2024
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
