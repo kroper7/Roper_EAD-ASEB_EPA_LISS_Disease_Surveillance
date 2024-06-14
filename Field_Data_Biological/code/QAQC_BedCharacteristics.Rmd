@@ -327,9 +327,34 @@ density_summary
 
 
 ```
-
+#Bed Area
 ```{r}
-#Bed area calcualtions
+##Bed area data CSV file
+
+bed_area <- read_csv("Field_Data_Biological\\raw_data\\Bed_area\\BedArea - Master.csv",col_names = TRUE)
+
+bed_area <- bed_area%>% filter(!is.na(Site))
+
+bed_area$Date_collected<- mdy(bed_area$Date_collected)
+
+bed_area$year<- year(bed_area$Date_collected)
+head(bed_area)
+bed_area
+
+#Loading packages to read and view .KML files
+library(tidyverse)
+library(sf)
+library(mapview)
+library(rvest)
+library(httr)
+
+#Read .KML file
+ASHC_AreaRight_2024<- st_read("Field_Data_Biological\\raw_data\\Bed_area\\0624ASHC_Right.kml")
+  
+ASHC_AreaRight_2024 %>%
+  glimpse()
+
+
 # Load library 
 library(leaflet)
 library(dplyr)
