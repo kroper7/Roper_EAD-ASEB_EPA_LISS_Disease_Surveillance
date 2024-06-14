@@ -500,7 +500,7 @@ BCS_proportion_FENC<- ggplot(data=FENC_BCS_proportions, aes(x=month, y= Proporti
 
 BCS_proportion_FENC
   
-pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/FENC_BCS_proportion.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output/FENC_BCS_proportion.pdf"), height = 7, width = 13)
 print(BCS_proportion_FENC)
 dev.off()
 ```
@@ -537,7 +537,7 @@ FENC_BCS_percentage <- ggplot(FENC_precent_greater_3,aes(x = month, y = Percenta
   #scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
 FENC_BCS_percentage
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/FENC_BCS_percentage.pdf"),height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output/FENC_BCS_percentage.pdf"),height = 7, width = 13)
 print(FENC_BCS_percentage)
 dev.off() 
 
