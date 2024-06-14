@@ -133,7 +133,7 @@ print(FENC_plot)
 
 #### Ash Creek ####
 ```{r}
-ASHC_HOBO <- read_csv("HOBO_Data\\raw_data\\052024_ASHC_HOBO.csv", col_names = TRUE)   
+ASHC_HOBO <- read_csv("HOBO_Data\\raw_data\\062024_ASHC_HOBO.csv", col_names = TRUE)   
 
 as.data.frame(ASHC_HOBO)
 
