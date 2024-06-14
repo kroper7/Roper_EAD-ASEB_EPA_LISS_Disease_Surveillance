@@ -17,9 +17,9 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r}
@@ -145,7 +145,7 @@ st_height$Completeness <- st_height$N /30
 
 st_height
 
-write.csv(st_height,"Lab_Data_TissueProcessing/output/Completeness_tissue_processing_data.csv", row.names=FALSE)
+write.csv(st_height, "Lab_Data_TissueProcessing/output\\Completeness_tissue_processing_data.csv", row.names=FALSE)
 ```
 #Mean Height
 ```{r}
@@ -219,7 +219,7 @@ BCS_proportion_all_2023<- ggplot(data=df_BCS_proportions2023, aes(x=month, y= Pr
 
 BCS_proportion_all_2023
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/all_BCS_proportion_2023.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2023.pdf"), height = 7, width = 13)
 print(BCS_proportion_all_2023)
 dev.off()
 ```
@@ -246,7 +246,7 @@ BCS_proportion_all_2024<- ggplot(data=df_BCS_proportions2024, aes(x=month, y= Pr
 
 BCS_proportion_all_2024
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/all_BCS_proportion_2024.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2024.pdf"), height = 7, width = 13)
 print(BCS_proportion_all_2024)
 dev.off()
 ```
@@ -311,7 +311,7 @@ ASHC_BCS_dist2023 <-ggplot(data=df_ASHC_2023, aes(x= condition)) +
   facet_wrap(~ month, scales = "free")
 ASHC_BCS_dist2023
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/ASHC_BCS_dist_2023.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/ASHC_BCS_dist_2023.pdf"), height = 7, width = 13)
 print(ASHC_BCS_dist2023)
 dev.off()
 
@@ -326,7 +326,7 @@ ASHC_BCS_dist2024 <-ggplot(data=df_ASHC_2024, aes(x= condition)) +
   facet_wrap(~ month, scales = "free")
 ASHC_BCS_dist2024
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/ASHC_BCS_dist_2024.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/ASHC_BCS_dist_2024.pdf"), height = 7, width = 13)
 print(ASHC_BCS_dist2024)
 dev.off()
 
@@ -369,7 +369,7 @@ BCS_proportion_ASHC<- ggplot(data=ASHC_BCS_proportions, aes(x=month, y= Proporti
 
 BCS_proportion_ASHC
   
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/ASHC_BCS_proportion.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/ASHC_BCS_proportion.pdf"), height = 7, width = 13)
 print(BCS_proportion_ASHC)
 dev.off()
 ```
@@ -406,7 +406,7 @@ ASHC_BCS_percentage <- ggplot(ASHC_precent_greater_3,aes(x = month, y = Percenta
   #scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
 ASHC_BCS_percentage
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/ASHC_BCS_percentage.pdf"),height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/ASHC_BCS_percentage.pdf"),height = 7, width = 13)
 print(ASHC_BCS_percentage)
 dev.off() 
 
@@ -500,7 +500,7 @@ BCS_proportion_FENC<- ggplot(data=FENC_BCS_proportions, aes(x=month, y= Proporti
 
 BCS_proportion_FENC
   
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/FENC_BCS_proportion.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/FENC_BCS_proportion.pdf"), height = 7, width = 13)
 print(BCS_proportion_FENC)
 dev.off()
 ```
@@ -537,7 +537,7 @@ FENC_BCS_percentage <- ggplot(FENC_precent_greater_3,aes(x = month, y = Percenta
   #scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))
 FENC_BCS_percentage
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output/FENC_BCS_percentage.pdf"),height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output", "/FENC_BCS_percentage.pdf"),height = 7, width = 13)
 print(FENC_BCS_percentage)
 dev.off() 
 

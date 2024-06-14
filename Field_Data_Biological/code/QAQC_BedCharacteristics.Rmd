@@ -7,13 +7,12 @@ updated: 3/19/2024
 description: This R code is used to important and summarize bed characteristics (height, area, rugosity, density, and coverage) data from the LISS Oyster Health Project's October 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar Beach and Laurel Hollow subtidal sites in New York. 
 ---
 
-Last updated: 6/11/2024 by M. Kachmar
-- updated ASH height measurements for spring 2024
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 
@@ -291,49 +290,46 @@ percentcover_summary
 write.csv(percentcover_summary, "Field_Data_Biological/output/percentcoverage_summary.csv", row.names=FALSE)
 
 ```
-#Bed Area
+
+
+#oyster density metrics. QAQC_PopulationHeight script implements this code.
 ```{r}
-#Bed area data CSV file
 
-bed_area <- read_csv("Field_Data_Biological\\raw_data\\Bed_area\\BedArea - Master.csv",col_names = TRUE)
+#data_all <- data_all %>%
+#  filter(!is.na(Live_count) & !is.na(Box_count) & !is.na(Gaper_count))
+#data_all  
 
-bed_area <- bed_area%>% filter(!is.na(Site))
+density_live_sum <- summarySE(data = data_all, measurevar = "Live_count", groupvars = c(  "Site"))
+density_live_sum
+density_live_sum <- density_live_sum %>%
+  mutate(Count = Live_count) %>%
+  select(-Live_count)
 
-bed_area$Date_collected<- mdy(bed_area$Date_collected)
 
-bed_area$year<- year(bed_area$Date_collected)
-head(bed_area)
+density_box_sum <- summarySE(data = data_all, measurevar = "Box_count", groupvars = c( "Site"))
+density_box_sum <- density_box_sum %>%
+  mutate(Count = Box_count) %>%
+  select(-Box_count)
+density_box_sum
 
-bed_area
+density_gaper_sum <- summarySE(data = data_all, measurevar = "Gaper_count", groupvars = c( "Site"))
+density_gaper_sum <- density_gaper_sum %>%
+  mutate(Count = Gaper_count) %>%
+  select(-Gaper_count)
 
-#Loading packages to read and view .KML files
 
-library(tidyverse)
-library(sf)
-library(mapview)
-library(rvest)
-library(httr)
 
-#Read .KML file
-ASHC_AreaRight_2024<- st_read("Field_Data_Biological\\raw_data\\Bed_area\\0624ASHC_Right.kml")
-  
-ASHC_AreaRight_2024 %>%
-  glimpse()
+density_summary<- rbind(density_gaper_sum, density_box_sum, density_live_sum)
+density_summary
 
-attributes <- lapply(X = 1:nrow(ASHC_AreaRight_2024), 
-                     FUN = function(x) {
+#sum total number of oysters counted per quadrat
+ 
 
-                       ASHC_AreaRight_2024 %>% 
-                         slice(x) %>%
-                         pull(Description) %>%
-                         read_html() %>%
-                         html_node("table") %>%
-                         html_table(header = TRUE, trim = TRUE, dec = ".", fill = TRUE) %>%
-                         as_tibble(.name_repair = ~ make.names(c("Attribute", "Value"))) %>% 
-                         pivot_wider(names_from = Attribute, values_from = Value)
 
-                     })
+```
 
+```{r}
+#Bed area calcualtions
 # Load library 
 library(leaflet)
 library(dplyr)
@@ -355,10 +351,14 @@ leaflet() %>%
                    overlayGroups=c("Fence Creek", "Ash Creek", "Goldstar"), 
                    options=layersControlOptions(collapsed=FALSE))
 
+library(leaflet-kml)
+
+
+kmlData = omnivore.kml('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml', null, customLayer)
+
 
 
 ```
-
 
 
 
