@@ -12,13 +12,17 @@ description: This R code is used to important and summarize bed characteristics 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+```
 
-library(ggplot2)
-library(readxl)
-library(dplyr)
-library(Rmisc)
+
+```{r}
+library("ggplot2")
+library("readxl")
+library("plyr")                                     
+library("dplyr")
+library("Rmisc")
 ```
 
 ## R Markdown
@@ -31,14 +35,11 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r}
 #read in all bed characteristics.
 
-quadratdensity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+quadratdensity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.csv") 
 
-rugosity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+rugosity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.csv") 
 
-BedHeight <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.xlsx",
-                     sheet = 1, col_names = TRUE) 
+BedHeight <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.csv") 
 ```
 
 #Summary of bed height at each site 
@@ -49,6 +50,16 @@ bedheight_summary <- summarySE(data = BedHeight, measurevar = "BedHeight_cm", gr
 bedheight_summary
 
 write.csv(bedheight_summary, "Field_Data_Biological/output/bedheight_summary.csv", row.names=FALSE)
+```
+
+```{r}
+#Removing zones and bed section for rugosity and quadrate density
+rugosity <- select(rugosity, -Bed_Section, -Zone)
+rugosity
+
+quadratdensity <- select(quadratdensity, -Quadrat_Zone, -Bed_Section, -Light_Zone)
+quadratdensity
+
 ```
 
 
@@ -62,30 +73,15 @@ fenc_rug <- rugosity %>% filter(Site_Name == "Fence Creek")
 
 
 #ASHC rugosity summaries
-ASHCrugosity_sumzone <- summarySE(data = ashc_rug, measurevar = "Rugosity", groupvars =c("Site_Name", "Zone"))
-ASHCrugosity_sumall <-summarySE(data = ashc_rug, measurevar = "Rugosity", groupvars =c("Site_Name"))
-
-#combine into 1 ASHC summary dataset 
-
-ASHCrugosity_sumall <- ASHCrugosity_sumall %>% mutate(Zone = "All")
-ASHCrugosity_final <- rbind(ASHCrugosity_sumall,ASHCrugosity_sumzone)
-
-ASHCrugosity_final
+ASHCrugosity_final <-summarySE(data = ashc_rug, measurevar = "Rugosity", groupvars =c("Site_Name"))
 
 
 #FENC rugosity summaries
-FENCrugosity_sumzone <- summarySE(data = fenc_rug, measurevar = "Rugosity", groupvars =c("Site_Name", "Bed_Section", "Zone"))
-FENCrugosity_sumall <-summarySE(data = fenc_rug, measurevar = "Rugosity", groupvars =c("Site_Name"))
+FENCrugosity_final <-summarySE(data = fenc_rug, measurevar = "Rugosity", groupvars =c("Site_Name"))
 
-#combine into 1 FENC summary dataset 
-
-FENCrugosity_sumall <- FENCrugosity_sumall %>% mutate(Zone = "All", Bed_Section = "All")
-FENCrugosity_final <- rbind(FENCrugosity_sumall,FENCrugosity_sumzone)
 
 
 #ALL Rugosity Summary 
-
-ASHCrugosity_final <-ASHCrugosity_final %>% mutate(Bed_Section = "NA")
 Rugosity_AllSite_Summary <- rbind(ASHCrugosity_final, FENCrugosity_final)
 
 Rugosity_AllSite_Summary
@@ -118,56 +114,29 @@ ashc_density_sum_live <- summarySE(data = ashc_density, measurevar = "LiveCount_
 ashc_density_sum_box <-summarySE(data = ashc_density, measurevar = "BoxCount_Total",groupvars=c("Site_Name"))
 ashc_density_sum_gaper <-summarySE(data = ashc_density, measurevar = "GaperCount_Total",groupvars=c("Site_Name"))
 
-#summary of each oyster type by zone
-ashc_density_sum_all_zone <-summarySE(data = ashc_density, measurevar = "AllCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
-ashc_density_sum_live_zone <- summarySE(data = ashc_density, measurevar = "LiveCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
-ashc_density_sum_box_zone <-summarySE(data = ashc_density, measurevar = "BoxCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
-ashc_density_sum_gaper_zone <-summarySE(data = ashc_density, measurevar = "GaperCount_Total", groupvars=c("Site_Name", "Quadrat_Zone"))
 
 
-#Add Zone variable to "All" dfs 
-ashc_density_sum_all <- ashc_density_sum_all %>% mutate(Quadrat_Zone = "All")
-ashc_density_sum_live <- ashc_density_sum_live %>% mutate(Quadrat_Zone = "All")
-ashc_density_sum_box <- ashc_density_sum_box %>% mutate(Quadrat_Zone = "All")
-ashc_density_sum_gaper <- ashc_density_sum_gaper %>% mutate(Quadrat_Zone = "All")
+ASHCdensitysummary_all <- subset(ashc_density_sum_all, select = -c(sd,se,ci)) %>%
+    left_join(subset(ashc_density_sum_live, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
+    left_join(subset(ashc_density_sum_box, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
+    left_join(subset(ashc_density_sum_gaper, select = -c(N,sd,se,ci)), by = "Site_Name") 
 
-
-
-ASHCdensitysummary_all <- subset(ashc_density_sum_all, select = -c(sd,se,ci, Quadrat_Zone)) %>%
-    left_join(subset(ashc_density_sum_live, select = -c(N,sd,se,ci)), by = "Site_Name", "Quadrat_Zone") %>%
-    left_join(subset(ashc_density_sum_box, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name", "Quadrat_Zone") %>%
-    left_join(subset(ashc_density_sum_gaper, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name", "Quadrat_Zone") 
-
-
-
-
-ASHCdensitysummary_zone <- subset(ashc_density_sum_all_zone, select = -c(sd,se,ci)) %>%
-    left_join(subset(ashc_density_sum_live_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Quadrat_Zone") %>%
-    left_join(subset(ashc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), by = "Quadrat_Zone") %>%
-    left_join(subset(ashc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  "Quadrat_Zone") 
-
-
-
-
-#This is not working - saying ASHCdensitysummary not found. should it be _all?
-ASHCdensitysummary2 <- rbind(ASHCdensitysummary_all,ASHCdensitysummary_zone)
   
 
 #renaming for clarity and to allow for binding with Fence Creek Data 
-ASHCdensitysummary3 <- ASHCdensitysummary2 %>%
-    mutate(Bed_Section = "NA") %>%
-  
+ASHCdensitysummary1 <- ASHCdensitysummary_all%>%
     dplyr::rename(
       AllCount_Mean = AllCount_Total,
       LiveCount_Mean = LiveCount_Total,
       BoxCount_Mean = BoxCount_Total, 
       GaperCount_Mean = GaperCount_Total) 
-ASHCdensitysummary3
+ASHCdensitysummary1
 
-ASHCdensitysummary4 <- ASHCdensitysummary3 %>%
-  dplyr::group_by(Site_Name, Quadrat_Zone, Bed_Section) %>% 
+#This code is putting counts in terms of density
+ASHCdensitysummary2 <- ASHCdensitysummary1 %>%
+ dplyr::group_by(Site_Name) %>% 
   dplyr::summarize(Live_Density = sum(LiveCount_Mean)*4, Box_Density = sum(BoxCount_Mean)*4, Gaper_Density = sum(GaperCount_Mean)*4)
-ASHCdensitysummary4
+ASHCdensitysummary2
 
 ```
 #oyster density metrics
@@ -181,59 +150,35 @@ fenc_density_sum_live <- summarySE(data = fenc_density, measurevar = "LiveCount_
 fenc_density_sum_box <-summarySE(data = fenc_density, measurevar = "BoxCount_Total",groupvars=c("Site_Name"))
 fenc_density_sum_gaper <-summarySE(data = fenc_density, measurevar = "GaperCount_Total",groupvars=c("Site_Name"))
 
-#summary of each oyster type by zone
-fenc_density_sum_all_zone <-summarySE(data = fenc_density, measurevar = "AllCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
-fenc_density_sum_live_zone <- summarySE(data = fenc_density, measurevar = "LiveCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
-fenc_density_sum_box_zone <-summarySE(data = fenc_density, measurevar = "BoxCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
-fenc_density_sum_gaper_zone <-summarySE(data = fenc_density, measurevar = "GaperCount_Total", groupvars=c("Site_Name", "Bed_Section", "Quadrat_Zone"))
-
-
-#Add Zone variable to "All" dfs 
-fenc_density_sum_all <- fenc_density_sum_all %>% mutate(Quadrat_Zone = "All")
-fenc_density_sum_live <- fenc_density_sum_live %>% mutate(Quadrat_Zone = "All")
-fenc_density_sum_box <- fenc_density_sum_box %>% mutate(Quadrat_Zone = "All")
-fenc_density_sum_gaper <- fenc_density_sum_gaper %>% mutate(Quadrat_Zone = "All")
-
 FENCdensitysummary_all <- subset(fenc_density_sum_all, select = -c(sd,se,ci)) %>%
-    left_join(subset(fenc_density_sum_live, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") %>%
-    left_join(subset(fenc_density_sum_box, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") %>%
-    left_join(subset(fenc_density_sum_gaper, select = -c(N,sd,se,ci,Quadrat_Zone)), by = "Site_Name") 
-
-#add bedsection variable to all for rbind with zone summary in later step 
-FENCdensitysummary_all <- FENCdensitysummary_all %>% mutate(Bed_Section = "All")
-
+    left_join(subset(fenc_density_sum_live, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
+    left_join(subset(fenc_density_sum_box, select = -c(N,sd,se,ci)), by = "Site_Name") %>%
+    left_join(subset(fenc_density_sum_gaper, select = -c(N,sd,se,ci)), by = "Site_Name") 
 
 
 ######when joining on multiple variables, need to use by = join_by() 
 #see https://dplyr.tidyverse.org/reference/mutate-joins.html#:~:text=To%20join%20by%20multiple%20variables,join_by(a%2C%20c)%20. for additional documentation. 
-
-FENCdensitysummary_zone <- subset(fenc_density_sum_all_zone, select = -c(sd,se,ci)) %>%
-    left_join(subset(fenc_density_sum_live_zone, select = -c(N,sd,se,ci,Site_Name)), by = join_by("Bed_Section", "Quadrat_Zone")) %>%
-    left_join(subset(fenc_density_sum_box_zone, select = -c(N,sd,se,ci,Site_Name)), join_by("Bed_Section", "Quadrat_Zone")) %>%
-    left_join(subset(fenc_density_sum_gaper_zone, select = -c(N,sd,se,ci,Site_Name)), by =  join_by("Bed_Section", "Quadrat_Zone")) 
-
-
-#append All sections summary with zone specific summaries 
-FENCdensitysummary2 <- rbind(FENCdensitysummary_all,FENCdensitysummary_zone)
   
 
 #renaming for clarity. need to use dplyr:: because another package is overriding the function
-FENCdensitysummary3 <- FENCdensitysummary2 %>%
+FENCdensitysummary1 <- FENCdensitysummary_all %>%
     dplyr::rename(
       AllCount_Mean = AllCount_Total,
       LiveCount_Mean = LiveCount_Total,
       BoxCount_Mean = BoxCount_Total, 
       GaperCount_Mean = GaperCount_Total) 
-FENCdensitysummary3
+FENCdensitysummary1
 
-# calculating per m^2
-FENCdensitysummary4 <- FENCdensitysummary3 %>%
-  dplyr::group_by(Site_Name, Quadrat_Zone, Bed_Section) %>% 
+# calculating per m^2 (changes counts to density)
+FENCdensitysummary2 <- FENCdensitysummary1 %>%
+  dplyr::group_by(Site_Name) %>% 
   dplyr::summarize(Live_Density = sum(LiveCount_Mean)*4, Box_Density = sum(BoxCount_Mean)*4, Gaper_Density = sum(GaperCount_Mean)*4)
-FENCdensitysummary4
+FENCdensitysummary2
 
   
 ```
+
+#######This chunk cannot be used - no regions are included in data########
 ```{r}
 #graphing FENC density by region (lease, ocean, bridge)
 
@@ -266,7 +211,7 @@ ggplot(data=FENCdensitysummary4, aes(x= Quadrat_Zone, y= Gaper_Density, fill = Q
 #oyster density metrics
 #combine Ash and Fence Creeks 
 
-Density_AllSite <- rbind(ASHCdensitysummary3, FENCdensitysummary3)
+Density_AllSite <- rbind(ASHCdensitysummary1, FENCdensitysummary1)
 
 write.csv(Density_AllSite, "Field_Data_Biological/output/density_summary.csv", row.names=FALSE)
 ```

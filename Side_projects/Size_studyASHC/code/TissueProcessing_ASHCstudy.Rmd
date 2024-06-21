@@ -1,0 +1,656 @@
+---
+title: "Tissue_ASHCsizestudy"
+author: "Kyra Lenderman"
+date: "2024-01-22"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+```
+
+```{r}
+library("dplyr")                                    
+library("plyr")                                     
+library("readr")             
+library("Rmisc")
+library("ggplot2")
+library("ggpubr")
+library("lubridate")
+library("tidyverse")
+library("broom")
+library("AICcmodavg")
+library("rstatix")
+
+
+data_all <- read.csv("Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
+str(data_all)
+head(data_all)
+
+#Removing unnecessary columns from data (such as light_regime and oyster_zone)
+g <- select(data_all, -light_regime, -oyster_zone, -X.1:-X.12)
+g
+
+#Removing NA rows
+data <- g %>%  filter(!row_number() %in% c(61:998))
+data
+summary(data)
+
+#Adding rftm data
+size_rftm <-read.csv("Size_studyASHC/raw_data/SizeASHC_RFTM.csv")
+size_rftm <- size_rftm %>% filter(!row_number() %in% c(61:999))
+data$X <- size_rftm$rftm_final
+colnames(data)[colnames(data) == "X"] = "rftm_final"
+```
+
+
+
+```{r}
+#Changing condition to numeric
+data<- data %>%
+  mutate(condition_score = dplyr::recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(data)
+
+#Creating size_class column
+newdf <- data %>%
+  mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
+                           height_mm < 121 ~ 'medium',
+                           height_mm > 120 ~ 'large'))
+
+```
+
+
+```{r}
+
+ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
+  geom_histogram(binwidth = .5)+
+  facet_wrap(~sizeclass, ncol = 1)+
+  scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_y_continuous("Number of Oysters", breaks = c(0,2,4,6,8,10))+
+  scale_fill_brewer(palette="Dark2")
+
+ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
+  geom_histogram()
+  
+ggplot(newdf, aes(x=condition_score, fill=sizeclass))+
+  geom_histogram(position="dodge", binwidth = .5)
+```
+
+
+```{r}
+#
+ggplot(newdf, aes(x=rftm_final, fill=sizeclass))+
+  geom_histogram(position="dodge", binwidth = .2)+
+  scale_fill_brewer(palette="Dark2")+
+  scale_x_continuous("RFTM Score", breaks = c(0,0.5,1,2))
+
+```
+
+
+```{r}
+
+
+head(newdf)
+
+```
+
+
+```{r}
+#One-way ANOVA test
+one.way<- aov(height_mm~condition, data = data)
+summary(one.way)  #p-value=0.544
+
+
+
+```
+
+```{r}
+#height_charac <- as.character(data$height_mm)
+
+```
+
+
+
+```{r}
+#Create bins for class sizes
+#data%>% mutate(new_bin = cut(height_mm, breaks = c(80,120)))
+
+newdf<- newdf %>%
+  mutate(condition_score = recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(data)
+```
+
+
+```{r}
+#Scatter Plot weight vs. height with condition fill
+p <- ggplot(data=data, aes(color=condition, x=height_mm, y=ww_total_g ), add = "reg.line") + geom_point()
+p+ scale_color_brewer(palette="Accent")
+
+#Scatter plot with R and p-value height vs. ww
+sp<- ggscatter(data, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(method = "pearson", p.accuracy = 0.001, r.accuracy = 0.01)
+sp
+
+#Scatter plot with R^2 and p-value height vs. ww
+sp.r <- ggscatter(data, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~`,`~")))
+sp.r
+
+#Scatter plot with height vs. weight and condition scores colored. R^2 mentioned for each condition
+sp.f <- ggscatter(data, x = "height_mm", y = "ww_total_g",
+   color = "condition", palette = "jco",
+   add = "reg.line")
+sp.f + stat_cor(aes(color = condition, label = paste(after_stat(rr.label))), label.x = 3)
+
+#Box and whisker plot for height vs. condition
+b <- ggplot(data, aes(x=height_mm, y=condition, fill=condition)) + geom_boxplot()
+b+scale_fill_brewer(palette="Dark2")+coord_flip()
+
+#Scatter plot rftm vs. condition scores with regression line for size classes
+sp.size <- ggscatter(newdf, x = "condition_score", y="rftm_final",
+   color = "sizeclass", palette = "jco",
+   add = "reg.line")
+sp.size + stat_cor(aes(color = sizeclass, label = paste(after_stat(rr.label))), label.x = 3)
+
+```
+
+
+
+
+```{r}
+w <- ggplot(data, aes(x=condition, y=rftm_final, fill=condition)) + geom_boxplot()
+w
+
+```
+
+
+```{r}
+#Graph of proportions for condition scores and rftm scores
+df_intensity_proportions<- newdf %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(condition_score, intensity_bin) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+df_intensity_proportions<- na.omit(df_intensity_proportions)
+
+
+ggplot(data=df_intensity_proportions, aes(x=condition_score, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within Body Condition Scores (Size Study)", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_fill_brewer(palette="Dark2")
+
+
+```
+
+
+```{r}
+#Table and graph of proportions for condition scores and rftm scores with sizeclass
+
+df_intensity_proportions_size<- newdf %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(sizeclass, condition_score, intensity_bin) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+df_intensity_proportions_size<- na.omit(df_intensity_proportions_size)
+
+ggplot(data=df_intensity_proportions_size, aes(x=condition_score, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within Body Condition Scores by Size Classes", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_fill_brewer(palette="Dark2")+
+   facet_grid(~factor(sizeclass, levels=c('small', 'medium', 'large')))
+```
+
+
+```{r}
+# Comparing proportions of 3 and above for body condition
+ggplot(data=subset(df_intensity_proportions_size, condition_score < 4), aes(x=condition_score , y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within 1-3 Body Condition Scores by Size Classes (Size Study)", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0), plot.title = element_text(size=10))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3))+
+  scale_fill_brewer(palette="Dark2")+
+   facet_grid(~factor(sizeclass, levels=c('small', 'medium', 'large')))
+```
+```{r}
+#Using survey data from 2023 at ASHC to compare
+june_rftm <- read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0623ASHC_RFTM - Master.csv")
+june_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0623ASHC_TissueProcessing - Master.csv")
+
+oct_rftm <-  read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/1023ASHC_RFTM - Master.csv")
+oct_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/1023ASHC_TissueProcessing - Master.csv")
+
+
+#Combining survey data and cleaning it up
+survey_data_cond <- rbind(june_condition, oct_condition)
+survey_data_cond <- select(survey_data_cond, -light_regime, -oyster_zone, -X.1:-X.12)
+survey_data_cond <- survey_data_cond %>%  filter(!row_number() %in% c(31:999, 1030:1998))
+
+
+survey_data_rftm <- rbind(june_rftm, oct_rftm)
+survey_data_rftm <- survey_data_rftm %>%  filter(!row_number() %in% c(61:1029))
+survey_data_rftm
+
+#Adding rftm scores to condition score dataframe
+survey_data_cond$X <- survey_data_rftm$rftm_final
+colnames(survey_data_cond)[colnames(survey_data_cond) == "X"] = "rftm_final"
+
+
+
+```
+
+```{r}
+#Changing condition to numeric
+survey_data_cond<- survey_data_cond %>%
+  mutate(condition_score = dplyr::recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(data)
+
+#Creating size_class column
+survey_data_cond <- survey_data_cond %>%
+  mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
+                           height_mm < 121 ~ 'medium',
+                           height_mm > 120 ~ 'large'))
+survey_data_cond
+
+#Adding size study data to survey data
+all_data <- rbind(survey_data_cond, newdf)
+```
+
+```{r}
+#Split dates into own list for further evaluation
+split_dates <- split(all_data, all_data$date_collected)
+june_data <- split_dates[[1]]
+aug_data<- split_dates[[2]]
+oct_data <- split_dates[[3]]
+
+#Count and proportion table for June 2023 rftm and body condition
+rftm.bc_table_june <- table(june_data$condition_score, june_data$rftm_final)
+names(dimnames(rftm.bc_table_june)) <- c("Condition Score", "RFTM Score")
+rftm.bc_table_june
+
+prop_table_june <- prop.table(rftm.bc_table_june)
+prop_table_june <- addmargins(prop_table_june)
+prop_table_june
+
+#Count and proportion table for August 2023 rftm and body condition
+rftm.bc_table_aug <- table(aug_data$condition_score, aug_data$rftm_final)
+names(dimnames(rftm.bc_table_aug)) <- c("Condition Score", "RFTM Score")
+rftm.bc_table_aug
+
+prop_table_aug <- prop.table(rftm.bc_table_aug)
+prop_table_aug <- addmargins(prop_table_aug)
+prop_table_aug
+
+#Count and proportion table for October 2023 rftm and body condition
+rftm.bc_table_oct <- table(oct_data$condition_score, oct_data$rftm_final)
+names(dimnames(rftm.bc_table_oct)) <- c("Condition Score", "RFTM Score")
+rftm.bc_table_oct
+
+prop_table_oct <- prop.table(rftm.bc_table_oct)
+prop_table_oct <- addmargins(prop_table_oct)
+prop_table_oct
+
+
+```
+
+
+```{r}
+
+#Condition score comparison for survey days and size study
+ggplot(data=all_data, aes(x=date_collected, y=condition_score, fill=date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="date collected", y = "Condition score")
+
+#RFTM score comparison for survey days and size study
+ggplot(data=all_data, aes(x=date_collected, y=rftm_final, fill=date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="date collected", y = "RFTM final")
+
+
+ggplot(data=newdf, aes(x=sizeclass, y=rftm_final, fill=sizeclass)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="Size", y = "RFTM Score")
+```
+```{r}
+#Creating proportion graphs comparing three dates of ASHC
+#Graph of RFTM scores and body conditions
+all_data_prop<- all_data %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(date_collected, condition_score, rftm_score) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+all_data_prop<- na.omit(all_data_prop)
+
+ggplot(data=all_data_prop, aes(x=condition_score, y= Proportion, fill=rftm_score)) +
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores within Body Condition Scores by Date Collected", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer()+
+  facet_wrap(~sizeclass)+
+  scale_fill_manual(scale_name = "RFTM Score") +
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_fill_brewer(palette="YlOrBr")+
+   facet_grid(~factor(date_collected))
+```
+
+
+```{r}
+# Comparing proportions of 3 and above for body condition
+ggplot(data=subset(all_data_prop, condition_score < 4), aes(x=condition_score , y= Proportion, fill=rftm_score)) +
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.title = element_text(size=12))+
+  labs(title="Proportion of Intensity scores within 1-3 Body Condition Scores by Date Collected", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3))+
+  scale_fill_brewer(palette="YlOrBr")+
+   facet_grid(~factor(date_collected))
+```
+
+```{r}
+#Facet wrap for body condition vs. proportion seperated by size class & date collected
+all_data_prop_size<- all_data %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(date_collected, condition_score, rftm_score, sizeclass) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+all_data_prop_size<- na.omit(all_data_prop_size)
+
+ggplot(all_data_prop_size, aes(x=condition_score, y=Proportion, fill=rftm_score))+
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.title = element_text(size=10))+
+  labs(title="Proportion of Intensity scores within Body Condition Scores by Date Collected & Size Class", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  scale_fill_brewer(palette="YlOrBr") + 
+  facet_grid(date_collected~factor(sizeclass, levels=c('small', 'medium', 'large')))
+
+```
+```{r}
+#Facet wrap for body condition above 3 vs. proportion separated by size class & date collected
+ggplot(data=subset(all_data_prop_size, condition_score < 4), aes(x=condition_score, y=Proportion, fill=rftm_score))+
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of RFTM scores vs. Body Condition Scores by Date Collected & Size Class", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0), plot.title = element_text(size=10))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer("RFTM Score")+
+  facet_wrap(~sizeclass)+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+   scale_fill_brewer(palette = "YlOrBr") + 
+  facet_grid(date_collected~factor(sizeclass, levels=c('small', 'medium', 'large')))
+```
+```{r}
+#Using data from 2023 at ASHC to compare
+april_rftm <- read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0423ASHC_RFTM - Master.csv")
+april_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0423ASHC_TissueProcessing - Master.csv")
+
+may_rftm <- read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0523ASHC_RFTM - Master.csv")
+may_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0523ASHC_TissueProcessing - Master.csv")
+
+june_rftm <- read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0623ASHC_RFTM - Master.csv")
+june_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0623ASHC_TissueProcessing - Master.csv")
+
+july_rftm <- read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0723ASHC_RFTM - Master.csv")
+july_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0723ASHC_TissueProcessing - Master.csv")
+
+aug_rftm_og <- read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0823ASHC_RFTM - Master.csv")
+aug_condition_og <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0823ASHC_TissueProcessing - Master.csv")
+
+sep_rftm <-  read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/0923ASHC_RFTM - Master.csv")
+sep_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/0923ASHC_TissueProcessing - Master.csv")
+
+oct_rftm <-  read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/1023ASHC_RFTM - Master.csv")
+oct_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/1023ASHC_TissueProcessing - Master.csv")
+
+nov_rftm <-  read.csv("Lab_Data_RFTM/raw_data/Files_by_Month/1123ASHC_RFTM - Master.csv")
+nov_condition <- read.csv("Lab_Data_TissueProcessing/raw_data/Files_by_Month/1123_ASHC_TissueProcessing - Master.csv")
+
+
+#Combining all data and cleaning it up
+all_data_cond <- rbind(april_condition, may_condition, june_condition, july_condition, aug_condition_og, sep_condition, oct_condition, nov_condition)
+all_data_cond <- select(all_data_cond, -light_regime, -oyster_zone, -X.1:-X.12)
+all_data_cond <- all_data_cond %>%  filter(!row_number() %in% c(31:999, 1030:1998, 2029:2997, 3028:3996, 4027:4995, 5026:5994, 6025:6993, 7024:7992))
+
+all_data_rftm <- rbind(april_rftm, may_rftm, june_rftm, july_rftm, aug_rftm_og, sep_rftm, oct_rftm, nov_rftm)
+all_data_rftm <- all_data_rftm %>%  filter(!row_number() %in% c(121:1089, 1120:2088, 2119:3087, 3118:4086, 4117:5085))
+all_data_rftm
+
+#Adding rftm scores to condition score dataframe
+all_data_cond$X <- all_data_rftm$rftm_final
+colnames(all_data_cond)[colnames(all_data_cond) == "X"] = "rftm_final"
+```
+
+
+
+```{r}
+#Changing condition to numeric
+all_data_cond<- all_data_cond %>%
+  mutate(condition_score = dplyr::recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(all_data_cond)
+
+#Creating size_class column
+all_data_cond <- all_data_cond %>%
+  mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
+                           height_mm < 121 ~ 'medium',
+                           height_mm > 120 ~ 'large'))
+
+#Adding size study data to all ASHC data
+all_data_dates <- rbind(all_data_cond, newdf)
+
+```
+
+```{r}
+#Condition score comparison for all dates collected
+ggplot(data=all_data_dates, aes(x=date_collected, y=condition_score, fill=date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 20, vjust = 0.5, hjust=1))+
+  labs(title="Condition Scores ASHC 2023", x ="Date collected", y = "Condition score")
+
+#RFTM score comparison for all dates collected
+ggplot(data=all_data_dates, aes(x=date_collected, y=rftm_final, fill=date_collected)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 20, vjust = 0.5, hjust=1))+
+  labs(title="RFTM Scores ASHC 2023", x ="Date collected", y = "RFTM final")+
+  scale_x_discrete(breaks=c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
+        labels=c("April", "May", "June", "July", "August", "Size Study", "September", "October", "November"))
+```
+
+```{r}
+#Proportion for body condition vs. proportion seperated by date collected
+all_data_dates_prop<- all_data_dates %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(date_collected, condition_score, rftm_score) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+all_data_dates_prop<- na.omit(all_data_dates_prop)
+
+#Changing dates and sizes to align with month
+all_data_dates_prop$date_collected <- factor(all_data_dates_prop$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "8/23/2024", "2023-09-05", "2023-10-03", "2023-11-06"),
+        labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
+
+```
+
+
+```{r}
+#Facet wrap for body condition vs. proportion seperated by date collected
+ggplot(all_data_dates_prop, aes(x=condition_score, y=Proportion, fill=rftm_score))+
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
+  theme(axis.text.x = element_text(angle = 15, vjust = 1, hjust=1, size = 8), plot.title = element_text(size = 10), axis.text.y = element_text(size = 9))+
+  labs(title="Proportion of RFTM scores within Body Condition Scores by Date Collected & Size Class (ASHC 2023)", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1), angle =90), axis.title.x = element_text(size = rel(1), angle = 0))+
+  theme(axis.text=element_text(size=7))+
+  theme(legend.title = element_text(size=10))+
+  labs(fill="RFTM Intesity Score")+
+ scale_fill_brewer(palette = "YlOrBr")+
+  scale_y_continuous("Proportion", breaks = c(0.00,0.50,1.00))+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  facet_grid(~date_collected)
+#Add count body condition score directly underneath
+ggplot(all_data_dates_prop, aes(x=condition_score, fill=date_collected))+
+  geom_histogram(position="dodge", binwidth = .5, colour="black")+ scale_fill_brewer(palette = "Set1")+
+   theme(legend.title = element_text(size=10))+ labs(fill="Date Collected")+
+   labs(title="Counts of Body Condition scores by Date Collected & Size Class (ASHC 2023)", x ="Body Condition", y = "Count")+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  facet_grid(~date_collected)
+
+```
+
+```{r}
+#Proportion for body condition vs. proportion seperated by size class & date collected
+all_data_dates_prop<- all_data_dates %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),rftm_score = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(date_collected, condition_score, rftm_score) %>% dplyr:: summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+all_data_dates_prop<- na.omit(all_data_dates_prop)
+
+
+#Facet wrap size class & date collected 
+ggplot(data=all_data_dates_prop, aes(x=condition_score, y=Proportion, fill=rftm_score))+
+  geom_bar(width = .8, stat="identity", position = "fill",colour = "black")+
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 0, vjust = 1, hjust=1))+
+  labs(title="Proportion of RFTM scores vs. Body Condition Scores by Date Collected & Size Class", x ="condition score", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1), angle = 0))+
+  theme(plot.title = element_text(size = 12))+
+  theme(axis.text=element_text(size=7))+
+ scale_fill_brewer(palette = "YlOrBr")+
+  scale_y_continuous("Proportion", breaks = c(0.00,0.50,1.00))+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3,4,5,6,7,8,9))+
+  facet_grid(~date_collected)
+```
+
+
+```{r}
+#Changing dates and sizes to align with month
+all_data_dates$date_collected <- factor(all_data_dates$date_collected, levels = c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"),
+        labels=c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"))
+all_data_dates$sizeclass <- factor(all_data_dates$sizeclass, levels = c("small", "medium", "large"),
+                                        labels = c("Small", "Medium", "Large"))
+```
+
+
+```{r}
+#Facet wrap with count of body condition score separated by date collected and size class
+ggplot(all_data_dates, aes(x=condition_score, fill=date_collected))+
+  geom_histogram(position="dodge", binwidth = .4)+ scale_fill_brewer(palette = "Set1")+
+   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())+ 
+   labs(title="Counts of Body Condition scores by Date Collected & Size Class", x ="Body Condition", y = "Count")+
+   scale_x_continuous("Body Condition Score", breaks = c(1,3,5,7,9))+
+  facet_grid(~factor(sizeclass, levels=c('Small', 'Medium', 'Large'))~date_collected)
+
+#Facet wrap with count of RFTM score separated by date collected and size class
+ggplot(all_data_dates, aes(x=rftm_final, fill=date_collected))+
+  geom_histogram(position="dodge", binwidth = .3)+ scale_fill_brewer(palette = "Set1")+
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())+ 
+     labs(title="Counts of RFTM scores by Date Collected & Size Class", x ="RFTM Score", y = "Count")+
+   scale_x_continuous("RFTM Score", breaks = c (0,1,2,3,4,5))+
+  facet_grid(~date_collected)
+
+```
+
+
+
+```{r}
+#Facet wrap with count of body condition score (>3) separated by date collected and size class
+ggplot(data = subset(all_data_dates, condition_score <4), aes(x=condition_score, fill=date_collected))+
+  geom_histogram(position="dodge", binwidth = .4)+ scale_fill_brewer(palette = "Set1")+
+   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())+ 
+     labs(title="Counts of Body Condition scores (>3) by Date Collected & Size Class", x ="Body Condition", y = "Count")+
+   scale_x_continuous("Body Condition Score", breaks = c(1,2,3))+
+  facet_grid(~date_collected)
+```
+```{r}
+#Calculating average body condition score for each month at ASHC
+mean_body_condition <- all_data_dates %>%
+  dplyr::group_by(date_collected)%>%
+  dplyr::summarize(mean_bsc = mean(condition_score, na.rm = TRUE))
+p <- na.omit(mean_body_condition)
+```
+
+```{r}
+#Line graph of mean body condition for each month ASHC
+ggplot(data = p, aes(x=date_collected, y=mean_bsc))+
+  scale_y_continuous("Mean Body Condtion Score")+
+  geom_line()+
+  geom_point()
+```
+
+```{r}
+#Calculating average rftm score for each month at ASHC
+mean_rftm_score <- all_data_dates %>%
+  dplyr::group_by(date_collected)%>%
+  dplyr::summarize(mean_rftm = mean(rftm_final, na.rm = TRUE))
+
+```
+
+```{r}
+#Line graph of mean rftm for each month ASHC
+mean_rftm_score$date_collected <- factor(mean_rftm_score$date_collected, levels =c("April", "May", "June", "July", "Aug", "Size Study", "Sept", "Oct", "Nov"),
+        labels= c("2023-04-23","2023-05-10","2023-06-12","2023-07-10", "2023-08-07", "2023-08-23", "2023-09-05", "2023-10-03", "2023-11-06"))
+mean_rftm_score$date_collected <- as.Date(mean_rftm_score$date_collected)
+
+ggplot(data = mean_rftm_score, aes(x=date_collected, y=mean_rftm))+
+  scale_y_continuous("Mean RFTM Score")+
+ scale_x_continuous("Date Collected", labels = as.character(mean_rftm_score$date_collected), breaks = mean_rftm_score$date_collected)+ 
+  geom_line()+
+  geom_point()
+```
+
+```{r}
+#Adding mean rftm scores to body condition means
+mean_all <- data.frame(mean_body_condition)
+mean_all[,'empty_column'] = NA
+mean_all$empty_column <- mean_rftm_score$mean_rftm
+colnames(mean_all)[colnames(mean_all) == "empty_column"] = "rftm_mean"
+mean_all
+```
+```{r}
+
+```
+
+
+
+
+
+
+
+```{r}
+sessionInfo()
+```
+

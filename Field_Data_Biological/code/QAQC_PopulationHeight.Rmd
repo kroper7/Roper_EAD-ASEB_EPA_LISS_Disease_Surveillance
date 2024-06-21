@@ -8,13 +8,17 @@ output: html_document
 description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
-Last updated 1/30/24 by K. Lenderman
+Last updated 5/20/24 M. Kachmar
 
 
 ```{r, setup, include=FALSE}
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+```
 
+
+```{r}
 library(tidyverse)
 library(gtools)
 library(Rmisc)
@@ -25,13 +29,14 @@ library(dplyr)
 library(lubridate)
 library(Rmisc)
 library(ggplot2)
+library(readr)
 
 ```
 
 ```{r}
 ##Changed working directory for file path, should be able to use now (1/30/24)##
 #### need to work on this chunk to read in all files at once - not ready to use  
-#data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological",                                                               
+#data_all <- list.files(path = "Field_Data_Biological",                                                               
  # pattern = "*.xlsx", full.names = TRUE) %>%         # Identify all xlsx files
  # lapply(read_excel)                           # Store all files in list
 #
@@ -52,28 +57,26 @@ library(ggplot2)
 
 
 #June 2023
-shellsize <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_ShellSize.xlsx",
-                     sheet = 1, col_names = TRUE) 
+shellsize <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_ShellSize.csv") 
 
-quadratdensity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+quadratdensity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_QuadratDensity.csv") 
 
-rugosity <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.xlsx",
-                     sheet = 1, col_names = TRUE) 
+rugosity <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_Rugosity.csv") 
 
-BedHeight <- read_excel("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.xlsx",
-                     sheet = 1, col_names = TRUE) 
+BedHeight <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.csv") 
 ```
 
 #Cleaning up June 2023 survey data to be meragable with other data
 ```{r}
 
-
 #renaming columns
 shellsize <- shellsize %>% dplyr::rename(Date_collected = TripDate) %>% dplyr::rename(Quadrat = QUADRAT_NUM) %>% dplyr::rename(Height = Height_mm) %>% dplyr::rename(Survival_status = SpecimenType)
 colnames(shellsize)
+shellsize$Date_collected <- factor(shellsize$Date_collected, levels = c("6/12/2023","6/14/2023"),
+                                     labels = c("2023-06-12","2023-06-14"))
+
 #adding columns
-shellsize$Season<- rep("spring", nrow(shellsize))
+shellsize$Season<- rep("Spring", nrow(shellsize))
 shellsize$State<- rep("CT", nrow(shellsize))
 
 #removing unneeded columns
@@ -91,69 +94,95 @@ shellsize
 #reorder columns
 shellsize <- shellsize %>% select("Date_collected", "Site", "State", "Quadrat", "Height", "Survival_status", "Season")
 
-
-
 ```
 
 
 # This chunk is exploritory for fall surveys. Thinking about best way to pull, clean, and merge data and best ways to standardize June and October survey data
 
-#Pulling all length data into single sheet
+#Pulling all height data into single sheet
 ```{r}
 
-## OCTOBER FALL SURVEY 
+## Shell Height Data
+
+# Use this code to reformat the dates to match
+
+file_paths <- list.files(path = "Field_Data_Biological/raw_data/Height",
+                          pattern = "*.csv", full.names = TRUE)
 
 
+height_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      Date_collected = as.Date(Date_collected,format = "%m/%d/%Y")
+    )
+}) %>%
+  bind_rows
+as.data.frame(height_all) 
 
-length_all <- list.files(path = "Field_Data_Biological/raw_data/Length",                           # Identify all CSV files
-  pattern = "*.xlsx", full.names = TRUE) %>% 
-  lapply(read_excel) %>%    # Store all files in list
-  bind_rows 
+#height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",                           # Identify all CSV files
+#  pattern = "*.csv", full.names = TRUE) %>% 
+#  lapply(read_csv) %>%    # Store all files in list
+#  bind_rows 
 
- length_all
+ 
 
  #Removing 'Count' column
- length_all$Count<- NULL
+ height_all$Count<- NULL
+
+#adding season columns
+
+#height_all$Date_collected <- factor(height_all$Date_collected, levels = c("10/3/2023","10/5/2023", "10/16/2023", "10/17/2023" ),
+#                                     labels = c("2023-10-03","2023-10-05","2023-10-16", "2023-10-17" ))
+ height_all <- height_all %>%
+  mutate(month = month(Date_collected))
+ 
+height_all <- height_all %>%
+  mutate(Season = case_when(between(month, 5,6) ~"Spring",
+                            between(month, 10,11) ~ "Fall"))
+height_all <- select(height_all, -c("month"))
 
 
 ```
 
-#Cleaning up length data
-#Need to fix "length" and change to "height" - using terms incorrectly
+#Cleaning up height data
 ```{r}
 
-# Subset by category length (live, box, gaper)
+# Subset by category height (live, box, gaper)
 
 #Live
 
-length_live <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_live')
-length_live <- na.omit(length_live)
-length_live$Survival_status<- rep("Live", nrow(length_live))
-length_live <- length_live %>% dplyr::rename(Height = Length_live)
-length_live
+height_live <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_live', 'Season')
+height_live <- na.omit(height_live)
+height_live$Survival_status<- rep("Live", nrow(height_live))
+height_live <- height_live %>% dplyr::rename(Height = Height_live)
+height_live
+
 
 #Box
 
-length_box <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_box')
-length_box <- na.omit(length_box)
-length_box$Survival_status<- rep("Box", nrow(length_box))
-length_box <- length_box %>% dplyr::rename(Height = Length_box)
+height_box <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_box', 'Season')
+height_box <- na.omit(height_box)
+height_box$Survival_status<- rep("Box", nrow(height_box))
+height_box <- height_box %>% dplyr::rename(Height = Height_box)
 
 #Gaper
 
-length_gaper <- select(length_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Length_gaper')
-length_gaper <- na.omit(length_gaper)
-length_gaper$Survival_status<- rep("Gaping", nrow(length_gaper))
-length_gaper <- length_gaper %>% dplyr::rename(Height = Length_gaper)
+height_gaper <- select(height_all, 'Field ID', 'Date_collected', 'Site', 'State', 'Quadrat','Height_gaper', 'Season')
+height_gaper <- na.omit(height_gaper)
+height_gaper$Survival_status<- rep("Gaping", nrow(height_gaper))
+height_gaper <- height_gaper %>% dplyr::rename(Height = Height_gaper)
 
-Height_all<- rbind(length_live,length_box,length_gaper)
-Height_all$Season<- rep("fall", nrow(Height_all))
+Height_all<- rbind(height_live,height_box,height_gaper)
 Height_all
 
 Height_all$`Field ID`<- NULL
+
+#reorder columns
+Height_all <- Height_all %>% select("Date_collected", "Site", "State", "Quadrat", "Height", "Survival_status", "Season")
+
 ```
 
-#Merging spring and fall 2023 Height data
+#Merging spring and fall 2023,2024 Height data
 ```{r}
 
 Height_master<- rbind(Height_all, shellsize)
@@ -161,8 +190,12 @@ Height_master
 
 Height_master<-na.omit(Height_master)
 
+Height_master$Year<- year(Height_master$Date_collected)
+
+View(Height_master)
 # Output to repository
-write.csv(Height_master, "Master_files/height_all_data.csv", row.names=FALSE)
+write_csv(Height_master, path= "Master_files/height_all_data.csv") #row.names=FALSE)
+
 
 ```
 #Oyster density metrics
@@ -176,27 +209,28 @@ quadratdensity_all<- Height_master %>%
 quadratdensity_all
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
-all_density_SE <-summarySE(data = quadratdensity_all, measurevar = "Count", groupvars=c("Site", "Survival_status", "Season"))
+all_density_SE <-summarySE(data = quadratdensity_all, measurevar = "Count", groupvars=c("Site", "Survival_status", "Season", "Date_collected"))
 all_density_SE
 
 #calculate percent standard error as 100*se/mean
 all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
 
-#calculate completeness as 100*N/12, where 12 is the desired number of quadrats per site 
+#calculate completeness as 100*N/4, where 4 is the desired number of quadrats per site. 2023 surveys had 12 quadrates measured. 
   densitysummary <- all_density_SE %>%
-    mutate(PercentComplete_Quad = ((N/12)*100))
+    mutate(PercentComplete_Quad = ((N/4)*100))
 densitysummary
 
 
-write.csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv", row.names=FALSE)
+write_csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv") #, row.names=FALSE)
 
 ```
 #oyster size distribution
 ```{r}
 
+Height_master$Year<- year(Height_master$Date_collected)
       
 shellsize_all <- 
-  Height_master %>% dplyr::group_by(Site, Season) %>%
+  Height_master %>% dplyr::group_by(Site, Season, Year) %>%
   dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
@@ -207,7 +241,7 @@ shellsize_all <-
 shellsize_all
 
 shellsize_live <- 
-  Height_master %>% dplyr::group_by(Site, Season) %>% dplyr::filter(Survival_status=="Live") %>%
+  Height_master %>% dplyr::group_by(Site, Season, Year) %>% dplyr::filter(Survival_status=="Live") %>%
    dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
@@ -218,7 +252,7 @@ shellsize_live <-
 shellsize_live
 
 shellsize_box <- 
-  Height_master %>%  dplyr::group_by(Site, Season) %>% dplyr::filter(Survival_status=="Box") %>%
+  Height_master %>%  dplyr::group_by(Site, Season, Year) %>% dplyr::filter(Survival_status=="Box") %>%
    dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
@@ -228,7 +262,7 @@ shellsize_box <-
   dplyr::mutate(Survival_status = "Box")
 
 shellsize_gaper <- 
-  shellsize %>%  dplyr::group_by(Site, Season) %>% dplyr::filter(Survival_status=="Gaping") %>%
+  Height_master %>%  dplyr::group_by(Site, Season, Year) %>% dplyr::filter(Survival_status=="Gaping") %>%
    dplyr::summarise(
     median_height=median(Height, na.rm = TRUE), 
     min_height=min(Height, na.rm = TRUE), 
@@ -244,7 +278,7 @@ shellsize_summary
 
 #size distribution summary
 #note that calculating PSE and accuracy do not make sense for size distributions. Will need to figure out new metrics for the QAPP
-write.csv(shellsize_summary, "Field_Data_Biological/output/shellsize_summary.csv", row.names=FALSE)
+write_csv(shellsize_summary, "Field_Data_Biological/output/shellsize_summary.csv") #, row.names=FALSE)
 ```
 
 #graphing shell height all sites
@@ -257,7 +291,7 @@ ggplot(Height_master, aes(x=Season, y=Height, fill=Site)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
-  facet_wrap(~Site)
+  facet_wrap(~Site +Year)
 
 ```
 
@@ -267,8 +301,8 @@ ggplot(Height_master, aes(x=Season, y=Height, fill=Site)) +
 
 height_ASHC<- Height_master %>% filter(Site == "ASHC")
 
-height_ASHC<- height_ASHC %>%
-  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
+#height_ASHC<- height_ASHC %>%
+#  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
 
 live_height_ASHC<- height_ASHC %>%
  group_by(Site, Season)%>%
@@ -304,7 +338,7 @@ ggplot(height_ASHC, aes(x=Season, y=Height, fill=Season)) +
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))
+  theme(axis.text=element_text(size=12)) + facet_wrap(~Year)
 
 #Distribution Live
 ggplot(data=height_ASHC_Live, aes(x= Height)) +
@@ -313,7 +347,7 @@ ggplot(data=height_ASHC_Live, aes(x= Height)) +
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
- facet_wrap(~ Month, scales = "free", ncol = 1)
+ facet_wrap(~ Season + Year, scales = "free", ncol = 1)
 
 #Distribution Dead
 ggplot(data=height_ASHC_Dead, aes(x= Height)) +
@@ -322,7 +356,7 @@ ggplot(data=height_ASHC_Dead, aes(x= Height)) +
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
-   facet_wrap(~ Month, scales = "free", ncol = 1)
+   facet_wrap(~ Season + Year, scales = "free", ncol = 1)
 
 ```
 
@@ -419,7 +453,7 @@ ggplot(data=height_FENC_Live, aes(x= Height)) +
  facet_wrap(~ Month, scales = "free", ncol = 1)
 
 #Distribution Dead
-ggplot(data=height_ASHC_Dead, aes(x= Height)) +
+ggplot(data=height_FENC_Dead, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+

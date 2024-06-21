@@ -1,0 +1,60 @@
+---
+title: "Juvenile Growth"
+author: 
+date: "6/20/2024"
+output: html_document
+
+description: 
+---
+Last updated 06/20/24 by K. Lenderman
+  - Created script
+  - Note: Check Kennedy's path
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+```
+
+```{r}
+library("ggplot2")
+library("readxl")
+library("plyr")                                     
+library("dplyr")
+library("Rmisc")
+library("readr")  
+library("lubridate")
+library("purrr")
+library("tidyr")
+```
+
+### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+# reading in .csv files from local folder
+```{r}
+#Collecting and merging all raw data
+data_all <- list.files(path = "Side_projects/Juvenile_growth/raw_data",  #need to have file with data in "raw_data"
+                          pattern = "*.csv", full.names = TRUE) #only looking at csv files located in raw_data file
+                          %>%
+                          lapply(read_csv) %>%
+                          bind_rows()
+data_all
+
+as.data.frame(data_all)  # Convert tibble to data.frame
+
+data_all <- data_all %>% filter(!is.na(lab_id))  #filtering NAs
+
+write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #creating/printing csv file of all raw data merged together
+```
+
+```{r}
+
+```
+
+```{r}
+sessionInfo()
+```
+
+

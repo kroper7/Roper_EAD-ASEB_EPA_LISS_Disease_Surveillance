@@ -1,0 +1,66 @@
+---
+title: "DNA quanitifcation QAQC"
+author: "Mariah Kachmar"
+date: "4/29/2024"
+output: html_document
+
+Description: This code is used for molecular sample DNA quanitification quality control and assurance for the LISS funded Oyster Health Project. This samples were extracted using a Qiagen blood and tissue extraction kit. Quanitify of nucleic acids were determined using a Nanodrop2000 and dsDNA using a Qubit Flex. 
+
+
+Updated: 06/21/24 K. Lenderman
+  - combined new Qubit Files created on 6/20/24
+
+---
+
+
+
+#Set working directory
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+```
+
+#run packages
+```{r}
+library("ggplot2")
+library("readxl")
+library("plyr")                                     
+library("dplyr")
+library("Rmisc")
+library("readr")  
+library("lubridate")
+library("purrr")
+library(reshape2)
+library(stringr)
+library("RColorBrewer")
+```
+
+#### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+# reading in .csv files from local folder
+```{r}
+
+data_all <- list.files(path = "Lab_Data_DNAQuantification/raw_data",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows                                         # Combine data sets into one data set 
+data_all                                            # Print data to RStudio console
+
+as.data.frame(data_all)                            # Convert tibble to data.frame
+
+
+data_all <- data_all %>% filter(!is.na('Sample Name'))
+
+data_all<- data_all %>% select(c('Test Date', 'Sample Name', 'Original Sample Conc.', 'Original sample conc. units'))
+
+data_all <- data_all %>% rename(Date = 'Test Date', Sample_ID = 'Sample Name', Concentration = 'Original Sample Conc.', Units = 'Original sample conc. units')
+
+data_all
+
+write.csv(data_all, "Master_files\\DNA_quant_all_data.csv", row.names=FALSE)
+```
+
+```{r}
+sessionInfo()
+```
