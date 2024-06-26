@@ -1752,23 +1752,26 @@ FENC_Monthly_Salinity <- FENC_Salinity %>% na.omit() %>%
 FENC_Monthly_Salinity
 
 ```
-### STOPPED YEAR SLIT HERE
+
+
 # Clean GOLD for the LISS stakeholder reports (NEW YORK)
 ```{r, figs for LISS stakeholder reports}
 
-GOLD_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('GOLD'))
+GOLD_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('GOLD')) 
 GOLD_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('GOLD'))
 GOLD_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('GOLD'))
 GOLD_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('GOLD'))
 GOLD_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('GOLD'))
 
-View(GOLD_Temperature)
+
+
+
 # pH 
 
 GOLD_pH_2023 <- GOLD_pH %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2023-06-01 00:00:00' & 'Date Time' < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1783,7 +1786,7 @@ GOLD_pH_2023 <- GOLD_pH %>% na.omit() %>%
               geom_errorbar(aes(ymin=(mean)-(se), 
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
-              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              #facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
               ggtitle("pH 2023") +
               labs(x = "Time", y = "pH") +
               theme_classic() +
@@ -1793,14 +1796,14 @@ GOLD_pH_2023 <- GOLD_pH %>% na.omit() %>%
 GOLD_pH_2023
 
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_pH_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_pH_2023.pdf"), height = 7, width = 14)
 print(GOLD_pH_2023)
 dev.off()
   
 GOLD_pH_2024 <- GOLD_pH %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2024-04-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2024-04-01 00:00:00' & 'Date Time' < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1825,16 +1828,16 @@ GOLD_pH_2024 <- GOLD_pH %>% na.omit() %>%
 GOLD_pH_2024
 
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_pH_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_pH_2024.pdf"), height = 7, width = 14)
 print(GOLD_pH_2024)
 dev.off()
 
 # Salinity 
 
 GOLD_Salinity_2023 <- GOLD_Salinity %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2023-06-01 00:00:00' & 'Date Time' < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1858,14 +1861,14 @@ GOLD_Salinity_2023 <- GOLD_Salinity %>% na.omit() %>%
 
 GOLD_Salinity_2023
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_Salinity_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_Salinity_2023.pdf"), height = 7, width = 14)
 print(GOLD_Salinity_2023)
 dev.off()
 
 GOLD_Salinity_2024 <- GOLD_Salinity %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2024-04-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2024-04-01 00:00:00' & 'Date Time' < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1889,16 +1892,16 @@ GOLD_Salinity_2024 <- GOLD_Salinity %>% na.omit() %>%
 
 GOLD_Salinity_2024
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_Salinity_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_Salinity_2024.pdf"), height = 7, width = 14)
 print(GOLD_Salinity_2024)
 dev.off()
 
 # Temperature 
 
 GOLD_Temperature_2023 <-GOLD_Temperature %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2023-06-01 00:00:00' & 'Date Time' < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1921,14 +1924,14 @@ GOLD_Temperature_2023 <-GOLD_Temperature %>% na.omit() %>%
 GOLD_Temperature_2023
 
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_Temperature_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_Temperature_2023.pdf"), height = 7, width = 14)
 print(GOLD_Temperature_2023)
 dev.off()
 
 GOLD_Temperature_2024 <-GOLD_Temperature %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2024-04-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2024-04-01 00:00:00' & 'Date Time' < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1951,16 +1954,16 @@ GOLD_Temperature_2024 <-GOLD_Temperature %>% na.omit() %>%
 GOLD_Temperature_2024
 
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_Temperature_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_Temperature_2024.pdf"), height = 7, width = 14)
 print(GOLD_Temperature_2024)
 dev.off()
 
 # DO 
 
 GOLD_DO_2023 <- GOLD_DO %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2023-06-01 00:00:00' & 'Date Time' < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1975,20 +1978,20 @@ GOLD_DO_2023 <- GOLD_DO %>% na.omit() %>%
               geom_errorbar(aes(ymin=(mean)-(se), 
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
-              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              #facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
               ggtitle("DO Concentration 2023") +
               labs(x = "Time", y = "DO Concentration (mg/L)") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_DO_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_DO_2023.pdf"), height = 7, width = 14)
 print(GOLD_DO_2023)
 dev.off()
 
 GOLD_DO_2024 <- GOLD_DO %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2024-04-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2024-04-01 00:00:00' & 'Date Time' < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -2009,15 +2012,15 @@ GOLD_DO_2024 <- GOLD_DO %>% na.omit() %>%
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_DO_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_DO_2024.pdf"), height = 7, width = 14)
 print(GOLD_DO_2024)
 dev.off()
 #Chlorophyll-a
 
 GOLD_CHLA_2023 <- GOLD_CHLA %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2023-06-01 00:00:00' & 'Date Time' < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -2040,13 +2043,13 @@ GOLD_CHLA_2023 <- GOLD_CHLA %>% na.omit() %>%
 
 GOLD_CHLA_2023
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_CHLA_2023.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_CHLA_2023.pdf"), height = 7, width = 14)
 print(GOLD_CHLA_2023)
 
 GOLD_CHLA_2024 <- GOLD_CHLA %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2024-04-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter('Date Time' > '2024-04-01 00:00:00' & 'Date Time' < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -2069,7 +2072,7 @@ GOLD_CHLA_2024 <- GOLD_CHLA %>% na.omit() %>%
 
 GOLD_CHLA_2024
 
-pdf(paste0(path="/raw_plots/Report_plots/GOLD_CHLA_2024.pdf"), height = 7, width = 14)
+pdf(paste0(path="output/raw_plots/Report_plots/GOLD_CHLA_2024.pdf"), height = 7, width = 14)
 print(GOLD_CHLA_2024)
 ```
 
