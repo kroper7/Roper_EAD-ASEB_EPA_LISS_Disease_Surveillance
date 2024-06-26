@@ -5,10 +5,10 @@ output: html_notebook
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 06/14/24 by M. Kachmar
+Updated 06/24/24 by K. Lenderman
 - all code up to date & graphs generated
-
-
+- 0624GOLD QAQC
+  - Mean height for this collection is significantly lower than other sample sets.
 
  
 
