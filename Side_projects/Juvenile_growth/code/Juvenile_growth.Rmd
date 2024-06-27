@@ -36,11 +36,8 @@ library("tidyr")
 # reading in .csv files from local folder
 ```{r}
 #Collecting and merging all raw data
-data_all <- list.files(path = "Side_projects/Juvenile_growth/raw_data",  #need to have file with data in "raw_data"
-                          pattern = "*.csv", full.names = TRUE) #only looking at csv files located in raw_data file
-                          %>%
-                          lapply(read_csv) %>%
-                          bind_rows()
+data_all <- list.files(path = "Side_projects/Juvenile_growth/raw_data",  #need to have file with data in "raw_data"\
+                       pattern = "*.csv", full.names = TRUE)%>% lapply(read_csv) %>% bind_rows()
 data_all
 
 as.data.frame(data_all)  # Convert tibble to data.frame
