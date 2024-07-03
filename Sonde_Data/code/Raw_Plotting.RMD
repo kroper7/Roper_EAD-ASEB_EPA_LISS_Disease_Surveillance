@@ -658,18 +658,18 @@ dev.off()
 # Clean ASHC for the LISS stakeholder reports (CT)
 ```{r, figs for LISS stakeholder reports}
 
-ASHC_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('ASHC'))
-ASHC_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('ASHC'))
-ASHC_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('ASHC'))
-ASHC_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('ASHC'))
-ASHC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('ASHC'))
+ASHC_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('ASHC'))
+ASHC_Salinity    <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('ASHC'))
+ASHC_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('ASHC'))
+ASHC_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('ASHC'))
+ASHC_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('ASHC'))
 
 # pH 
 
 ASHC_pH_2023 <- ASHC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>%  # change date range needed here
+             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>%  # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -691,9 +691,9 @@ ASHC_pH_2023 <- ASHC_pH %>% na.omit() %>%
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_pH_callout_2023 <- ASHC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-08-03 00:00:00' & Date.Time < '2023-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -723,9 +723,9 @@ print(ASHC_pH_2023)
 dev.off()
   
 ASHC_pH_2024 <- ASHC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>%  # change date range needed here
+             dplyr::filter(Date.Time > '2024-03-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>%  # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -747,9 +747,9 @@ ASHC_pH_2024 <- ASHC_pH %>% na.omit() %>%
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_pH_callout_2024 <- ASHC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-08-03 00:00:00' & `Date Time` < '2024-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-08-03 00:00:00' & Date.Time < '2024-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -782,9 +782,9 @@ dev.off()
 # Salinity 
 
 ASHC_Salinity_2023 <- ASHC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -808,9 +808,9 @@ ASHC_Salinity_2023 <- ASHC_Salinity %>% na.omit() %>%
 ASHC_Salinity_2023
 
 ASHC_Salinity_2023 <- ASHC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-08-03 00:00:00' & Date.Time < '2023-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -840,9 +840,9 @@ print(ASHC_Salinity_2023)
 dev.off()
 
 ASHC_Salinity_2024 <- ASHC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-03-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -866,9 +866,9 @@ ASHC_Salinity_2024 <- ASHC_Salinity %>% na.omit() %>%
 ASHC_Salinity_2024
 
 ASHC_Salinity_callout_2024 <- ASHC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-08-03 00:00:00' & `Date Time` < '2024-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-08-03 00:00:00' & Date.Time < '2024-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -900,9 +900,9 @@ dev.off()
 # Temperature 
 
 ASHC_Temperature_2023 <-ASHC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -925,9 +925,9 @@ ASHC_Temperature_2023 <-ASHC_Temperature %>% na.omit() %>%
 ASHC_Temperature_2023
 
 ASHC_Temperature_callout_2023 <- ASHC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-08-03 00:00:00' & Date.Time < '2023-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -956,9 +956,9 @@ print(ASHC_Temperature_2023)
 dev.off()
 
 ASHC_Temperature_2024 <-ASHC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-03-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -981,9 +981,9 @@ ASHC_Temperature_2024 <-ASHC_Temperature %>% na.omit() %>%
 ASHC_Temperature_2024
 
 ASHC_Temperature_callout_2024 <- ASHC_Temperature %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-08-03 00:00:00' & `Date Time` < '2024-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-08-03 00:00:00' & Date.Time < '2024-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1014,9 +1014,9 @@ dev.off()
 # DO 
 
 ASHC_DO_2023 <- ASHC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1038,9 +1038,9 @@ ASHC_DO_2023 <- ASHC_DO %>% na.omit() %>%
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_DO_callout_2023 <- ASHC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-08-03 00:00:00' & `Date Time` < '2023-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-08-03 00:00:00' & Date.Time < '2023-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1066,10 +1066,11 @@ pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_DO_2023.pdf"), height = 7,
 print(ASHC_DO_2023)
 #ggarrange(ASHC_DO_all, ASHC_DO_callout, ncol = 2, widths = c(2, 1))
 dev.off()
+
 ASHC_DO_2024 <- ASHC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-03-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1091,9 +1092,9 @@ ASHC_DO_2024 <- ASHC_DO %>% na.omit() %>%
               theme(legend.position = "none", axis.text= element_text(size= 15))
 
 ASHC_DO_callout_2024 <- ASHC_DO %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-08-03 00:00:00' & `Date Time` < '2024-08-06 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-08-03 00:00:00' & Date.Time < '2024-08-06 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1123,9 +1124,9 @@ dev.off()
 #Chlorophyll-a
 
 ASHC_CHLA_2023 <- ASHC_CHLA %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1152,9 +1153,9 @@ pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_CHLA_2023.pdf"), height = 
 print(ASHC_CHLA_all)
 
 ASHC_CHLA_2024 <- ASHC_CHLA %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-03-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1184,8 +1185,8 @@ print(ASHC_CHLA_2024)
 
 ## DAILY AVERAGES OF DO - ASHC###
 
-ASHC_DO$`Date Time` <- as.character(ASHC_DO$`Date Time`)
-date_time <- strsplit(ASHC_DO$`Date Time`, " ")  # Split at the space
+ASHC_DO$Date.Time <- as.character(ASHC_DO$Date.Time)
+date_time <- strsplit(ASHC_DO$Date.Time, " ")  # Split at the space
 print(ASHC_DO)
 
 # Create separate columns for date and time
@@ -1267,8 +1268,8 @@ pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_daily_DO_2024.pdf"), heigh
 print(ASHC_DAILY_DO_2024)
 
 # Monthly mean temperatures ASHC
-ASHC_Temperature$`Date Time` <- as.character(ASHC_Temperature$`Date Time`)
-date_time <- strsplit(ASHC_Temperature$`Date Time`, " ")  # Split at the space
+ASHC_Temperature$Date.Time <- as.character(ASHC_Temperature$Date.Time)
+date_time <- strsplit(ASHC_Temperature$Date.Time, " ")  # Split at the space
 print(ASHC_Temperature)
 
 # Create separate columns for date and time
@@ -1293,7 +1294,7 @@ ASHC_Monthly_Temperature
 ```{r, figs for LISS stakeholder reports}
 
 FENC_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('FENC'))
-FENC_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC'))
+View(FENC_Salinity) #   <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC'))
 FENC_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC'))
 FENC_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC'))
 FENC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('FENC'))
@@ -1301,9 +1302,9 @@ FENC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlor
 # pH 
 
 FENC_pH_2023 <- FENC_pH %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1769,9 +1770,9 @@ GOLD_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlor
 # pH 
 
 GOLD_pH_2023 <- GOLD_pH %>% na.omit() %>%
-             dplyr::filter('Date Time' > '2023-06-01 00:00:00' & 'Date Time' < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2023-06-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x='Date Time', 
+             ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -1801,7 +1802,7 @@ print(GOLD_pH_2023)
 dev.off()
   
 GOLD_pH_2024 <- GOLD_pH %>% na.omit() %>%
-             dplyr::filter('Date Time' > '2024-04-01 00:00:00' & 'Date Time' < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-04-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'GOLD' ~ 'Gold Star', .default = 'Fence Creek')) %>% 
              ggplot(aes(x='Date Time', 
                        y=mean, # the mean values
@@ -2080,8 +2081,8 @@ print(GOLD_CHLA_2024)
 
 ## DAILY AVERAGES OF DO - GOLD###
 
-GOLD_DO$Date.Time <- as.character(GOLD_DO$Date.Time)
-date_time <- strsplit(GOLD_DO$Date.Time, " ")  # Split at the space
+GOLD_DO$Date Time <- as.character(GOLD_DO$Date Time)
+date_time <- strsplit(GOLD_DO$Date Time, " ")  # Split at the space
 print(GOLD_DO)
 
 # Create separate columns for date and time
@@ -2107,7 +2108,7 @@ class(GOLD_DO_avg$Date)
 GOLD_DO_avg$date <- as.Date(GOLD_DO_avg$date)
 
 GOLD_DAILY_DO_2023 <- GOLD_DO_avg %>% 
-   dplyr::filter(Date.Time > '2023-04-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>%
+   dplyr::filter(Date Time > '2023-04-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>%
   ggplot(aes(x= date, 
                        y=Daily_mean, # the mean values
                        group=Site)) + # call the new mean
