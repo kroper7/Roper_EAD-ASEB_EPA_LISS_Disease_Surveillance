@@ -6,7 +6,7 @@ output: html_document
 ---
 
 Last updated 6/13/2024 by M.Kachmar
--for some reason summary code is not updating the Master_Table_LONG_Means file but it is working or the CT parse. Will return to this issue
+-for some reason summary code is not updating the Master_table_LONG_means file but it is working or the CT parse. Will return to this issue
 -FENC data  skipped from 5/13 to 5/27 not recording data. This happened last year and appears to only happen with this sonde. need to look into this. 
 
 ## Setup: 
@@ -122,7 +122,7 @@ write.csv(CT_means, "output/Sonde_hourly_means_CT.csv")
 for(i in 1:nrow(vars)) {
   
   # filter table for each variable
-  Table_by_var <- Master_Table_LONG_means %>% 
+  Table_by_var <- Master_table_LONG_means %>% 
                     dplyr::filter(variable %in% vars[i,])
   
   # plot each
@@ -661,8 +661,8 @@ dev.off()
 ASHC_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('ASHC'))
 ASHC_Salinity    <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('ASHC'))
 ASHC_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('ASHC'))
-ASHC_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('ASHC'))
-ASHC_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('ASHC'))
+ASHC_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO.Concentration' & Site %in% c('ASHC'))
+ASHC_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll.a.Fluorescence' & Site %in% c('ASHC'))
 
 # pH 
 
@@ -1150,7 +1150,7 @@ ASHC_CHLA_2023 <- ASHC_CHLA %>% na.omit() %>%
 ASHC_CHLA_2023
 
 pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_CHLA_2023.pdf"), height = 7, width = 14)
-print(ASHC_CHLA_all)
+print(ASHC_CHLA_2023)
 
 ASHC_CHLA_2024 <- ASHC_CHLA %>% na.omit() %>%
              dplyr::filter(Date.Time > '2024-03-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
@@ -1293,11 +1293,11 @@ ASHC_Monthly_Temperature
 # Clean FENC for the LISS stakeholder reports (CT)
 ```{r, figs for LISS stakeholder reports}
 
-FENC_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('FENC'))
-View(FENC_Salinity) #   <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC'))
-FENC_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC'))
-FENC_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC'))
-FENC_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('FENC'))
+FENC_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('FENC'))
+FENC_Salinity   <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC'))
+FENC_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC'))
+FENC_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO.Concentration' & Site %in% c('FENC'))
+FENC_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll.a.Fluorescence' & Site %in% c('FENC'))
 
 # pH 
 
@@ -1758,11 +1758,11 @@ FENC_Monthly_Salinity
 # Clean GOLD for the LISS stakeholder reports (NEW YORK)
 ```{r, figs for LISS stakeholder reports}
 
-GOLD_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('GOLD')) 
-GOLD_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('GOLD'))
-GOLD_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('GOLD'))
-GOLD_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('GOLD'))
-GOLD_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('GOLD'))
+GOLD_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('GOLD')) 
+GOLD_Salinity    <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('GOLD'))
+GOLD_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('GOLD'))
+GOLD_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO.Concentration' & Site %in% c('GOLD'))
+GOLD_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll.a.Fluorescence' & Site %in% c('GOLD'))
 
 
 
@@ -2226,11 +2226,11 @@ GOLD_Monthly_Salinity
 
 ```{r, figs for LISS stakeholder reports}
 
-LAUR_pH          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('LAUR'))
-LAUR_Salinity    <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('LAUR'))
-LAUR_Temperature <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('LAUR'))
-LAUR_DO          <- Master_Table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('LAUR'))
-LAUR_CHLA        <- Master_Table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('LAUR'))
+LAUR_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('LAUR'))
+LAUR_Salinity    <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('LAUR'))
+LAUR_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('LAUR'))
+LAUR_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO.Concentration' & Site %in% c('LAUR'))
+LAUR_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll.a.Fluorescence' & Site %in% c('LAUR'))
 
 # pH 
 LAUR_pH
