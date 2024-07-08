@@ -327,38 +327,17 @@ density_summary
 
 
 ```
-#Bed Area
+
 ```{r}
-##Bed area data CSV file
-
-bed_area <- read_csv("Field_Data_Biological\\raw_data\\Bed_area\\BedArea - Master.csv",col_names = TRUE)
-
-bed_area <- bed_area%>% filter(!is.na(Site))
-
-bed_area$Date_collected<- mdy(bed_area$Date_collected)
-
-bed_area$year<- year(bed_area$Date_collected)
-head(bed_area)
-bed_area
-
-#Loading packages to read and view .KML files
-library(tidyverse)
-library(sf)
-library(mapview)
-library(rvest)
-library(httr)
-
-#Read .KML file
-ASHC_AreaRight_2024<- st_read("Field_Data_Biological\\raw_data\\Bed_area\\0624ASHC_Right.kml")
-  
-ASHC_AreaRight_2024 %>%
-  glimpse()
-
-
+#Bed area calcualtions
 # Load library 
 library(leaflet)
 library(dplyr)
 library(gapminder)
+library(tidyverse)
+library(sf)
+library(dplyr)
+library(kml)
 # Draw map
 leaflet() %>%
   # Add first tile
@@ -376,10 +355,96 @@ leaflet() %>%
                    overlayGroups=c("Fence Creek", "Ash Creek", "Goldstar"), 
                    options=layersControlOptions(collapsed=FALSE))
 
-library(leaflet-kml)
+
+# should work to pull the data off the gps kml file ~ left side
+kml_data <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml')
+
+#kml_data <- sf::st_read('C:/Users/kelly.roper/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml') # in case the the top is not loaded
+
+kml_data$geometry
+
+# trying to pull from the right kml file
+kml_data2 <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Right.kml')
+
+#trying to elminate a row 
+kml_data2 <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Right.kml') %>% dplyr::rename(Coordinates =geometry, Right_Side_Coordinates = Name) %>% 
+  select(-'Description')
+
+#trying to eliminate a row from left side
+kml_data <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml') %>% dplyr::rename(Coordinates =geometry, Left_Side_Coordinates = Name) %>% 
+  select(-'Description')
 
 
-kmlData = omnivore.kml('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml', null, customLayer)
+kml_data
+
+kml_data$Left_Side_Coordinates
+kml_data$Coordinates
+
+#made a data set with left side coordinates "kml_data"
+mydf <- data.frame(Sites = c("Fence Creek", "Ash Creek", "Goldstar"),
+                   Latitude = c(41.14643, 41.14642, 41.14641, 41.14638, 41.14650, 41.14660, 41.14661,41.14653, 41.14649),
+                   Longitude = c(-73.23568,-73.23564,-73.23551,-73.23541,-73.23536,-73.23537, -73.23546,-73.23555,-73.23565,-73.23568),
+stringAsFactors = FALSE)
+
+#data frame for kml_data2
+kml_right <- as.data.frame(kml_data2[[2]][[1]][[1]]) %>% 
+  dplyr::select(!V3) %>% 
+  dplyr::rename(Long=V1,
+                Lat=V2)
+
+
+kml_left <- as.data.frame(kml_data[[2]][[1]][[1]]) %>% 
+  dplyr::select(!V3) %>% 
+  dplyr::rename(Long=V1,
+                Lat=V2)
+
+view(kml_data2)
+
+kml_left$
+
+#dev tools for kml understanding
+
+devtools::install_github("briatte/tidykml")
+library(tidykml)
+
+devtools::install_github("r-lib/remotes")
+options(timeout=99999999)
+getOption('timeout')
+
+install.packages("remotes", dependencies = TRUE)
+
+kml_data2[,1]
+kml_data[,1]
+
+mydf <- data.frame(Sites = c("1", "2","3","4","5","6","7","8","9","10"), 
+                   Latitude = c(41.14643, 41.14642, 41.14641, 41.14638, 41.14650, 41.14660, 41.14661,41.14653, 41.14649,41.14643), 
+                   Longitude = c(-73.23568,-73.23564,-73.23551,-73.23541,-73.23536,-73.23537, -73.23546,-73.23555,-73.23565,-73.23568),
+                   stringAsFactors = FALSE)
+
+#this worked 
+df <- data.frame(matrix(nrow = 10,ncol = 3)) # make a table template %>% 
+colnames(df) <- c('Sites','Lat','Long')
+df$Sites <- c("1", "2","3","4","5","6","7","8","9","10")
+df$Lat <- c(41.14643, 41.14642, 41.14641, 41.14638, 41.14650, 41.14660, 41.14661,41.14653, 41.14649)
+df$Long <- c(-73.23568,-73.23564,-73.23551,-73.23541,-73.23536,-73.23537, -73.23546,-73.23555,-73.23565,-73.23568)
+
+
+view(kml_data2)
+
+view(mydf)
+
+
+leaflet(data = mydf) %>% 
+  addTiles(group="One") %>% 
+  addProviderTiles(providers$Esri.WorldImagery,group = "Two") %>%
+  addPolylines(lat = mydf$Latitude, lng = mydf$Longitude, color = "blue") %>% 
+  addPopups(lat = ~Latitude, lng = ~Longitude,popup = ~Sites) %>% 
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Ash Creek"), 
+                   options=layersControlOptions(collapsed=FALSE))
+
+
+Sites <- c("1","2","3","4","5","6","7","8","9","10") 
 
 
 
