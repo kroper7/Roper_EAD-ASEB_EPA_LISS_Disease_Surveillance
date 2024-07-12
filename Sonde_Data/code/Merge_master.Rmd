@@ -45,7 +45,7 @@ Sonde_2024 <- read.csv("output/Sonde_master_2024.csv", check.names = F) %>% dply
 
 ?rbind # 
 
-Sonde_master <- rbind(Sonde_2023, Sonde_2024)
+Sonde_master  <- rbind(Sonde_2023, Sonde_2024)
 
 
 write.csv(Sonde_master, "output/Sonde_master.csv")

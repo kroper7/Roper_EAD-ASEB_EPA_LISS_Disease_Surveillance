@@ -13,13 +13,14 @@ Last updated 06/20/24 by K. Lenderman
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
 #knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
-```{r}
+
+```{r,echo = FALSE}
 library("ggplot2")
 library("readxl")
 library("plyr")                                     
@@ -35,11 +36,8 @@ library("tidyr")
 # reading in .csv files from local folder
 ```{r}
 #Collecting and merging all raw data
-data_all <- list.files(path = "Side_projects/Juvenile_growth/raw_data",  #need to have file with data in "raw_data"
-                          pattern = "*.csv", full.names = TRUE) #only looking at csv files located in raw_data file
-                          %>%
-                          lapply(read_csv) %>%
-                          bind_rows()
+data_all <- list.files(path = "Side_projects/Juvenile_growth/raw_data",  #need to have file with data in "raw_data"\
+                       pattern = "*.csv", full.names = TRUE)%>% lapply(read_csv) %>% bind_rows()
 data_all
 
 as.data.frame(data_all)  # Convert tibble to data.frame
@@ -50,7 +48,11 @@ write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #
 ```
 
 ```{r}
+# Summary of all data
 
+st_height <- summarySE(data_all%>% filter(!is.na(height_mm)), measurevar="", groupvars=c("", ""))
+
+st_height 
 ```
 
 ```{r}

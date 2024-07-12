@@ -1,4 +1,4 @@
-lab_id,pathology_notes,boring_sponge,polydora,conchiolin_mod_severe,mud_blister,pea_crab,gill_erosion,pale_digestive,discoloration,horn_add,cyst_abscess,tumor,scarring
+lab_id,pathology_notes,boring_sponge,polydora,conchiolin_mod_severe,mud_blister,pea_crab,gill_erosion,pale_digestive,discoloration,horn_add,cyst_abscess,tumor,shell_scarring
 0624ASHC_01,,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE
 0624ASHC_02,,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE
 0624ASHC_03,,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE
