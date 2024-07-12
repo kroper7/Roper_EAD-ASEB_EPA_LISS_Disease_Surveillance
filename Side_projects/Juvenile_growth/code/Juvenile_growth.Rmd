@@ -14,8 +14,8 @@ Last updated 06/20/24 by K. Lenderman
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 #knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
-#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -30,6 +30,10 @@ library("readr")
 library("lubridate")
 library("purrr")
 library("tidyr")
+library(readxl)
+library(survminer)
+library(survival)
+library(ggpubr)
 ```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
@@ -42,7 +46,7 @@ data_all
 
 as.data.frame(data_all)  # Convert tibble to data.frame
 
-data_all <- data_all %>% filter(!is.na(lab_id))  #filtering NAs
+data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs
 
 write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #creating/printing csv file of all raw data merged together
 ```
@@ -50,9 +54,70 @@ write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #
 ```{r}
 # Summary of all data
 
-st_height <- summarySE(data_all%>% filter(!is.na(height_mm)), measurevar="", groupvars=c("", ""))
+st_height <- summarySE(data_all%>% filter(!is.na(Shell_Height)), measurevar="", groupvars=c("", ""))
 
 st_height 
+```
+#Survival
+```{r}
+counts <- list.files(path = "Side_projects/Juvenile_growth",  #need to have file with data in "raw_data"\
+                       pattern = "*.csv", full.names = TRUE)%>% lapply(read_csv) %>% bind_rows()
+counts
+
+### Fence creek ###
+FENC_counts_all <- counts %>%
+  dplyr::filter(Site == "FENC")%>%
+  dplyr::group_by(Date)%>%
+  dplyr::summarize(total = sum(Live_Count))
+  
+FENC_counts_all
+
+FENC_counts_June <- FENC_counts_all %>% filter(Date == "6/10/2024")
+FENC_counts_July <- FENC_counts_all %>% filter(Date == "7/10/2024")
+
+# % survival between June and July
+
+FENC_total_surv <- (FENC_counts_July$total/FENC_counts_June$total)*100
+FENC_total_surv
+
+
+### Ash creek ###
+ASHC_counts_all <- counts %>%
+  dplyr::filter(Site == "ASH")%>%
+  dplyr::group_by(Date)%>%
+  dplyr::summarize(total = sum(Live_Count))
+  
+ASHC_counts_all
+
+ASHC_counts_June <- ASHC_counts_all %>% filter(Date == "6/10/2024")
+ASHC_counts_July <- ASHC_counts_all %>% filter(Date == "7/10/2024")
+
+# % survival between June and July
+
+ASHC_total_surv <- (ASHC_counts_July$total/ASHC_counts_June$total)*100
+ASHC_total_surv
+
+# % survival per bag
+
+```
+
+#Kaplan Meier Survivorship 
+```{r}
+#Lets create a Kaplan Meier friendly datasheet by categorizing alive as "0" and dead "1"
+
+data_all <- data_all %>% mutate( Status = recode())
+
+#Create a survival object 
+Surv1 <- Surv(time = data_all$Date, event = data_all$Status)
+fit.surv1 <- survfit(formula = Surv1 ~ Dilution, data = Master_Easterns_NJ)
+
+#Plot your objects
+CVplot<-ggsurvplot(fit.surv1, data = Master_Easterns_NJ, xlim = c(3,7), break.x.by = 1,
+           linetype= c(1, 2, 3, 4),xlab = NULL, ylab= NULL, legend.labs= c("Control", "1x10^4",
+                                                                 "1x10^5", "1x10^6"),
+           legend.title = "Treatment:", legend = "top", risk.table =TRUE )+ theme_survminer(base_size = 20,font.legend = c(15))
+CVplot
+CVplot + labs(title= "Eastern Oyster FRA")
 ```
 
 ```{r}
