@@ -5,8 +5,9 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 7/12/2024 by M.Kachmar
-- ASHC data skipped logging between 6/10-6/17 and then picked up between 6/17-6/21 and stopped recording again. Going to call insitu. 
+Last updated 7/15/2024 by M.Kachmar
+-I accidentally uploaded the wrong sheet and the ash creek sonde is NOT skipping data. 
+
 
 ## Setup: 
 
