@@ -392,7 +392,7 @@ kml_right <- as.data.frame(kml_data2[[2]][[1]][[1]]) %>%
   dplyr::rename(Long=V1,
                 Lat=V2)
 
-
+#data frame for kml_data
 kml_left <- as.data.frame(kml_data[[2]][[1]][[1]]) %>% 
   dplyr::select(!V3) %>% 
   dplyr::rename(Long=V1,
@@ -400,18 +400,41 @@ kml_left <- as.data.frame(kml_data[[2]][[1]][[1]]) %>%
 
 view(kml_data2)
 
-kml_left$
+kml_left$Long
+
+
+
+kml_left <- as.data.frame(kml_data[[2]][[1]][[1]]) %>%
+  dplyr::select(!V3) %>%
+  dplyr::rename(Long = V1,
+                Lat = V2) %>%
+  dplyr::mutate(Site = "Left")
+
+kml_right <- as.data.frame(kml_data2[[2]][[1]][[1]]) %>%
+  dplyr::select(!V3) %>%
+  dplyr::rename(Long = V1,
+                Lat = V2) %>%
+  dplyr::mutate(Site = "Right")
+
+
+kml_final <- rbind(kml_left, kml_right)
+View(kml_final)
+
+#df.convert would be your kml_left and kml_right
+
+
+
 
 #dev tools for kml understanding
 
-devtools::install_github("briatte/tidykml")
-library(tidykml)
+#devtools::install_github("briatte/tidykml")
+#library(tidykml)
 
-devtools::install_github("r-lib/remotes")
-options(timeout=99999999)
-getOption('timeout')
+#devtools::install_github("r-lib/remotes")
+#options(timeout=99999999)
+#getOption('timeout')
 
-install.packages("remotes", dependencies = TRUE)
+#install.packages("remotes", dependencies = TRUE)
 
 kml_data2[,1]
 kml_data[,1]
@@ -444,7 +467,20 @@ leaflet(data = mydf) %>%
                    options=layersControlOptions(collapsed=FALSE))
 
 
-Sites <- c("1","2","3","4","5","6","7","8","9","10") 
+leaflet() %>%
+  # Add first tile
+  addTiles(group="One") %>%
+  # Add second tile
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  # Add first marker
+  addMarkers(lat = kml_left$Lat,lng = kml_left$Long, group="Left", popup = "Left Ash Creek, Fairfield") %>%
+  # Add second marker
+  addMarkers(lat = kml_right$Lat, lng = kml_right$Long, group="Right", popup = "Right Ash Creek, Fairfield") %>%
+  # Add Layer controls
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Left Ash Creek", "Right Ash Creek"), 
+                   options=layersControlOptions(collapsed=FALSE))
+
 
 
 
