@@ -6,8 +6,7 @@ output: html_document
 
 ---
 
-Last updated: 6/21/24 M.Kachmar
-- Fence creek up to date. Peak temperatures 6/3/24 at 26.3C - last year it did not reach this temperature range until July. 
+Last updated: 7/12/24 M.Kachmar
 
 
 ```{r setup, include=FALSE}

@@ -5,9 +5,8 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 6/13/2024 by M.Kachmar
--for some reason summary code is not updating the Master_table_LONG_means file but it is working or the CT parse. Will return to this issue
--FENC data  skipped from 5/13 to 5/27 not recording data. This happened last year and appears to only happen with this sonde. need to look into this. 
+Last updated 7/12/2024 by M.Kachmar
+- ASHC data skipped logging between 6/10-6/17 and then picked up between 6/17-6/21 and stopped recording again. Going to call insitu. 
 
 ## Setup: 
 
