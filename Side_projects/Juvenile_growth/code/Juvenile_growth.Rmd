@@ -5,6 +5,8 @@ date: "6/20/2024"
 output: html_document
 
 description: 
+Colors that can be used in ggplot https://sape.inf.usi.ch/quick-reference/ggplot2/colour
+
 ---
 Last updated 06/20/24 by K. Lenderman
   - Created script
