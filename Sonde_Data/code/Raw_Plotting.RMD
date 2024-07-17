@@ -117,6 +117,7 @@ write.csv(Master_table_LONG_means, "output/Sonde_hourly_means_master.csv",)
 CT_means<- Master_table_LONG_means[Master_table_LONG_means$Site == "ASHC" | Master_table_LONG_means$Site =="FENC", ]
 
 
+
 write.csv(CT_means, "output/Sonde_hourly_means_CT.csv")
 
 for(i in 1:nrow(vars)) {
@@ -654,10 +655,34 @@ dev.off()
 
 
 #Grid of June and July 2024 temperature and salinity for HOllings Scholar Juvenille Growth project
-CT_Temperature_2024_jg <- CT_Temperature %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2024-06-01 00:00:00' & Date.Time < '2024-07-15 00:00:00' ) %>% # change date range needed here
+Master_table <- Master_table %>% filter(!is.na(Temperature))
+
+Master_table <- Master_table %>% dplyr::mutate(month = month(Date.Time))
+
+CT_Temperature_jg <- Master_table %>%  
+                      dplyr::mutate(Date.Time = as.factor(substr(Date.Time,1,13))) %>% # remove minutes and seconds
+                      melt(id.vars = c("Date.Time", "Site"),
+                                    measure.vars = c("Actual.Conductivity", "Salinity", "Resistivity", 
+                                                     "Total.Dissolved.Solids" ,"RDO.Concentration", "RDO.Saturation",
+                                                     "Oxygen.Partial.Pressure", "Chlorophyll.a.Fluorescence", "pH", "pH.mV", 
+                                                     "Temperature")) %>% 
+                      dplyr::mutate(Date.Time = ymd_h(Date.Time), month = month(Date.Time)) %>%
+                      dplyr::filter(variable == 'Temperature' & Site %in% c('FENC', 'ASHC')) %>%                    
+                      dplyr::group_by(month, Site, variable) %>% 
+                      summarise_each(funs(mean, sd, se=sd(.)/sqrt(n())), value)  
+                      
+CT_Temperature_jg <- CT_Temperature_jg[CT_Temperature_jg$month == "6" |CT_Temperature_jg$month =="7", ]
+  
+
+#CT_Temperature_jg <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC', 'ASHC')) %>% 
+##  dplyr:: mutate(month = month(Date.Time))%>%
+#  dplyr:: group_by(Site, month, variable) %>%
+#  summarise_each(funs(mean, sd, se=sd(.)/sqrt(n())), mean)
+  
+
+CT_Temperature_2024_jg <- CT_Temperature_jg %>% na.omit() %>%
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=Date.Time, 
+             ggplot(aes(x=month, 
                        y=mean, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
@@ -685,7 +710,7 @@ print(CT_Temperature_2024_jg)
 dev.off()
 
 CT_Salinity_2024_jg <- CT_Salinity %>% na.omit() %>%
-             dplyr::filter(Date.Time > '2024-06-01 00:00:00' & Date.Time < '2024-07-15 00:00:00' ) %>% # change date range needed here
+             dplyr::filter(Date.Time > '2024-06-01 00:00:00' & Date.Time < '2024-07-01 00:00:00' ) %>% # change date range needed here
              dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x=Date.Time, 
                        y=mean, # the mean values
@@ -704,7 +729,7 @@ CT_Salinity_2024_jg <- CT_Salinity %>% na.omit() %>%
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
               ggtitle("Salinity - 2024") +
-              labs(x = "Time", y = "Salinity") +
+              labs(x = "Date", y = "Salinity") +
               theme_classic() +
               theme(legend.position = "none")
 CT_Salinity_2024_jg
