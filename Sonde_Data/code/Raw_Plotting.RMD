@@ -653,6 +653,68 @@ print(CT_DO_2024)
 dev.off()
 
 
+#Grid of June and July 2024 temperature and salinity for HOllings Scholar Juvenille Growth project
+CT_Temperature_2024_jg <- CT_Temperature %>% na.omit() %>%
+             dplyr::filter(Date.Time > '2024-06-01 00:00:00' & Date.Time < '2024-07-15 00:00:00' ) %>% # change date range needed here
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=Date.Time, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("orange1",  "cornflowerblue")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - 2024") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none")
+CT_Temperature_2024_jg
+
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Temp_Juv_grow.pdf"), height = 6, width = 11)
+#ggarrange(CT_DO_2024, CT_DO_callout_2024, ncol = 2, widths = c(2, 1))
+print(CT_Temperature_2024_jg)
+dev.off()
+
+CT_Salinity_2024_jg <- CT_Salinity %>% na.omit() %>%
+             dplyr::filter(Date.Time > '2024-06-01 00:00:00' & Date.Time < '2024-07-15 00:00:00' ) %>% # change date range needed here
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=Date.Time, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("orange1",  "cornflowerblue")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity - 2024") +
+              labs(x = "Time", y = "Salinity") +
+              theme_classic() +
+              theme(legend.position = "none")
+CT_Salinity_2024_jg
+
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Salinity_Juv_grow.pdf"), height = 6, width = 11)
+#ggarrange(CT_DO_2024, CT_DO_callout_2024, ncol = 2, widths = c(2, 1))
+print(CT_Salinity_2024_jg)
+dev.off()
+
+
 ```
 
 # Clean ASHC for the LISS stakeholder reports (CT)
