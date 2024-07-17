@@ -13,9 +13,9 @@ Last updated 06/20/24 by K. Lenderman
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
 #knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 #knitr::opts_knit$set(root.dir = 'C:/Users/katherine.mcfarland/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Katie's
 ```
@@ -108,7 +108,8 @@ survival_sum
 ```
 
 ```{r}
-prop.survived <- ggplot(data=survival_sum, aes(x=Site, y=Survival , fill=Site)) +
+prop.survived <- ggplot(data=survival_sum, aes(x=Site, y=Survival, fill=Site)) +
+  geom_col(color = "black", linewidth =  0.75) +
   geom_bar(stat="identity")+ geom_errorbar(aes(ymin=Survival-se, ymax=Survival+se), width=.2, position=position_dodge(.9))+ #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ scale_fill_manual(values = c("orange1", "cornflowerblue") )+
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
