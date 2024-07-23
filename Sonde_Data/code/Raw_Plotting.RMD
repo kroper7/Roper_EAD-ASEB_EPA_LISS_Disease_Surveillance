@@ -20,8 +20,8 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE)
 
 #knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
 ```
 
@@ -741,6 +741,75 @@ dev.off()
 
 
 ```
+
+```{r}
+#Adding linear regression lines and equations to temperature data
+#Going to use this to compare temperature of 2023 and 2024 when more data overlaps
+CT_Temperature_2023 <- CT_Temperature %>% na.omit() %>%
+             dplyr::filter(Date.Time > '2023-07-01 00:00:00' & Date.Time < '2023-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=Date.Time, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              stat_cor(label.y = 32)+
+              geom_smooth(method = "lm")+
+              stat_regline_equation(label.y = 35)+
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - 2023") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none")
+CT_Temperature_2023
+
+pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Temperature_2023.pdf"), height = 6, width = 11)
+#ggarrange(CT_Temperature_2023, CT_Temperature_callout_2023, ncol = 2, widths = c(2, 1))
+print(CT_Temperature_2023)
+dev.off()
+
+cor(CT_Temperature_2023, method = c("pearson"))
+```
+```{r}
+CT_Temperature_2024 <- CT_Temperature %>% na.omit() %>%
+             dplyr::filter(Date.Time > '2024-03-01 00:00:00' & Date.Time < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
+             ggplot(aes(x=Date.Time, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              stat_cor(label.y = 30)+
+              stat_regline_equation(label.y = 35)+
+              geom_smooth(method = "lm")+
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - 2024") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none")
+CT_Temperature_2024
+```
+
 
 # Clean ASHC for the LISS stakeholder reports (CT)
 ```{r, figs for LISS stakeholder reports}
