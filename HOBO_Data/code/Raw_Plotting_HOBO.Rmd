@@ -224,6 +224,55 @@ pdf(paste0(path_out,"ASHC_HOBO.pdf"), height = 7, width = 14)
 print(ASHC_plot)
 
 ```
+#### juvenile growth Fence Creek ###
+```{r}
+# we just need june and july data so we are going to subset that out
+ASHC_jj <- ASHC_means %>% filter(Date_Time > '2024-06-01 00:00:00' & Date_Time < '2024-07-10 00:00:00' )
+
+ASHC_plot_juv <- ASHC_jj %>%
+    mutate(Date_Time = as.POSIXct(Date_Time)) %>%
+    ggplot(aes(Date_Time, mean_value)) + 
+    geom_point() + 
+    geom_line(size = 0.2, position = position_dodge(.4)) +
+    scale_shape_manual(values = c(21, 22, 24, 25)) + 
+    scale_fill_manual(values = c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+    geom_errorbar(aes(ymin = mean_value - se_value, 
+                      ymax = mean_value + se_value), 
+                  width = 0, position = position_dodge(.4)) +
+    ggtitle("Ash Creek, CT") +
+    labs(x = "", y = "") + 
+    theme_classic() + 
+    theme(axis.text = element_text(size = 12), axis.title = element_text(size = 12)) +
+    scale_x_datetime(date_labels = "%b/%Y", 
+                     date_breaks = "1 month", 
+                     limits = as.POSIXct(c('2024-06-01', '2024-07-15')))
+
+ASHC_plot_juv
+
+
+FENC_jj <- FENC_means %>% filter(Date_Time > '2024-06-01 00:00:00' & Date_Time < '2024-07-10 00:00:00' )
+
+FENC_plot_juv <- FENC_jj %>%
+    mutate(Date_Time = as.POSIXct(Date_Time)) %>%
+    ggplot(aes(Date_Time, mean_value)) + 
+    geom_point() + 
+    geom_line(size = 0.2, position = position_dodge(.4)) +
+    scale_shape_manual(values = c(21, 22, 24, 25)) + 
+    scale_fill_manual(values = c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+    geom_errorbar(aes(ymin = mean_value - se_value, 
+                      ymax = mean_value + se_value), 
+                  width = 0, position = position_dodge(.4)) +
+    ggtitle("Fenc Creek, CT") +
+    labs(x = "", y = "") + 
+    theme_classic() + 
+    theme(axis.text = element_text(size = 12), axis.title = element_text(size = 12)) +
+    scale_x_datetime(date_labels = "%b/%Y", 
+                     date_breaks = "1 month", 
+                     limits = as.POSIXct(c('2024-06-01', '2024-07-15')))
+
+FENC_plot_juv
+
+```
 
 ```{r}
 CT_plot<-ggarrange(ASHC_plot, FENC_plot,nrow=2 ) %>%
@@ -238,7 +287,7 @@ print(CT_plot)
 
 ## Gold Star Beach
 ```{r}
-GOLD_HOBO <- read_csv("HOBO_Data\\raw_data\\062024_GOLD_HOBO.csv", col_names = TRUE)   
+GOLD_HOBO <- read_csv("HOBO_Data\\raw_data\\072024_GOLD_HOBO.csv", col_names = TRUE)   
 
 as.data.frame(GOLD_HOBO)
 
