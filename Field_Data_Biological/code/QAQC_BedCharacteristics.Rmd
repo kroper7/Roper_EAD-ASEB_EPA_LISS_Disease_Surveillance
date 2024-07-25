@@ -400,10 +400,10 @@ kml_left <- as.data.frame(kml_data[[2]][[1]][[1]]) %>%
 
 view(kml_data2)
 
-kml_left$Long
+#kml_left$Long
 
 
-
+#data frame for kml_data and kml_data2 again but with mutate
 kml_left <- as.data.frame(kml_data[[2]][[1]][[1]]) %>%
   dplyr::select(!V3) %>%
   dplyr::rename(Long = V1,
@@ -416,14 +416,11 @@ kml_right <- as.data.frame(kml_data2[[2]][[1]][[1]]) %>%
                 Lat = V2) %>%
   dplyr::mutate(Site = "Right")
 
-
+# convert both right and left side of ash creek to one data frame
 kml_final <- rbind(kml_left, kml_right)
 View(kml_final)
 
 #df.convert would be your kml_left and kml_right
-
-
-
 
 #dev tools for kml understanding
 
@@ -456,7 +453,7 @@ view(kml_data2)
 
 view(mydf)
 
-
+#this is with handmaid data frame versus the kml_final
 leaflet(data = mydf) %>% 
   addTiles(group="One") %>% 
   addProviderTiles(providers$Esri.WorldImagery,group = "Two") %>%
@@ -466,7 +463,7 @@ leaflet(data = mydf) %>%
                    overlayGroups=c("Ash Creek"), 
                    options=layersControlOptions(collapsed=FALSE))
 
-
+#this is the map with the data frames being separate has both left and right of the reef
 leaflet() %>%
   # Add first tile
   addTiles(group="One") %>%
@@ -481,8 +478,55 @@ leaflet() %>%
                    overlayGroups=c("Left Ash Creek", "Right Ash Creek"), 
                    options=layersControlOptions(collapsed=FALSE))
 
+#map for the kml_final
+leaflet() %>%
+  # Add first tile
+  addTiles(group="One") %>%
+  # Add second tile
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  # Add first marker
+  addMarkers(lat = kml_final$Lat,lng = kml_final$Long, group="Left") %>%
+  # Add popups
+  addPopups(-73.23568, 41.14643,kml_data, options = popupOptions(closeButton = FALSE)) %>% 
+  # Add Layer controls
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Ash Creek, Fairfield"), 
+                   options=layersControlOptions(collapsed=FALSE))
 
 
+
+#map<- paste(sep = "<br/>","fisheries.noaa.gov", "212 Rogers Ave", "Milford, CT")
+
+
+map2<- paste(sep = "<br/>","<b><a href='https://www.fisheries.noaa.gov/new-england-mid-atlantic/habitat-conservation/understanding-health-long-island-sounds-oyster-beds'>N.O.A.A.</a></b>", "Ash Creek","Fairfield, CT")
+
+leaflet() %>% addTiles(group = "One") %>%
+   addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
+  addPopups(-73.23568, 41.14643, map2,
+    options = popupOptions(closeButton = FALSE))
+
+#beneath says invalid map
+
+leaflet(map2) %>% addTiles(group="One") %>%
+   addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  addPopups(-73.23568, 41.14643, map,
+    options = popupOptions(closeButton = FALSE) %>% # Add Layer controls
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Ash Creek"), 
+                   options=layersControlOptions(collapsed=FALSE))
+  )
+
+#<br/>","<b><a href='https://www.fisheries.noaa.gov/'>N.O.A.A.</a></b>", "Goldstar","Huntington, NY")
+
+#https://www.fisheries.noaa.gov/new-england-mid-atlantic/habitat-conservation/understanding-health-long-island-sounds-oyster-beds
+
+mapgoldstar<- paste(sep = "<br/>","<b><a href='https://www.fisheries.noaa.gov/new-england-mid-atlantic/habitat-conservation/understanding-health-long-island-sounds-oyster-beds'>N.O.A.A.</a></b>", "Goldstar",
+            "Huntington, NY")
+
+leaflet() %>% addTiles(group = "One") %>%
+   addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
+  addPopups(-73.43414331536832, 40.89684920400523, mapgoldstar,
+    options = popupOptions(closeButton = FALSE))
 
 ```
 
