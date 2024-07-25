@@ -1,0 +1,173 @@
+---
+title: "Cleanup_TEST"
+author: "Mariah Kachmarr"
+date: "2024-07-25"
+output: html_document
+---
+
+# Objective:
+
+* call the raw data files for fence creek 2023 & 2024. We recovered what we thought was lost data.
+
+* **output**: "Sonde_master_FENC.csv"
+
+
+## Setup: 
+
+* call your root directory, using opts_knit assigns for the entire script so your paths will alwyas be from this start point!
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      cache = TRUE)
+
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+
+```
+
+* load libraries
+
+```{r load_libraries, include = TRUE}
+# load libraries - notes show the install command needed to install (pre installed)
+# Plotting
+# library(ggplot2)
+library(dplyr)
+# library(gplots)
+# library(RColorBrewer)
+# library(ggpubr)
+library(stringr)
+library(lubridate)
+library(readr)
+library(reshape2)
+library(tidyverse) # read_csv call from readr, included in tidyverse
+```
+
+
+* set your data path, this is a string name as "path.raw" will will 'paste' this to the end of 
+our path (called above) to output to the folder raw_data. 
+
+* *Note* in order to run this properly there must be an existing folder called "raw_data" in the Sonde_Data folder
+
+```{r}
+
+path.raw <- "raw_data/"
+
+# using the paste0 function we will add the whole path together, check it out in the example below! 
+# paste0 does not require you to set your separation between calls, so we will manually assign as "/"
+paste0(getwd(),"/",path.raw) # you see the whole directory prints including the raw_data folder! yay.
+
+
+```
+
+## Ready. Set. ReadAndFormatRawDataToMerge! 
+
+*IMPORTANT*: We realized that there are a few cases in which raw Sonde data differ, so the following is a bit cumbersome
+built to successfully reformat dates according to how they are presented raw, using **lubridate**! 
+
+* first, we need to make a generate a list of file names
+
+```{r generate list of file names}
+
+file.names         <- data.frame(txt.files = 
+                                         (basename(list.files(path = paste0(getwd(),"/",path.raw), 
+                                                              pattern = "csv$", 
+                                                              recursive = FALSE)))) 
+
+file.names
+
+```
+
+* second, assign your *blank* master dataframe 
+
+```{r}
+
+Master_FENC <- data.frame() 
+
+```
+
+* third, run the loop
+
+  * calls each csv file in 'file.names.2024' one by one, reformts them using 'lubridate', and 'rbind' (row bind) to Master_2023
+  
+
+*Important!* Below are custom notes on how the data differs between csv files, based on date format
+The objective being to reformat each csv file so that they merge successfully and convert date character to POSIXlt
+
+* What the heck POSIXct?
+
+  - time series format that stores data as seconds starting from January 1, 1970 (I know, wierd...)
+
+Lubridate calls: 
+
+(a) **ymd_hms** for 072023_GOLD_Sonde.csv, 072023_LAUR_Sonde.csv, 082023_FENC_Sonde.csv, 082023_GOLD_Sonde.csv, 092023_FENC_Sonde.csv
+
+(b) **mdy_hms** for 072023_ASHC_Sonde.csv
+
+(c) **mdy_hm** for 082023_ASHC_Sonde.csv, 082023_LAUR_Sonde.csv, 092023_ASHC_Sonde.csv, 092023_GOLD_Sonde.csv, 102023_ASHC_Sonde.csv,102023_FENC_Sonde.csv, 102023_GOLD_Sonde.csv, 102023_LAUR_Sonde.csv, 112023_ASHC_Sonde.csv, 112023_FENC_Sonde.csv
+
+* y = year, m = month, d = day, h = hour, m = minute, s = second
+
+*Important!* At any time you wish to just upload or diagnose an error in a particular file, you can copy and paste the syntax wihtin the loop below and change 'm' to the row # in file.names.2023
+  
+```{r run the crazy loop}
+
+# for loop to merge all csv files to one dataframe
+
+for (m in 1:nrow(file.names)) { # this is your loop, for each row in th filenames tbale, do the followin!
+  # NOTE: you will 'm' used in this loop to read and assign data
+  
+  
+  # call the dir of the csv file in loop using paste0 to 'paste' the strings for the 
+  # working directry, path to raw data, and the mth file name in the loop
+  raw_Sonde_rootdir        <- paste0(getwd(),"/",path.raw,file.names[m,1]) #reads in the data files
+  
+  # We need to skip some lines, and this can differ Sonde to Sonde based on the equipment tech specs info, etc. 
+  # to do this we will use readLines then grep to call the row that contains the delimiter 'Date Time', 
+  # becasue this is where the target data begins! (actual measured readings!)
+  D        <- readLines(raw_Sonde_rootdir) 
+  ind      <- grep('Date Time',D) # the row number where the data begins, containing 'Date Time'
+
+  # read the data using read_csv and skip columns based on 'ind' above 
+  raw      <- read_csv(raw_Sonde_rootdir,skip=ind-1,col_types = cols())
+  raw_df   <- as.data.frame(raw) # ocnvert the dataframe now that you skipped the crappola 
+  
+  # if you look at the raw data, its MESSY , containing the Sonde=--specific ID number in each column, this will NOT let us merge datasets
+  # a few more lines, commented to explain why...
+  # columns  <- names(raw) # what are the column names?  - youll see why
+  raw_df[2:(ncol(raw_df))] <- lapply(raw_df[2:(ncol(raw_df))],as.numeric) # convert all data  to numeric
+  names(raw_df) <- sapply(strsplit(names(raw_df), '\\s*[()]'), `[`, 1) # ommit all numeric column data, also the format of the units does not pair between datasets
+  # raw_df[,1] # remove the # and reun this if you want to see th raw date format of an individual file - rationalize why we have a crazy conditioninal statement below
+
+  # As of 6/3/2024, all data is in format mdy_hm, use lubridate to format to POSIXct format 
+  raw_df[,1] <- mdy_hm(raw_df[,1])
+  
+  # add a column for the site 
+  filename      <- file.names.2024[m,1]
+  raw_df        <- raw_df %>% 
+                    dplyr::mutate(Site = sub(".*_(.*)_.*","\\1",filename),
+                    Date = gsub("_.*","",filename)) 
+  
+  Master_FENC <- rbind(raw_df, Master_FENC) #bind to a cumulative list dataframe
+}
+
+names(raw_df)
+names(Master_FENC)
+
+```
+
+
+## Cleanup and print 
+
+* remove the columns "External Voltage", "Battery Capacity", "Barometric Pressure", "Date" ( DAte is an extra column we have a correct date in there already)
+
+```{r cleanup and r}
+
+Master_FENC_output <- Master_FENC %>%  
+                      dplyr::select(-c("External Voltage", "Battery Capacity", "Barometric Pressure", "Date")) 
+Master_FENC_output <- na.omit(Master_FENC_output)
+
+write.csv(Master_2024_output, "output/Sonde_master_FENC.csv")
+```
