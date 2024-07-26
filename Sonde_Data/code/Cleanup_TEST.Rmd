@@ -33,11 +33,11 @@ knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-AS
 ```{r load_libraries, include = TRUE}
 # load libraries - notes show the install command needed to install (pre installed)
 # Plotting
-# library(ggplot2)
+library(ggplot2)
 library(dplyr)
-# library(gplots)
-# library(RColorBrewer)
-# library(ggpubr)
+library(gplots)
+library(RColorBrewer)
+library(ggpubr)
 library(stringr)
 library(lubridate)
 library(readr)
@@ -93,24 +93,6 @@ Master_FENC <- data.frame()
   * calls each csv file in 'file.names.2024' one by one, reformts them using 'lubridate', and 'rbind' (row bind) to Master_2023
   
 
-*Important!* Below are custom notes on how the data differs between csv files, based on date format
-The objective being to reformat each csv file so that they merge successfully and convert date character to POSIXlt
-
-* What the heck POSIXct?
-
-  - time series format that stores data as seconds starting from January 1, 1970 (I know, wierd...)
-
-Lubridate calls: 
-
-(a) **ymd_hms** for 072023_GOLD_Sonde.csv, 072023_LAUR_Sonde.csv, 082023_FENC_Sonde.csv, 082023_GOLD_Sonde.csv, 092023_FENC_Sonde.csv
-
-(b) **mdy_hms** for 072023_ASHC_Sonde.csv
-
-(c) **mdy_hm** for 082023_ASHC_Sonde.csv, 082023_LAUR_Sonde.csv, 092023_ASHC_Sonde.csv, 092023_GOLD_Sonde.csv, 102023_ASHC_Sonde.csv,102023_FENC_Sonde.csv, 102023_GOLD_Sonde.csv, 102023_LAUR_Sonde.csv, 112023_ASHC_Sonde.csv, 112023_FENC_Sonde.csv
-
-* y = year, m = month, d = day, h = hour, m = minute, s = second
-
-*Important!* At any time you wish to just upload or diagnose an error in a particular file, you can copy and paste the syntax wihtin the loop below and change 'm' to the row # in file.names.2023
   
 ```{r run the crazy loop}
 
@@ -145,7 +127,7 @@ for (m in 1:nrow(file.names)) { # this is your loop, for each row in th filename
   raw_df[,1] <- mdy_hm(raw_df[,1])
   
   # add a column for the site 
-  filename      <- file.names.2024[m,1]
+  filename      <- file.names[m,1]
   raw_df        <- raw_df %>% 
                     dplyr::mutate(Site = sub(".*_(.*)_.*","\\1",filename),
                     Date = gsub("_.*","",filename)) 
@@ -169,7 +151,7 @@ Master_FENC_output <- Master_FENC %>%
                       dplyr::select(-c("External Voltage", "Battery Capacity", "Barometric Pressure", "Date")) 
 Master_FENC_output <- na.omit(Master_FENC_output)
 
-#write.csv(Master_2024_output, "output/Sonde_master_FENC.csv")
+write.csv(Master_FENC_output, "output/Sonde_master_FENC.csv")
 ```
 
 ```{r load data}
@@ -178,7 +160,6 @@ Master_FENC_table <- Master_FENC_output # check.names = F allows with col names 
 
 Master_FENC_table$'Date Time' <- lubridate::ymd_hms(Master_FENC_table$'Date Time')
 
-### Raw visual (ready. set. blobs!)
 
 
 ```
@@ -197,8 +178,8 @@ Master_table_LONG <- Master_FENC_table %>%
 # View the blobs! 
 ggplot(Master_table_LONG,
          aes(x='Date Time',
-             y=value,
-             fill=Site)) +
+             y= value,
+             )) +
   geom_point() +
   theme_classic() + 
   facet_wrap(~variable, scales = "free_y")
@@ -222,7 +203,8 @@ Master_table_LONG_means <- Master_FENC_table %>%
                                                      'Temperature')) %>% 
                       dplyr::group_by('Date Time', Site, variable) %>% 
                       summarise_each(funs(mean, sd, se=sd(.)/sqrt(n())), value) %>% 
-                      dplyr::mutate('Date Time' = ymd_h('Date Time')) # reformat back to date 
+                      #dplyr::mutate('Date Time' = ymd_h('Date Time')) # reformat back to date
+                      dplyr::mutate('Date Time' = as.Date('Date Time', format = "%Y-%m-%d %H"))
 
 
 vars <- as.data.frame(
@@ -238,7 +220,7 @@ vars <- as.data.frame(
 ```{r}
 
 
-FENC_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('FENC'))
+FENC_pH          <- Master_FENC_output %>% select('Date Time', pH, Site)
 FENC_Salinity   <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC'))
 FENC_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC'))
 FENC_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC'))
@@ -247,11 +229,11 @@ FENC_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlor
 # pH 
 
 FENC_pH_2023 <- FENC_pH %>% na.omit() %>%
-             dplyr::filter('Date Time' > '2023-06-01 00:00:00' & 'Date Time' < '2023-11-30 00:00:00' ) %>% 
+             dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00')  %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
              ggplot(aes(x='Date Time', 
-                       y=mean, # the mean values
-                       group=Site)) + # call the new mean
+                       y=pH, # the mean values
+                      group= Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
                                 linetype = Site), 
                             size = 0.2, 
@@ -261,9 +243,9 @@ FENC_pH_2023 <- FENC_pH %>% na.omit() %>%
                              fill=Site)) + 
               scale_shape_manual(values=c(21, 22, 24, 25)) + 
               scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
-              geom_errorbar(aes(ymin=(mean)-(se), 
-                                ymax=(mean)+(se)), 
-                            width=0,position=position_dodge(.4)) +
+             # geom_errorbar(aes(ymin=(mean)-(se), 
+              #                  ymax=(mean)+(se)), 
+              #              width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
               ggtitle("pH 2023") +
               labs(x = "Time", y = "pH") +
@@ -410,7 +392,7 @@ FENC_Temperature_2024 <-FENC_Temperature %>% na.omit() %>%
              dplyr::filter('Date Time' > '2024-03-01 00:00:00' & 'Date Time' < '2024-11-30 00:00:00' ) %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Fence Creek')) %>% 
              ggplot(aes(x='Date Time', 
-                       y=mean, # the mean values
+                       y=value, # the mean values
                        group=Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
                                 linetype = Site), 
