@@ -7,7 +7,7 @@ output: html_document
 
 # Objective:
 
-* call the raw data files for fence creek 2023 & 2024. We recovered what we thought was lost data.
+* call the raw data files for fence creek 2023 & 2024. We recovered what we thought was lost data.This code is pulling in that data file, cleaning, and graphing to make sure that it will be suitable to incorporate with our previous data. 
 
 * **output**: "Sonde_master_FENC.csv"
 
