@@ -195,25 +195,59 @@ ggplot(Master_table_LONG,
 
 
 ```{r}
-Master_table_LONG_means <- Master_FENC_table %>%  
-                      dplyr::mutate('Date Time' = as.factor(substr('Date Time',1,13))) %>% # remove minutes and seconds
-                      melt(id.vars = c("Date Time", "Site"),
+Master_table_LONG_means_FENC <- Master_FENC_table %>%  
+                      dplyr::mutate(`Date Time` = as.factor(substr(`Date Time`,1,13))) %>% # remove minutes and seconds
+                      melt(id.vars = c('Date Time', 'Site'),
                                     measure.vars = c('Actual Conductivity', 'Salinity', 'Resistivity', 
                                                      'Total Dissolved Solids' ,'RDO Concentration', 'RDO Saturation',
                                                      'Oxygen Partial Pressure', 'Chlorophyll-a Fluorescence', 'pH', 'pH mV', 
                                                      'Temperature')) %>% 
-                      dplyr::group_by('Date Time', Site, variable) %>% 
-                      summarise_each(funs(mean, sd, se=sd(.)/sqrt(n())), value) %>% 
-                      #dplyr::mutate('Date Time' = ymd_h('Date Time')) # reformat back to date
-                      dplyr::mutate('Date Time' = as.Date('Date Time', format = "%Y-%m-%d %H"))
-
+                      dplyr::group_by(`Date Time`, Site, variable) %>% 
+                      summarise(across(value, list(mean = mean, sd = sd, se = ~ sd(.) / sqrt(n())), .names = "{.fn}_{.col}")) %>% 
+                      dplyr::mutate(`Date Time` = ymd_h(`Date Time`)) # reformat back to date
+                      
+View(Master_table_LONG_means_FENC)
 
 vars <- as.data.frame(
           list(
             as.character(
               unique(
-                Master_table_LONG_means$variable)))) %>% 
+                Master_table_LONG_means_FENC$variable)))) %>% 
         dplyr::rename(dat = 1)
+        
+  for(i in 1:nrow(vars)) {
+  
+  # filter table for each variable
+  Table_by_var <- Master_table_LONG_means_FENC %>% 
+                    dplyr::filter(variable %in% vars[i,])
+  
+  # plot each
+  plot <- Table_by_var %>% 
+              ggplot(aes(x='Date Time', 
+                       y=mean_value, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#CC79A7", "#D55E00", "#009E73", "#0072B2")) + 
+              geom_errorbar(aes(ymin=(mean_value)-(se_value), 
+                                ymax=(mean_value)+(se_value)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Site), scales = "free_y") +
+              ggtitle(vars[i,]) +
+              theme_bw()
+  
+  # print plots and name them as the var    
+  pdf(paste0(path= "/raw_plots",gsub(" ", "_", vars[i,]),".pdf"), height = 12, width = 15)
+  print(plot) 
+  dev.off()
+
+  } # close the loop
 
 
 ```
@@ -221,11 +255,11 @@ vars <- as.data.frame(
 ```{r}
 
 
-FENC_pH          <- Master_FENC_output %>% select('Date Time', pH, Site)
-FENC_Salinity   <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC'))
-FENC_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC'))
-FENC_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC'))
-FENC_CHLA        <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('FENC'))
+FENC_pH          <- Master_table_LONG_means_FENC %>% dplyr::filter(variable == 'pH' & Site %in% c('FENC'))
+FENC_Salinity   <- Master_table_LONG_means_FENC %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC'))
+FENC_Temperature <- Master_table_LONG_means_FENC %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC'))
+FENC_DO          <- Master_table_LONG_means_FENC %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC'))
+FENC_CHLA        <- Master_table_LONG_means_FENC %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('FENC'))
 
 # pH 
 
@@ -233,7 +267,7 @@ FENC_pH_2023 <- FENC_pH %>% na.omit() %>%
              dplyr::filter(`Date Time` > '2023-06-01 00:00:00' & `Date Time` < '2023-11-30 00:00:00')  %>% 
              dplyr::mutate(Site = case_when(Site == 'FENC' ~ 'Fence Creek', .default = 'Ash Creek')) %>% 
              ggplot(aes(x='Date Time', 
-                       y=pH, # the mean values
+                       y=mean_value, # the mean values
                       group= Site)) + # call the new mean
               geom_line(aes(group = factor(Site), # lines for site
                                 linetype = Site), 
@@ -244,8 +278,8 @@ FENC_pH_2023 <- FENC_pH %>% na.omit() %>%
                              fill=Site)) + 
               scale_shape_manual(values=c(21, 22, 24, 25)) + 
               scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
-             # geom_errorbar(aes(ymin=(mean)-(se), 
-              #                  ymax=(mean)+(se)), 
+             # geom_errorbar(aes(ymin=(mean_value)-(se_value), 
+              #                  ymax=(mean_value)+(se_value)), 
               #              width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
               ggtitle("pH 2023") +
