@@ -528,6 +528,18 @@ leaflet() %>% addTiles(group = "One") %>%
   addPopups(-73.43414331536832, 40.89684920400523, mapgoldstar,
     options = popupOptions(closeButton = FALSE))
 
+#Starting of a heatmap need to add temperature range
+library(leaflet.extras)
+kml_final %>%
+  leaflet() %>% 
+  addTiles(group="One") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  addHeatmap(lng = kml_final$Long, lat = kml_final$Lat, blur = 40, max = 0.05, radius = 15, group = "Ash Creek") %>% 
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Ash Creek"), 
+                   options=layersControlOptions(collapsed=FALSE))
+
+
 ```
 
 
