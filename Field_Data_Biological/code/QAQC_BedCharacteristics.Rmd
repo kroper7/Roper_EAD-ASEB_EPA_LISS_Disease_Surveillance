@@ -495,6 +495,25 @@ leaflet() %>%
 
 
 
+
+
+#uploaded Fence Creek coordinates 
+kml_fenc <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624FENC.kml') %>% dplyr::rename(Coordinates =geometry, Fenc_Coordinates = Name) %>% 
+  select(-'Description')
+
+view(kml_fenc)
+
+#below is if we wanted to rename column three like fence I think I would just have to not delete description and then we could bind Ashc and Fenc coordinates
+#kml_fence <- as.data.frame(kml_fenc[[2]][[1]]) %>% 
+  #dplyr::select(!V3) %>% 
+ # dplyr::rename(Long=V1,
+                #Lat=V2)
+
+# without labeled site
+kml_fence <- as.data.frame(kml_fenc[[2]][[1]][[1]]) %>% 
+  dplyr::rename(Long=V1,
+                Lat=V2)
+
 #map<- paste(sep = "<br/>","fisheries.noaa.gov", "212 Rogers Ave", "Milford, CT")
 
 
@@ -538,6 +557,21 @@ kml_final %>%
   addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c("Ash Creek"), 
                    options=layersControlOptions(collapsed=FALSE))
+
+library(ggmap)
+library(interp)
+
+#mapheat <- get_stamenmap(qc, zoom = 7, maptype = "toner-lite")
+
+
+#attempting to make a code for a heat map not working yet
+ggmap() +
+  geom_tile(aes(x = x, y = y, fill = z) ,
+             data = with(kml_final, interp(Long, Lat, Temp, nx = 100, ny = 100,
+                                       duplicate = "mean", extrap = TRUE)) |> 
+               interp2xyz() |> as.data.frame()) +
+  scale_fill_gradientn("Temperature", na.value = NA,
+                       colours = c("blue", "green", "yellow", "orange"))
 
 
 ```
