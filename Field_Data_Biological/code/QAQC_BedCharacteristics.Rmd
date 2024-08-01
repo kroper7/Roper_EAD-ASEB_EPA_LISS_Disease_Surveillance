@@ -528,12 +528,12 @@ leaflet() %>% addTiles(group = "One") %>%
 
 leaflet(map2) %>% addTiles(group="One") %>%
    addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
-  addPopups(-73.23568, 41.14643, map,
+  addPopups(-73.23568, 41.14643, map2,
     options = popupOptions(closeButton = FALSE) %>% # Add Layer controls
   addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c("Ash Creek"), 
-                   options=layersControlOptions(collapsed=FALSE))
-  )
+                   options=layersControlOptions(collapsed=FALSE)))
+  
 
 #<br/>","<b><a href='https://www.fisheries.noaa.gov/'>N.O.A.A.</a></b>", "Goldstar","Huntington, NY")
 
@@ -542,10 +542,14 @@ leaflet(map2) %>% addTiles(group="One") %>%
 mapgoldstar<- paste(sep = "<br/>","<b><a href='https://www.fisheries.noaa.gov/new-england-mid-atlantic/habitat-conservation/understanding-health-long-island-sounds-oyster-beds'>N.O.A.A.</a></b>", "Goldstar",
             "Huntington, NY")
 
+
 leaflet() %>% addTiles(group = "One") %>%
    addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
-  addPopups(-73.43414331536832, 40.89684920400523, mapgoldstar,
-    options = popupOptions(closeButton = FALSE))
+  addPopups(-73.43414331536832, 40.89684920400523, mapgoldstar, group = "Gold Star") %>% 
+  addLayersControl(baseGroups = c("One", "Two"),
+                   overlayGroups = c("Gold Star"),
+                   options = popupOptions(closeButton = FALSE))
+
 
 #Starting of a heatmap need to add temperature range
 library(leaflet.extras)
@@ -561,7 +565,7 @@ kml_final %>%
 library(ggmap)
 library(interp)
 
-#mapheat <- get_stamenmap(qc, zoom = 7, maptype = "toner-lite")
+#mapheat <- get_stadiamap(qc, zoom = 7, maptype = "stamen_toner_lite")
 
 
 #attempting to make a code for a heat map not working yet
