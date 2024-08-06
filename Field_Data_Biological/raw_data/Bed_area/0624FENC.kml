@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Folder><name>waypoints</name>
+</Folder>
+<Folder><name>routes</name>
+</Folder>
+<Folder><name>tracks</name>
+  <Placemark>
+	<name>2024-06-12 FENC</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#tracks">
+		<SimpleData name="gpxx_TrackExtension">&lt;gpxx:DisplayColor&gt;Cyan&lt;/gpxx:DisplayColor&gt;</SimpleData>
+	</SchemaData></ExtendedData>
+      <MultiGeometry><LineString><coordinates>-72.5860499963,41.2719344068 -72.5859971903,41.2719016336 -72.5859538559,41.2718696147 -72.5859036483,41.2718588859 -72.5858658459,41.2718530186 -72.5858867168,41.2718346622 -72.5859119464,41.2718333211 -72.5859448873,41.2718355004 -72.5859966036,41.2718326505 -72.5860806741,41.2718355842 -72.5861246791,41.2718567904 -72.586211348,41.2719502486 -72.5862763915,41.2719210796 -72.5863125175,41.2719279528 -72.5862870365,41.27194128 -72.5862719491,41.2719593849 -72.5862447917,41.2720061559 -72.5862151198,41.2719754782 -72.5862048101,41.2719529308 -72.586165918,41.2719396036 -72.5860618986,41.2719226722 -72.5860271975,41.2719339039</coordinates></LineString></MultiGeometry>
+  </Placemark>
+</Folder>
+<Folder><name>route_points</name>
+</Folder>
+<Folder><name>track_points</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">0</SimpleData>
+		<SimpleData name="ele">-7.55</SimpleData>
+		<SimpleData name="time">2024/06/12 14:46:00+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5860499963,41.2719344068</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">1</SimpleData>
+		<SimpleData name="ele">-4.67</SimpleData>
+		<SimpleData name="time">2024/06/12 14:46:13+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5859971903,41.2719016336</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">2</SimpleData>
+		<SimpleData name="ele">-2.75</SimpleData>
+		<SimpleData name="time">2024/06/12 14:46:26+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5859538559,41.2718696147</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">3</SimpleData>
+		<SimpleData name="ele">-1.79</SimpleData>
+		<SimpleData name="time">2024/06/12 14:46:40+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5859036483,41.2718588859</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">4</SimpleData>
+		<SimpleData name="ele">-1.79</SimpleData>
+		<SimpleData name="time">2024/06/12 14:46:51+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5858658459,41.2718530186</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">5</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:47:04+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5858867168,41.2718346622</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">6</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:47:18+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5859119464,41.2718333211</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">7</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:47:34+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5859448873,41.2718355004</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">8</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:47:52+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5859966036,41.2718326505</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">9</SimpleData>
+		<SimpleData name="ele">-0.34</SimpleData>
+		<SimpleData name="time">2024/06/12 14:48:08+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5860806741,41.2718355842</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">10</SimpleData>
+		<SimpleData name="ele">-0.34</SimpleData>
+		<SimpleData name="time">2024/06/12 14:48:21+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5861246791,41.2718567904</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">11</SimpleData>
+		<SimpleData name="ele">-0.34</SimpleData>
+		<SimpleData name="time">2024/06/12 14:48:40+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.586211348,41.2719502486</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">12</SimpleData>
+		<SimpleData name="ele">-0.34</SimpleData>
+		<SimpleData name="time">2024/06/12 14:48:52+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5862763915,41.2719210796</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">13</SimpleData>
+		<SimpleData name="ele">0.14</SimpleData>
+		<SimpleData name="time">2024/06/12 14:49:07+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5863125175,41.2719279528</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">14</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:49:18+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5862870365,41.27194128</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">15</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:49:34+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5862719491,41.2719593849</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">16</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:49:46+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5862447917,41.2720061559</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">17</SimpleData>
+		<SimpleData name="ele">-1.3</SimpleData>
+		<SimpleData name="time">2024/06/12 14:49:56+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5862151198,41.2719754782</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">18</SimpleData>
+		<SimpleData name="ele">0.14</SimpleData>
+		<SimpleData name="time">2024/06/12 14:50:02+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5862048101,41.2719529308</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">19</SimpleData>
+		<SimpleData name="ele">0.14</SimpleData>
+		<SimpleData name="time">2024/06/12 14:50:19+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.586165918,41.2719396036</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">20</SimpleData>
+		<SimpleData name="ele">0.14</SimpleData>
+		<SimpleData name="time">2024/06/12 14:50:40+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5860618986,41.2719226722</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#track_points">
+		<SimpleData name="track_fid">0</SimpleData>
+		<SimpleData name="track_seg_id">0</SimpleData>
+		<SimpleData name="track_seg_point_id">21</SimpleData>
+		<SimpleData name="ele">0.14</SimpleData>
+		<SimpleData name="time">2024/06/12 14:50:48+00</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-72.5860271975,41.2719339039</coordinates></Point>
+  </Placemark>
+</Folder>
+<Schema name="tracks" id="tracks">
+	<SimpleField name="cmt" type="string"></SimpleField>
+	<SimpleField name="desc" type="string"></SimpleField>
+	<SimpleField name="src" type="string"></SimpleField>
+	<SimpleField name="link1_href" type="string"></SimpleField>
+	<SimpleField name="link1_text" type="string"></SimpleField>
+	<SimpleField name="link1_type" type="string"></SimpleField>
+	<SimpleField name="link2_href" type="string"></SimpleField>
+	<SimpleField name="link2_text" type="string"></SimpleField>
+	<SimpleField name="link2_type" type="string"></SimpleField>
+	<SimpleField name="number" type="int"></SimpleField>
+	<SimpleField name="type" type="string"></SimpleField>
+	<SimpleField name="gpxx_TrackExtension" type="string"></SimpleField>
+</Schema>
+<Schema name="track_points" id="track_points">
+	<SimpleField name="track_fid" type="int"></SimpleField>
+	<SimpleField name="track_seg_id" type="int"></SimpleField>
+	<SimpleField name="track_seg_point_id" type="int"></SimpleField>
+	<SimpleField name="ele" type="float"></SimpleField>
+	<SimpleField name="time" type="string"></SimpleField>
+	<SimpleField name="magvar" type="float"></SimpleField>
+	<SimpleField name="geoidheight" type="float"></SimpleField>
+	<SimpleField name="cmt" type="string"></SimpleField>
+	<SimpleField name="desc" type="string"></SimpleField>
+	<SimpleField name="src" type="string"></SimpleField>
+	<SimpleField name="link1_href" type="string"></SimpleField>
+	<SimpleField name="link1_text" type="string"></SimpleField>
+	<SimpleField name="link1_type" type="string"></SimpleField>
+	<SimpleField name="link2_href" type="string"></SimpleField>
+	<SimpleField name="link2_text" type="string"></SimpleField>
+	<SimpleField name="link2_type" type="string"></SimpleField>
+	<SimpleField name="sym" type="string"></SimpleField>
+	<SimpleField name="type" type="string"></SimpleField>
+	<SimpleField name="fix" type="string"></SimpleField>
+	<SimpleField name="sat" type="int"></SimpleField>
+	<SimpleField name="hdop" type="float"></SimpleField>
+	<SimpleField name="vdop" type="float"></SimpleField>
+	<SimpleField name="pdop" type="float"></SimpleField>
+	<SimpleField name="ageofdgpsdata" type="float"></SimpleField>
+	<SimpleField name="dgpsid" type="int"></SimpleField>
+</Schema>
+</Document></kml>
