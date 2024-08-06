@@ -4,14 +4,16 @@ author:
 date: "6/20/2024"
 output: html_document
 
-description: 
+description: This code is for the Juvenille Growth Study looking at growth rates and survival of 1 year old spat produced from the natural oyster bed at Ash Creek. The spat were divided into replicates of 3 spat bags with 100 individuals per bag and placed at Ash Creek, Fairfield CT and Fence Creek, Madison CT. The goal is to compare growth and survival at each site and determine if and what environmental factors may influence the population. 
+
+Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
+
 ---
-Last updated 08/1/24 by M.Kachmar
-  - combine the two code files we have 
-  -This code needs some work to make sure that all of it is working. 
-  -The fence creek data file is only saying that june has 150 individuals. Is this correct? Was trying to go into the google drive to make sure everything is there but I am confused about the data sheets in there and what is what. This is an example of why it is important to keep correct data files and organization. 
+Last updated 08/6/24 by M.Kachmar
+  - reorganized the files to now have monthly measurements that will be merged like how our other data is set up
+  - started to redo some of the code below to give metrics that we want
+  
  
- -Colors that can be used in ggplot https://sape.inf.usi.ch/quick-reference/ggplot2/colour
 
 ```{r setup, include=FALSE}
 #make sure that your path is not commented (#) out and all others are
@@ -53,22 +55,27 @@ as.data.frame(data_all)  # Convert tibble to data.frame. This helps when working
 
 data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs only in column "Date"
 
+data_all <- data_all %>% select(where(~ !all(is.na(.)))) #removing excess columns with NA
 
-#write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #creating/printing csv file of all raw data merged together
+
+write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #creating/printing csv file of all raw data merged together
 ```
 
 #This code chunk with specify to R the order in which you want month presented. When not using a data and grouping by month, the default is to put in alphabetical order, this chuck will correct that. 
 
-#This code chunk is not working. It is giving an incorrect format for the dates
+#This code chunk is not working. it is reading the format as dd/mm/yy instead of mm/dd/yy and giving a month associated with the date. 
 ```{r}
 #The dates in the data files are reading as a character "chr" so we need to change them to date format
 
-#data_all <- data_all %>% mutate(Date = as.Date(Date)) 
+data_all <- data_all %>% dplyr::mutate(Date= as.Date(Date), Month = month(Date))
 
-#Create a month column in the data
-#data_all <- data_all %>%
-#  mutate(month = month(Date))
 
+
+#changing numeric month to month name
+data_all$Month <- factor(data_all$Month, levels = c("1","2","3","4","5","6","7", "8", "9", "10", "11", "12"),
+        labels=c("Jan","Feb", "March","April","May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"))
+
+data_all
 
 ```
 
@@ -76,13 +83,37 @@ data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs only in column "Da
 ```{r}
 # Summary of all data
 
-st_height <- summarySE(data_all%>% filter(!is.na(Shell_Height)), measurevar="Shell_Height", groupvars=c("Site", "Date"))
+st_height <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date"))
 
 st_height 
 
 
 ```
 #Survival
+
+```{r}
+#Sum total number of live oysters per shell bag per date
+spatbag_counts<- data_all %>%
+  dplyr::group_by(Bag_number, Survival, Site, Date) %>%
+  dplyr::summarize(Count = n())
+spatbag_counts
+
+#summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
+all_density_SE <-summarySE(data = quadratdensity_all, measurevar = "Count", groupvars=c("Site", "Survival_status", "Season", "Date_collected"))
+all_density_SE
+
+#calculate percent standard error as 100*se/mean
+all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
+
+#calculate completeness as 100*N/4, where 4 is the desired number of quadrats per site. 2023 surveys had 12 quadrates measured. 
+  densitysummary <- all_density_SE %>%
+    mutate(PercentComplete_Quad = ((N/4)*100))
+densitysummary
+
+
+write_csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv") #, row.names=FALSE)
+```
+
 ```{r}
 counts <- list.files(path = "Side_projects/Juvenile_growth",  #need to have file with data in "raw_data"\
                        pattern = "*.csv", full.names = TRUE)%>% lapply(read_csv) %>% bind_rows()
