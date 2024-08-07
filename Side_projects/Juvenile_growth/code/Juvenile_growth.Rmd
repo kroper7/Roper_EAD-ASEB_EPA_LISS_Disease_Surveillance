@@ -4,14 +4,14 @@ author:
 date: "6/20/2024"
 output: html_document
 
-description: This code is for the Juvenille Growth Study looking at growth rates and survival of 1 year old spat produced from the natural oyster bed at Ash Creek. The spat were divided into replicates of 3 spat bags with 100 individuals per bag and placed at Ash Creek, Fairfield CT and Fence Creek, Madison CT. The goal is to compare growth and survival at each site and determine if and what environmental factors may influence the population. 
+description: This code is for the Juvenille Growth Study looking at growth rates and survival of ~1 year old spat produced from the natural oyster bed at Ash Creek. The spat were divided into replicates of 3 spat bags with 100 individuals per bag and placed at Ash Creek, Fairfield CT and Fence Creek, Madison CT. The goal is to compare growth and survival at each site and determine if and what environmental factors may influence the population. 
 
 Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
 
 ---
-Last updated 08/6/24 by M.Kachmar
+Last updated 08/7/24 by M.Kachmar
   - reorganized the files to now have monthly measurements that will be merged like how our other data is set up
-  - started to redo some of the code below to give metrics that we want
+  - started to redo code and reorganize to make sense for metrics that we want to run
   
  
 
@@ -40,18 +40,29 @@ library("readr")
 library("lubridate")
 library("purrr")
 library("tidyr")
+library("survminer")
+library("survival")
+library("ggpubr")
 ```
 
 ### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
 #Collecting and merging all raw data
-data_all <- list.files(path = "Side_projects/Juvenile_growth/raw_data",  #path in files
-                       pattern = "*.csv" #calling all csv files
-                       , full.names = TRUE)%>% lapply(read_csv) %>% bind_rows() #combines all raw data from the path/folder into one tibble
-data_all
 
-as.data.frame(data_all)  # Convert tibble to data.frame. This helps when working with raw date
+file_paths <- list.files(path = "Side_projects/Juvenile_growth/raw_data",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+data_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      Date = as.Date(Date,format = "%m/%d/%Y"))
+}) %>%
+  bind_rows
+
+as.data.frame(data_all)  # Convert tibble to data.frame
+
 
 data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs only in column "Date"
 
@@ -67,15 +78,15 @@ write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #
 ```{r}
 #The dates in the data files are reading as a character "chr" so we need to change them to date format
 
-data_all <- data_all %>% dplyr::mutate(Date= as.Date(Date), Month = month(Date))
+data_all <- data_all %>% dplyr::mutate(Month = month(Date))
 
 
 
 #changing numeric month to month name
-data_all$Month <- factor(data_all$Month, levels = c("1","2","3","4","5","6","7", "8", "9", "10", "11", "12"),
+#data_all$Month <- factor(data_all$Month, levels = c("1","2","3","4","5","6","7", "8", "9", "10", "11", "12"),
         labels=c("Jan","Feb", "March","April","May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"))
 
-data_all
+#data_all
 
 ```
 
@@ -88,93 +99,25 @@ st_height <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="She
 st_height 
 
 
-```
-#Survival
-
-```{r}
-#Sum total number of live oysters per shell bag per date
-spatbag_counts<- data_all %>%
-  dplyr::group_by(Bag_number, Survival, Site, Date) %>%
-  dplyr::summarize(Count = n())
-spatbag_counts
-
-#summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
-all_density_SE <-summarySE(data = quadratdensity_all, measurevar = "Count", groupvars=c("Site", "Survival_status", "Season", "Date_collected"))
-all_density_SE
-
-#calculate percent standard error as 100*se/mean
-all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
-
-#calculate completeness as 100*N/4, where 4 is the desired number of quadrats per site. 2023 surveys had 12 quadrates measured. 
-  densitysummary <- all_density_SE %>%
-    mutate(PercentComplete_Quad = ((N/4)*100))
-densitysummary
-
-
-write_csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv") #, row.names=FALSE)
-```
-
-```{r}
-counts <- list.files(path = "Side_projects/Juvenile_growth",  #need to have file with data in "raw_data"\
-                       pattern = "*.csv", full.names = TRUE)%>% lapply(read_csv) %>% bind_rows()
-counts
-
-### Fence creek ###
-FENC_counts_all <- counts %>%
-  dplyr::filter(Site == "FENC")%>%
-  dplyr::group_by(Date)%>%
-  dplyr::summarize(total = sum(Live_Count))
-  
-FENC_counts_all
-
-FENC_counts_June <- FENC_counts_all %>% filter(Date == "6/10/2024")
-FENC_counts_July <- FENC_counts_all %>% filter(Date == "7/10/2024")
-
-# % survival between June and July
-
-FENC_total_surv <- (FENC_counts_July$total/FENC_counts_June$total)*100
-FENC_total_surv
-
-
-### Ash creek ###
-ASHC_counts_all <- counts %>%
-  dplyr::filter(Site == "ASH")%>%
-  dplyr::group_by(Date)%>%
-  dplyr::summarize(total = sum(Live_Count))
-  
-ASHC_counts_all
-
-ASHC_counts_June <- ASHC_counts_all %>% filter(Date == "6/10/2024")
-ASHC_counts_July <- ASHC_counts_all %>% filter(Date == "7/10/2024")
-
-# % survival between June and July
-
-ASHC_total_surv <- (ASHC_counts_July$total/ASHC_counts_June$total)*100
-ASHC_total_surv
-
-# % survival per bag
 
 ```
-
+#Let's take a look at the data - Shell length! 
 
 ```{r}
-ggplot(data=data_all, aes(x=Site, y=Shell_Height, fill=Site)) +
+#Average shell height per month per site
+
+ggplot(data=data_all, aes(x=Site, y=Shell_length, fill=Site)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Mean Shell Height ", x ="Site", y = "Mean Shell Height (mm)") +
   facet_wrap(~Month)
 ```
-Based on the graph above, it looks like we have greater shell growth at FENCE, so 
-
 
 ```{r}
+# size class distribution graph per site per month
 
-```
-
-
-```{r}
-ggplot(data=data_all, aes(x=Shell_Height)) +
+ggplot(data=data_all, aes(x=Shell_length)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
@@ -184,21 +127,28 @@ ggplot(data=data_all, aes(x=Shell_Height)) +
 # add date to facet wrap after July collection
 ```
 
-
-# Read in a summary file for counts and growth rate. Normally we would build code that does this for us, but to ensure you have plots to work with for your presenations, we will use this work around. 
-
+#Survival calculations
 ```{r}
-df<-read.csv("Side_projects/Juvenile_growth/summary_count_data.csv", header = T) #calling out path to read file
-#$Survival=as.numeric(df$Survival)
-```
-```{r}
-df2 <- df%>%na.omit(Survival) #removing rows within data frame that have NAs in Survival column
-df2
+#Lets great some summaries to see numbers and calculate the survival %
+#Create a summary of counts across all bags
+Survival_counts_all <- data_all %>% 
+  dplyr::group_by(Site, Date, Survival) %>% 
+  dplyr::summarise(count = n())
+Survival_counts_all
 
-survival_sum <- summarySE(df2, "Survival", groupvars=c("Site")) #creating stats (sd, se, ci) about data
-survival_sum
-```
+#Create a summary of counts per bag
+Survival_counts_bag <- data_all %>% 
+  dplyr::group_by(Site, Date, Survival, Bag_number) %>% 
+  dplyr::summarise(count = n())
+Survival_counts_bag
 
+#Survival summary
+survival_sum_all <- summarySE(data_all, "Survival", groupvars=c("Site", "Date")) #creating stats (sd, se, ci) about data
+survival_sum_all
+
+
+```
+#Proportions of survival - graphing survival summary
 ```{r}
 #This chunk is creating a ggplot of the data
 prop.survived <- ggplot(data=survival_sum, aes(x=Site, y=Survival, fill=Site))+ #describe what data frame to use and the what rows should be on the x and y axis. Fill is the data that color codes the individual bars
@@ -214,16 +164,22 @@ theme(axis.title = element_text(size = rel(1.7)), axis.text = element_text(size 
 #changes axis and legend text and title, also plot.margin removes the white space within the graph
   ylim(0,1) #restrcting y axis limits from 0 to 1
 prop.survived
-```
-```{r}
+
+
+#output of graph
 pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"NEWprop_survived2024.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
 print(prop.survived) #specify the graph
 dev.off()
 ```
 
-#Look at previous graph's code for a description of each line when creating a ggplot graph
+#Calculating Growth Rate
 ```{r}
-growth.rate <- ggplot(data=df, aes(x=Site, y=GR_mergedT0, fill=Site)) +
+
+```
+
+#graphing growth rate
+```{r}
+growth.rate <- ggplot(data=survival_sum_all, aes(x=Site, y=GR_mergedT0, fill=Site)) +
   geom_boxplot(width = 2)+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+scale_fill_manual(values = c("orange1", "cornflowerblue") )+
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
@@ -236,12 +192,30 @@ growth.rate <- ggplot(data=df, aes(x=Site, y=GR_mergedT0, fill=Site)) +
 growth.rate
 ```
 
-# use to save indivdual graphs as a pdf in the outputs folder. must make graph an object first
+
+#Kaplan Meier Survival 
+#This needs some work - the counts are not correct
 ```{r}
-pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"NEWgrowthrate2024.pdf"), height = 7, width = 11)
-print(growth.rate)
-dev.off()
+
+# Create a survival object per bag and plot 
+data_all$survival <-as.numeric(data_all$Survival) #need to make sure everything is in numeric format
+data_all$Month <-as.numeric(data_all$Month)
+
+Surv1 <- Surv(time = data_all$Month, event = data_all$Survival)
+fit.surv1 <- survfit(formula = Surv1 ~ Bag_number, data = data_all)
+
+Survival_plot<-ggsurvplot(fit.surv1, data = data_all, break.x.by = 1,
+           linetype= c(1, 2, 3),xlab = NULL, ylab= NULL, xlim = c(5,7), legend.labs= c("bag 1", "bag 2",
+                                                                 "bag 3"),
+           legend.title = "Replicate:", legend = "top", risk.table =TRUE )+ theme_survminer(base_size = 20,font.legend = c(15))
+Survival_plot
+plot + labs(title= "Eastern Oyster FRA")
+
+
 ```
+
+
+#ALL OF THE CODE BELOW IS OLD CODE 
 
 
 Testing assumptions for statistical analysis (Survival and Growth rate)
