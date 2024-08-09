@@ -22,16 +22,18 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data") 
 ```
-```
+
 
 * load libraries
 
-```{r load_libraries, include = TRUE}
+
+```{r load_libraries, include=TRUE}
+
 # load libraries - notes show the install command needed to install (pre installed)
 # Plotting
 library(ggplot2)
@@ -125,7 +127,7 @@ for (m in 1:nrow(file.names)) { # this is your loop, for each row in th filename
   # raw_df[,1] # remove the # and reun this if you want to see th raw date format of an individual file - rationalize why we have a crazy conditioninal statement below
 
   # As of 6/3/2024, all data is in format mdy_hm, use lubridate to format to POSIXct format 
-  raw_df[,1] <- mdy_hm(raw_df[,1])
+  # raw_df[,1] <- mdy_hm(raw_df[,1]) #COMMENTED OUT ON 8/9/2024
   
   # add a column for the site 
   filename      <- file.names[m,1]
@@ -138,7 +140,12 @@ for (m in 1:nrow(file.names)) { # this is your loop, for each row in th filename
 
 names(raw_df)
 names(Master_FENC)
+View(Master_FENC)
 
+
+Master_FENC$Date_time_format_test <- lubridate::mdy_hm(Master_FENC$`Date Time`) # this worked fine, 
+
+View(Master_FENC %>% dplyr::select(`Date Time`,Date_time_format_test)) # scroll threough here to view
 ```
 
 
@@ -159,9 +166,7 @@ write.csv(Master_FENC_output, "output/Sonde_master_FENC.csv")
 
 Master_FENC_table <- Master_FENC_output # check.names = F allows with col names with spaces (opthwise fills with a '.' )
 
-Master_FENC_table$'Date Time' <- lubridate::ymd_hms(Master_FENC_table$'Date Time')
-
-
+# Master_FENC_table$'Date Time' <- lubridate::ymd_hms(Master_FENC_table$'Date Time')
 
 ```
 
@@ -169,8 +174,11 @@ Master_FENC_table$'Date Time' <- lubridate::ymd_hms(Master_FENC_table$'Date Time
 # melt is akin to pivot_longer, but I like that its called melt so I prefer it
 # Im melting Im melting
 library(reshape2)
-Master_table_LONG <- Master_FENC_table %>%  
-                      melt(id.vars = c('Date Time', 'Site'),
+Master_table_LONG <- Master_FENC_output %>%  
+                      melt(id.vars = c(
+                                       # 'Date Time', 
+                                       'Date_time_format_test',
+                                       'Site'),
                                     measure.vars = c('Actual Conductivity', 'Salinity', 'Resistivity', 
                                                      'Total Dissolved Solids' ,'RDO Concentration', 'RDO Saturation',
                                                      'Oxygen Partial Pressure', 'Chlorophyll-a Fluorescence', 'pH', 'pH mV', 
@@ -178,7 +186,7 @@ Master_table_LONG <- Master_FENC_table %>%
 
 # View the blobs! 
 ggplot(Master_table_LONG,
-         aes(x='Date Time',
+         aes(x=Date_time_format_test,
              y= value,
              )) +
   geom_point() +
