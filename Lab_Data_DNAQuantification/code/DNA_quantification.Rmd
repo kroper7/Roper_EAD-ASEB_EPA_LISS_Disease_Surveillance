@@ -37,7 +37,7 @@ library(stringr)
 library("RColorBrewer")
 ```
 
-#### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+#### This code chunk merges all .csv files within the qubit folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
 ```{r}
 
@@ -58,7 +58,29 @@ data_all <- data_all %>% rename(Date = 'Test Date', Sample_ID = 'Sample Name', C
 
 data_all
 
-write.csv(data_all, "Master_files\\DNA_quant_all_data.csv", row.names=FALSE)
+write.csv(data_all, "Master_files\\qubit_all_data.csv", row.names=FALSE)
+```
+
+#### This code chunk merges all .csv files within the NANODROP folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+# will not be adding to this master file frequently, so it is commented out
+```{r}
+
+nano_all <- list.files(path = "Lab_Data_DNAQuantification/raw_data/Nanodrop",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows                                         # Combine data sets into one data set 
+nano_all                                            # Print data to RStudio console
+
+as.data.frame(nano_all)                            # Convert tibble to data.frame
+
+
+nano_all <- nano_all %>% filter(!is.na('Sample ID'))
+
+nano_all<- nano_all %>% select(-c(...9:...26))
+
+nano_all
+
+write.csv(nano_all, "Master_files\\nanodrop_all_data.csv", row.names=FALSE)
 ```
 
 ```{r}
