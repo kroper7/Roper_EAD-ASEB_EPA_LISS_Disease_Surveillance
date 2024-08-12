@@ -154,7 +154,7 @@ for (m in 1:nrow(file.names.2024)) { # this is your loop, for each row in th fil
 }
 
 names(raw_df)
-names(Master_2024)
+View(Master_2024)
 
 ```
 
