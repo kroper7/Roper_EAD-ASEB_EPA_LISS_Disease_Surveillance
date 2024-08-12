@@ -22,9 +22,9 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data") 
 ```
 
@@ -204,15 +204,15 @@ ggplot(Master_table_LONG,
 
 ```{r}
 Master_table_LONG_means_FENC <- Master_FENC_table %>%  
-                      dplyr::mutate(`Date Time` = as.factor(substr(`Date Time`,1,13))) %>% # remove minutes and seconds
-                      melt(id.vars = c('Date Time', 'Site'),
+                      dplyr::mutate(`Date_time_format_test` = as.factor(substr(`Date_time_format_test`,1,13))) %>% # remove minutes and seconds
+                      melt(id.vars = c('Date_time_format_test', 'Site'),
                                     measure.vars = c('Actual Conductivity', 'Salinity', 'Resistivity', 
                                                      'Total Dissolved Solids' ,'RDO Concentration', 'RDO Saturation',
                                                      'Oxygen Partial Pressure', 'Chlorophyll-a Fluorescence', 'pH', 'pH mV', 
                                                      'Temperature')) %>% 
-                      dplyr::group_by(`Date Time`, Site, variable) %>% 
+                      dplyr::group_by(`Date_time_format_test`, Site, variable) %>% 
                       summarise(across(value, list(mean = mean, sd = sd, se = ~ sd(.) / sqrt(n())), .names = "{.fn}_{.col}")) %>% 
-                      dplyr::mutate(`Date Time` = ymd_h(`Date Time`)) # reformat back to date
+                      dplyr::mutate(`Date_time_format_test` = ymd_h(`Date_time_format_test`)) # reformat back to date
                       
 View(Master_table_LONG_means_FENC)
 
