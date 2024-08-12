@@ -22,9 +22,9 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE, 
                       cache = TRUE)
 
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 
 ```
 
@@ -153,12 +153,11 @@ for (m in 1:nrow(file.names.2023)) { # this is your loop, for each row in th fil
        '092023_GOLD_Sonde.csv',
 
        '102023_ASHC_Sonde.csv',
-       '102023_FENC_Sonde.csv',
        '102023_GOLD_Sonde.csv',
        '102023_LAUR_Sonde.csv',
 
        '112023_ASHC_Sonde.csv',
-       '112023_FENC_Sonde.csv'))  { # date formatted as mdy_hm
+       '2023_FENC_ALL - Sonde.csv'))  { # date formatted as mdy_hm
      
     raw_df[,1] <- mdy_hm(raw_df[,1]) # reformat as date using lubridate mdy_hm
     
@@ -168,7 +167,7 @@ for (m in 1:nrow(file.names.2023)) { # this is your loop, for each row in th fil
       raw_df[,1] <- mdy_hms(raw_df[,1]) # reformat as date using lubridate
       
       
-    } else (raw_df[,1] <- ymd_hms(raw_df[,1]) # laste if the others are FLASE, use ymd_hms for the remaining.
+    } else (raw_df[,1] <- ymd_hms(raw_df[,1]) # last if the others are FALSE, use ymd_hms for the remaining.
             
   ) # close the if else statement
 
@@ -181,6 +180,9 @@ for (m in 1:nrow(file.names.2023)) { # this is your loop, for each row in th fil
   Master_2023 <- rbind(raw_df,Master_2023) #bind to a cumulative list dataframe
 }
 
+View(Master_2023)
+
+#Master_2023$`Date Time` <- lubridate::mdy_hm(Master_2023$`Date Time`)
 
 ```
 
@@ -194,6 +196,8 @@ for (m in 1:nrow(file.names.2023)) { # this is your loop, for each row in th fil
 library(reshape2)
 Master_2023_output <- Master_2023 %>%  
                       dplyr::select(-c("External Voltage", "Battery Capacity", "Barometric Pressure", "Date")) 
+
+View(Master_2023_output)
 
 write.csv(Master_2023_output, "output/Sonde_master_2023.csv")
 
