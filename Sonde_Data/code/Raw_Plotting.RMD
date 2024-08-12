@@ -5,8 +5,8 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 7/15/2024 by M.Kachmar
--I accidentally uploaded the wrong sheet and the ash creek sonde is NOT skipping data. 
+Last updated 8/12/2024 by M.Kachmar
+-Added code for FENC and ASHC facet wrap of different year with the same enviromental data
 
 
 ## Setup: 
@@ -20,8 +20,8 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE)
 
 #knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 ```
 
@@ -772,12 +772,11 @@ CT_Temperature_2023 <- CT_Temperature %>% na.omit() %>%
               theme(legend.position = "none")
 CT_Temperature_2023
 
-pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Temperature_2023.pdf"), height = 6, width = 11)
+#pdf(paste0(path = "output/raw_plots/LISS_proposal_plots/CT_Temperature_2023.pdf"), height = 6, width = 11)
 #ggarrange(CT_Temperature_2023, CT_Temperature_callout_2023, ncol = 2, widths = c(2, 1))
-print(CT_Temperature_2023)
-dev.off()
+#print(CT_Temperature_2023)
+#dev.off()
 
-cor(CT_Temperature_2023, method = c("pearson"))
 ```
 
 ```{r}
@@ -813,14 +812,80 @@ CT_Temperature_2023
 
 
 ```{r}
-#Separating Sonde data by year at ASHC
-CT_Temperature <- CT_Temperature %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+#Separating temperature data by year at ASHC
+CT_Temperature_test <- CT_Temperature %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
 CT_Temperature_test$`Date Time` <- sub('.....', '', CT_Temperature$`Date Time`) 
 CT_Temperature_ASHC <- CT_Temperature_test %>% filter(!Site=="FENC")
 CT_Temperature_ASHC$`Date Time` <- as.Date(CT_Temperature_ASHC$`Date Time`, "%m-%d")
 CT_Temperature_ASHC$Year <- as.factor(CT_Temperature_ASHC$Year)
 
-CT_Temperature_ASHC. <- CT_Temperature_ASHC %>% na.omit() %>%
+CT_Temperature_ASHC_yearly <- CT_Temperature_ASHC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              geom_hline(yintercept = 20, color = "red", size = 1)+
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - ASHC") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic()
+
+CT_Temperature_ASHC_yearly
+```
+```{r}
+#Separating salinity data by year at ASHC
+CT_Salinity_test <- CT_Salinity %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+CT_Salinity_test$`Date Time` <- sub('.....', '', CT_Salinity_test$`Date Time`) 
+CT_Salinity_ASHC <- CT_Salinity_test %>% filter(!Site=="FENC")
+CT_Salinity_ASHC$`Date Time` <- as.Date(CT_Salinity_ASHC$`Date Time`, "%m-%d")
+CT_Salinity_ASHC$Year <- as.factor(CT_Salinity_ASHC$Year)
+
+CT_Salinity_ASHC_yearly <- CT_Salinity_ASHC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              geom_hline(yintercept = 15, color = "red", size = 1)+
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity - ASHC") +
+              labs(x = "Time", y = "Salinity (ppt)") +
+              theme_classic()
+
+CT_Salinity_ASHC_yearly
+```
+```{r}
+#Separating pH data by year at ASHC
+CT_pH_test <- CT_pH %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+CT_pH_test$`Date Time` <- sub('.....', '', CT_pH_test$`Date Time`) 
+CT_pH_ASHC <- CT_pH_test %>% filter(!Site=="FENC")
+CT_pH_ASHC$`Date Time` <- as.Date(CT_pH_ASHC$`Date Time`, "%m-%d")
+CT_pH_ASHC$Year <- as.factor(CT_pH_ASHC$Year)
+
+CT_pH_ASHC_yearly <- CT_pH_ASHC %>% na.omit() %>%
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site,
@@ -838,13 +903,214 @@ CT_Temperature_ASHC. <- CT_Temperature_ASHC %>% na.omit() %>%
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("Temperature - ASHC") +
-              labs(x = "Time", y = "Temperature (Celcius)") +
+              ggtitle("pH - ASHC") +
+              labs(x = "Time", y = "pH") +
               theme_classic()
 
-CT_Temperature_ASHC.
+CT_pH_ASHC_yearly
+```
+```{r}
+#Separating DO data by year at ASHC
+CT_pH_test <- CT_pH %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+CT_pH_test$`Date Time` <- sub('.....', '', CT_pH_test$`Date Time`) 
+CT_pH_ASHC <- CT_pH_test %>% filter(!Site=="FENC")
+CT_pH_ASHC$`Date Time` <- as.Date(CT_pH_ASHC$`Date Time`, "%m-%d")
+CT_pH_ASHC$Year <- as.factor(CT_pH_ASHC$Year)
+
+CT_pH_ASHC_yearly <- CT_pH_ASHC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("pH - ASHC") +
+              labs(x = "Time", y = "pH") +
+              theme_classic()
+
+CT_pH_ASHC_yearly
 ```
 
+```{r}
+#Separating DO data by year at ASHC
+CT_DO_test <- CT_DO %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+CT_DO_test$`Date Time` <- sub('.....', '', CT_DO_test$`Date Time`) 
+CT_DO_ASHC <- CT_DO_test %>% filter(!Site=="FENC")
+CT_DO_ASHC$`Date Time` <- as.Date(CT_DO_ASHC$`Date Time`, "%m-%d")
+CT_DO_ASHC$Year <- as.factor(CT_DO_ASHC$Year)
+
+CT_DO_ASHC_yearly <- CT_DO_ASHC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO - ASHC") +
+              labs(x = "Time", y = "DO (mg/L)") +
+              theme_classic()
+
+CT_DO_ASHC_yearly
+```
+#Sonde data for FENC seperated by year
+```{r}
+#Separating temperature data by year at FENC
+CT_temp_test <- CT_Temperature %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+CT_temp_test$`Date Time` <- sub('.....', '', CT_temp_test$`Date Time`) 
+CT_temp_FENC <- CT_temp_test %>% filter(!Site=="ASHC")
+CT_temp_FENC$`Date Time` <- as.Date(CT_temp_FENC$`Date Time`, "%m-%d")
+CT_temp_FENC$Year <- as.factor(CT_temp_FENC$Year)
+
+CT_temp_FENC_yearly <- CT_temp_FENC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              geom_hline(yintercept = 20, color = "red", size = 1)+
+              geom_hline(yintercept = 30, color = "blue", size = .5)+
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - FENC") +
+              labs(x = "Time", y = "Temperature (C)") +
+              theme_classic()
+
+CT_temp_FENC_yearly
+```
+```{r}
+#Separating salinity data by year at FENC
+CT_salinity_test <- CT_Salinity %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+CT_salinity_test$`Date Time` <- sub('.....', '', CT_salinity_test$`Date Time`) 
+CT_salinity_FENC <- CT_salinity_test %>% filter(!Site=="ASHC")
+CT_salinity_FENC$`Date Time` <- as.Date(CT_salinity_FENC$`Date Time`, "%m-%d")
+CT_salinity_FENC$Year <- as.factor(CT_salinity_FENC$Year)
+
+CT_salinity_FENC_yearly <- CT_salinity_FENC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              geom_hline(yintercept = 15, color = "red", size = 1)+
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Salinity - FENC") +
+              labs(x = "Time", y = "Salinity (ppt)") +
+              theme_classic()
+
+CT_salinity_FENC_yearly
+```
+```{r}
+#Separating pH data by year at FENC
+
+#CT_pH_test <- CT_pH %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+#CT_pH_test$`Date Time` <- sub('.....', '', CT_pH_test$`Date Time`) 
+CT_ph_FENC <- CT_pH_test %>% filter(!Site=="ASHC")
+CT_ph_FENC$`Date Time` <- as.Date(CT_ph_FENC$`Date Time`, "%m-%d")
+CT_ph_FENC$Year <- as.factor(CT_ph_FENC$Year)
+
+CT_pH_FENC_yearly <- CT_ph_FENC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              geom_hline(yintercept = 7.5, color = "red", size = 1)+
+              geom_hline(yintercept = 7, color = "blue", size = .5)+
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("pH - FENC") +
+              labs(x = "Time", y = "pH") +
+              theme_classic()
+
+CT_pH_FENC_yearly
+```
+```{r}
+#Separating DO data by year at FENC
+
+CT_DO_test <- CT_DO %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+CT_DO_test$`Date Time` <- sub('.....', '', CT_DO_test$`Date Time`) 
+CT_DO_FENC <- CT_DO_test %>% filter(!Site=="ASHC")
+CT_DO_FENC$`Date Time` <- as.Date(CT_DO_FENC$`Date Time`, "%m-%d")
+CT_DO_FENC$Year <- as.factor(CT_DO_FENC$Year)
+
+CT_DO_FENC_yearly <- CT_DO_FENC %>% na.omit() %>%
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site,
+                       fill = Year)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.1, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Year,
+                             fill=Year)) + 
+              geom_hline(yintercept = 2, color = "red", size = 1)+
+              scale_shape_manual(values=c(21, 22, 24, 25)) +
+              scale_colour_manual(values=c("2023"="#D55E00",  "2024"="#0072B2")) +
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              facet_grid(rows = vars(Year)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO - FENC") +
+              labs(x = "Time", y = "DO (mg/L)") +
+              theme_classic()
+
+CT_DO_FENC_yearly
+```
 
 # Clean ASHC for the LISS stakeholder reports (CT)
 ```{r, figs for LISS stakeholder reports}
