@@ -1,6 +1,6 @@
 ---
 title: "Juvenile Growth"
-author: 
+author: Kyra Lenderman
 date: "6/20/2024"
 output: html_document
 
@@ -9,9 +9,8 @@ description: This code is for the Juvenille Growth Study looking at growth rates
 Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
 
 ---
-Last updated 08/7/24 by M.Kachmar
-  - reorganized the files to now have monthly measurements that will be merged like how our other data is set up
-  - started to redo code and reorganize to make sense for metrics that we want to run
+Last updated 08/13/24 by M.Kachmar
+  - attempted to calculate the growth rates (:
   
  
 
@@ -92,14 +91,18 @@ data_all <- data_all %>% dplyr::mutate(Month = month(Date))
 
 
 ```{r}
-# Summary of all data
+# Summary of all height data
 
-st_height <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date"))
+st_height <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date", "Month"))
 
 st_height 
 
 
+#Summary of all height data per bag
 
+st_height_bag <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date", "Bag_number", "Month"))
+
+st_height_bag 
 ```
 #Let's take a look at the data - Shell length! 
 
@@ -151,7 +154,7 @@ survival_sum_all
 #Proportions of survival - graphing survival summary
 ```{r}
 #This chunk is creating a ggplot of the data
-prop.survived <- ggplot(data=survival_sum, aes(x=Site, y=Survival, fill=Site))+ #describe what data frame to use and the what rows should be on the x and y axis. Fill is the data that color codes the individual bars
+prop.survived <- ggplot(data=survival_sum_all, aes(x=Site, y=Survival, fill=Site))+ #describe what data frame to use and the what rows should be on the x and y axis. Fill is the data that color codes the individual bars
 geom_col(color = "black", linewidth =  0.75) + #codes the outline of the bars
 geom_bar(stat="identity")+ #defines the type of graph to be bar
 geom_errorbar(aes(ymin=Survival-se, ymax=Survival+se), width=.2, position=position_dodge(.9))+ #adds error bars previously calculated
@@ -173,11 +176,34 @@ dev.off()
 ```
 
 #Calculating Growth Rate
+#Reading this paper : Osei et al. 2022 - "monthly growth rate = (H2 − H1)/(t/30), where H1 is initial shell height (cm), H2 is final shell height (cm) and t is the number days between sampling" - how to tell R to do this?
+#Is the correct? I am not sure - needs to be checked over and adjusted. I have it a whirl LOL - MK
 ```{r}
+
+#Create summary of height per bag per time period per site
+
+st_height_bag <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date", "Bag_number", "Month"))
+
+st_height_bag 
+
+#So we need to calculate how many days between each measurement to calculate the growth rate
+# Sort data by site and sampling date (important if dates are not ordered)
+st_height_bag <- st_height_bag %>%
+  arrange(Site, Date, Bag_number)
+
+# Calculate the number of days between sampling dates and the monthly growth rate per site per replicate
+st_height_bag <- st_height_bag %>%
+  group_by(Site, Bag_number) %>%
+  mutate(Days_between = c(NA, diff(Date)), H1 = lag(Shell_length), H2 = Shell_length, monthly_growth_rate = (H2-H1)/(Days_between))
+
+st_height_bag
+
+
 
 ```
 
 #graphing growth rate
+#this needs to be fixed/updated
 ```{r}
 growth.rate <- ggplot(data=survival_sum_all, aes(x=Site, y=GR_mergedT0, fill=Site)) +
   geom_boxplot(width = 2)+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
