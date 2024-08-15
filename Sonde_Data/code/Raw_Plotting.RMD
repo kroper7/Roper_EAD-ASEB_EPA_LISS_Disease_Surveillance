@@ -2537,18 +2537,18 @@ print(GOLD_CHLA_2024)
 #Graphed sonde data for GOLD seperated by year
 ```{r}
 #Separating temperature data by year at GOLD
-CT_temp_test <- CT_Temperature %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
-CT_temp_test$`Date Time` <- sub('.....', '', CT_temp_test$`Date Time`) 
-CT_temp_GOLD <- CT_temp_test %>% filter(!Site=="ASHC")
-CT_temp_GOLD$`Date Time` <- as.Date(CT_temp_GOLD$`Date Time`, "%m-%d")
-CT_temp_GOLD$Year <- as.factor(CT_temp_GOLD$Year)
+NY_temp_test <- NY_Temperature %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+NY_temp_test$`Date Time` <- sub('.....', '', NY_temp_test$`Date Time`) 
+NY_temp_GOLD <- NY_temp_test %>% filter(!Site=="ASHC")
+NY_temp_GOLD$`Date Time` <- as.Date(NY_temp_GOLD$`Date Time`, "%m-%d")
+NY_temp_GOLD$Year <- as.faNYor(NY_temp_GOLD$Year)
 
-CT_temp_GOLD_yearly <- CT_temp_GOLD %>% na.omit() %>%
+NY_temp_GOLD_yearly <- NY_temp_GOLD %>% na.omit() %>%
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site,
                        fill = Year)) + # call the new mean
-              geom_line(aes(group = factor(Site), # lines for site
+              geom_line(aes(group = faNYor(Site), # lines for site
                                 linetype = Site), 
                             size = 0.1, 
                             position=position_dodge(.4)) + 
@@ -2567,22 +2567,22 @@ CT_temp_GOLD_yearly <- CT_temp_GOLD %>% na.omit() %>%
               labs(x = "Time", y = "Temperature (C)") +
               theme_classic()
 
-CT_temp_GOLD_yearly
+NY_temp_GOLD_yearly
 ```
 ```{r}
 #Separating salinity data by year at GOLD
-CT_salinity_test <- CT_Salinity %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
-CT_salinity_test$`Date Time` <- sub('.....', '', CT_salinity_test$`Date Time`) 
-CT_salinity_GOLD <- CT_salinity_test %>% filter(!Site=="ASHC")
-CT_salinity_GOLD$`Date Time` <- as.Date(CT_salinity_GOLD$`Date Time`, "%m-%d")
-CT_salinity_GOLD$Year <- as.factor(CT_salinity_GOLD$Year)
+NY_salinity_test <- NY_Salinity %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+NY_salinity_test$`Date Time` <- sub('.....', '', NY_salinity_test$`Date Time`) 
+NY_salinity_GOLD <- NY_salinity_test %>% filter(!Site=="ASHC")
+NY_salinity_GOLD$`Date Time` <- as.Date(NY_salinity_GOLD$`Date Time`, "%m-%d")
+NY_salinity_GOLD$Year <- as.faNYor(NY_salinity_GOLD$Year)
 
-CT_salinity_GOLD_yearly <- CT_salinity_GOLD %>% na.omit() %>%
+NY_salinity_GOLD_yearly <- NY_salinity_GOLD %>% na.omit() %>%
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site,
                        fill = Year)) + # call the new mean
-              geom_line(aes(group = factor(Site), # lines for site
+              geom_line(aes(group = faNYor(Site), # lines for site
                                 linetype = Site), 
                             size = 0.1, 
                             position=position_dodge(.4)) + 
@@ -2600,23 +2600,23 @@ CT_salinity_GOLD_yearly <- CT_salinity_GOLD %>% na.omit() %>%
               labs(x = "Time", y = "Salinity (ppt)") +
               theme_classic()
 
-CT_salinity_GOLD_yearly
+NY_salinity_GOLD_yearly
 ```
 ```{r}
 #Separating pH data by year at GOLD
 
-#CT_pH_test <- CT_pH %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
-#CT_pH_test$`Date Time` <- sub('.....', '', CT_pH_test$`Date Time`) 
-CT_ph_GOLD <- CT_pH_test %>% filter(!Site=="ASHC")
-CT_ph_GOLD$`Date Time` <- as.Date(CT_ph_GOLD$`Date Time`, "%m-%d")
-CT_ph_GOLD$Year <- as.factor(CT_ph_GOLD$Year)
+#NY_pH_test <- NY_pH %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+#NY_pH_test$`Date Time` <- sub('.....', '', NY_pH_test$`Date Time`) 
+NY_ph_GOLD <- NY_pH_test %>% filter(!Site=="ASHC")
+NY_ph_GOLD$`Date Time` <- as.Date(NY_ph_GOLD$`Date Time`, "%m-%d")
+NY_ph_GOLD$Year <- as.faNYor(NY_ph_GOLD$Year)
 
-CT_pH_GOLD_yearly <- CT_ph_GOLD %>% na.omit() %>%
+NY_pH_GOLD_yearly <- NY_ph_GOLD %>% na.omit() %>%
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site,
                        fill = Year)) + # call the new mean
-              geom_line(aes(group = factor(Site), # lines for site
+              geom_line(aes(group = faNYor(Site), # lines for site
                                 linetype = Site), 
                             size = 0.1, 
                             position=position_dodge(.4)) + 
@@ -2635,23 +2635,23 @@ CT_pH_GOLD_yearly <- CT_ph_GOLD %>% na.omit() %>%
               labs(x = "Time", y = "pH") +
               theme_classic()
 
-CT_pH_GOLD_yearly
+NY_pH_GOLD_yearly
 ```
 ```{r}
 #Separating DO data by year at GOLD
 
-CT_DO_test <- CT_DO %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
-CT_DO_test$`Date Time` <- sub('.....', '', CT_DO_test$`Date Time`) 
-CT_DO_GOLD <- CT_DO_test %>% filter(!Site=="ASHC")
-CT_DO_GOLD$`Date Time` <- as.Date(CT_DO_GOLD$`Date Time`, "%m-%d")
-CT_DO_GOLD$Year <- as.factor(CT_DO_GOLD$Year)
+NY_DO_test <- NY_DO %>% dplyr::mutate(`Date Time`= as.Date(`Date Time`), Year = year(`Date Time`))
+NY_DO_test$`Date Time` <- sub('.....', '', NY_DO_test$`Date Time`) 
+NY_DO_GOLD <- NY_DO_test %>% filter(!Site=="ASHC")
+NY_DO_GOLD$`Date Time` <- as.Date(NY_DO_GOLD$`Date Time`, "%m-%d")
+NY_DO_GOLD$Year <- as.faNYor(NY_DO_GOLD$Year)
 
-CT_DO_GOLD_yearly <- CT_DO_GOLD %>% na.omit() %>%
+NY_DO_GOLD_yearly <- NY_DO_GOLD %>% na.omit() %>%
              ggplot(aes(x=`Date Time`, 
                        y=mean, # the mean values
                        group=Site,
                        fill = Year)) + # call the new mean
-              geom_line(aes(group = factor(Site), # lines for site
+              geom_line(aes(group = faNYor(Site), # lines for site
                                 linetype = Site), 
                             size = 0.1, 
                             position=position_dodge(.4)) + 
@@ -2669,8 +2669,73 @@ CT_DO_GOLD_yearly <- CT_DO_GOLD %>% na.omit() %>%
               labs(x = "Time", y = "DO (mg/L)") +
               theme_classic()
 
-CT_DO_GOLD_yearly
+NY_DO_GOLD_yearly
 ```
+
+```{r}
+pH_CT.GOLD          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('FENC', 'ASHC','GOLD'))
+Salinity_CT.GOLD    <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC', 'ASHC','GOLD'))
+Temperature_CT.GOLD <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC', 'ASHC','GOLD'))
+DO_CT.GOLD          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC', 'ASHC','GOLD'))
+```
+```{r}
+Temperature_2023 <- Temperature_CT.GOLD %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2023-07-01 00:00:00' & `Date Time` < '2023-10-15 00:00:00' ) %>% # change date range needed here
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2", "gray")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              stat_cor(label.y = 32)+
+              geom_smooth(method = "lm")+
+              stat_regline_equation(label.y = 35)+
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("Temperature - 2023") +
+              labs(x = "Time", y = "Temperature (Celcius)") +
+              theme_classic() +
+              theme(legend.position = "none")
+Temperature_2023
+
+```
+```{r}
+DO_2024 <- DO_CT.GOLD %>% na.omit() %>%
+             dplyr::filter(`Date Time` > '2024-04-20 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% # change date range needed here
+             ggplot(aes(x=`Date Time`, 
+                       y=mean, # the mean values
+                       group=Site)) + # call the new mean
+              geom_line(aes(group = factor(Site), # lines for site
+                                linetype = Site), 
+                            size = 0.2, 
+                            position=position_dodge(.4)) + 
+              # scale_linetype_manual(values=c("solid", "dashed")) +
+              geom_point(aes(shape=Site, 
+                             fill=Site)) + 
+              scale_shape_manual(values=c(21, 22, 24, 25)) + 
+              scale_fill_manual(values=c("#D55E00",  "#0072B2", "gray")) + # "#CC79A7","#009E73"
+              geom_errorbar(aes(ymin=(mean)-(se), 
+                                ymax=(mean)+(se)), 
+                            width=0,position=position_dodge(.4)) +
+              stat_cor(label.y = 32)+
+              geom_smooth(method = "lm")+
+              stat_regline_equation(label.y = 35)+
+              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
+              ggtitle("DO - 2024") +
+              labs(x = "Time", y = "DO (mg/L)") +
+              theme_classic() +
+              theme(legend.position = "none")
+DO_2024
+```
+
 
 
 ```{r}
