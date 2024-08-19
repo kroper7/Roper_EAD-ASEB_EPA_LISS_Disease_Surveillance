@@ -10,9 +10,9 @@ description: This R code is used to important and summarize bed characteristics 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
-knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 
@@ -59,14 +59,14 @@ View(data_all)
 data_all <- data_all %>%
   dplyr::rename(Date_collected = Date)
 
-data_all$Date_collected <- as.Date(data_all$Date_collected, format= "%m/%d/%Y")
+data_all<- data_all %>% mutate(Date_collected = as.Date(Date_collected,format = "%m/%d/%Y"))
 
 #adding season columns
 data_all <- data_all %>%
   mutate( month = month(Date_collected))
 data_all <- data_all %>%
   mutate(Season = case_when(between(month, 5,6) ~"Spring",
-                            between(month, 10,11) ~ "Fall"))
+                            between(month, 8,10) ~ "Fall"))
 data_all <- select(data_all, -c("month"))
 ```
 
@@ -300,20 +300,20 @@ write.csv(percentcover_summary, "Field_Data_Biological/output/percentcoverage_su
 #  filter(!is.na(Live_count) & !is.na(Box_count) & !is.na(Gaper_count))
 #data_all  
 
-density_live_sum <- summarySE(data = data_all, measurevar = "Live_count", groupvars = c(  "Site"))
+density_live_sum <- summarySE(data = data_all, measurevar = "Live_count", groupvars = c(  "Site", "Year", "Season"))
 density_live_sum
 density_live_sum <- density_live_sum %>%
   mutate(Count = Live_count) %>%
   select(-Live_count)
 
 
-density_box_sum <- summarySE(data = data_all, measurevar = "Box_count", groupvars = c( "Site"))
+density_box_sum <- summarySE(data = data_all, measurevar = "Box_count", groupvars = c( "Site", "Year", "Season"))
 density_box_sum <- density_box_sum %>%
   mutate(Count = Box_count) %>%
   select(-Box_count)
 density_box_sum
 
-density_gaper_sum <- summarySE(data = data_all, measurevar = "Gaper_count", groupvars = c( "Site"))
+density_gaper_sum <- summarySE(data = data_all, measurevar = "Gaper_count", groupvars = c( "Site", "Year", "Season"))
 density_gaper_sum <- density_gaper_sum %>%
   mutate(Count = Gaper_count) %>%
   select(-Gaper_count)
