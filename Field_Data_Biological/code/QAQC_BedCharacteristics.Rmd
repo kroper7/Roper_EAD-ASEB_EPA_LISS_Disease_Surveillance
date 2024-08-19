@@ -672,6 +672,27 @@ tempmap %>%
             opacity = 1)
 
 
+#comparison of temp between the sites from tempmap excel sheet
+ggplot(tempmap, aes(x = tempmap$Date, y = tempmap$Temperature, color = Site ))+ geom_point() + labs(x = "Date (hours)", y = "Temperature (C)", title = "Date vs Temperature at 3 sites") +geom_smooth(method = "lm", se = FALSE)
+
+ggplot(tempmap, aes(x = tempmap$Date, y = tempmap$Temperature, color = Site))+ geom_bin_2d() + labs(x = "Date (hours)", y = "Temperature (C)", title = "Date vs Temperature at 3 sites") +geom_smooth(method = "lm", se = FALSE)+ facet_wrap(~tempmap$Site)
+
+
+
+ggplot(
+  tempmap = tempmap,
+  mapping = aes(x = tempmap$Date, y = tempmap$Temperature)
+) +
+  geom_point(aes(color = tempmap$Site, shape= tempmap$Site)) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Total weight and height",
+    subtitle = "Dimensions for Eastern Oysters at Ash Creek",
+    x = "Date (hours)", y = "Temperature (C)",
+    color = "Site", shape = "Site"
+  ) 
+
+
 #leag add ons could be an option but we have to download from website
 # leaflet-heatmap.js.
 #
