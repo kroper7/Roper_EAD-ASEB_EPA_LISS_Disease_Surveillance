@@ -329,6 +329,8 @@ density_summary
 
 ```
 
+
+# bed area calculations and heat map
 ```{r}
 #Bed area calcualtions
 # Load library 
