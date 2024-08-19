@@ -119,6 +119,8 @@ height_all <- lapply(file_paths, function(file_path) {
   bind_rows
 as.data.frame(height_all) 
 
+View(height_all)
+
 #height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",                           # Identify all CSV files
 #  pattern = "*.csv", full.names = TRUE) %>% 
 #  lapply(read_csv) %>%    # Store all files in list
@@ -138,7 +140,7 @@ as.data.frame(height_all)
  
 height_all <- height_all %>%
   mutate(Season = case_when(between(month, 5,6) ~"Spring",
-                            between(month, 10,11) ~ "Fall"))
+                            between(month, 8,10) ~ "Fall"))
 height_all <- select(height_all, -c("month"))
 
 
@@ -524,11 +526,11 @@ ggplot(data=mean_total_oysters_FENC, aes(x= Survival_status, y = Total_Density, 
 height_GOLD<- Height_master %>% filter(Site == "GOLD")
 height_GOLD
 
-height_GOLD<- height_GOLD %>%
-  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
+#height_GOLD<- height_GOLD %>%
+#  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
 
 live_height_GOLD<- height_GOLD %>%
- group_by(Site, Season)%>%
+ group_by(Site, Season, Year)%>%
   filter(Survival_status == "Live")%>%
   summarize(Mean_Height = mean(Height))
 live_height_GOLD
@@ -571,8 +573,8 @@ ggplot(data=height_GOLD_Live, aes(x= Height)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Gold Star Beach Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,170), breaks = seq(0,170, by =10) )+
-  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))
- # facet_wrap(~ Month, scales = "free", ncol = 1)
+  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
+  facet_wrap(~ Year, scales = "free", ncol = 1)
 
 #Distribution Dead
 ggplot(data=height_GOLD_Dead, aes(x= Height)) +
@@ -580,7 +582,8 @@ ggplot(data=height_GOLD_Dead, aes(x= Height)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Gold Star Beach Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,170), breaks = seq(0,170, by =10) )+
-  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))
+  scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
+  facet_wrap(~ Year, scales = "free", ncol = 1)
 
 
 ```
