@@ -99,6 +99,7 @@ bed_all <- bed_all %>% select("Date_collected", "Site", "State", "Bed_height_cm"
 
 bedheight_june2023 <- read.csv("Field_Data_Biological\\raw_data\\qry_2023-06_Survey_BedHeight.csv") 
 
+
 #Cleaning up June 2023 data
 #renaming columns
 bedheight_june2023 <- bedheight_june2023 %>%
@@ -359,7 +360,7 @@ leaflet() %>%
 # should work to pull the data off the gps kml file ~ left side
 kml_data <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml')
 
-#kml_data <- sf::st_read('C:/Users/kelly.roper/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml') # in case the the top is not loaded
+kml_data <- sf::st_read('C:/Users/kelly.roper/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml') # in case the the top is not loaded
 
 kml_data$geometry
 
@@ -370,10 +371,20 @@ kml_data2 <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Right
 kml_data2 <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Right.kml') %>% dplyr::rename(Coordinates =geometry, Right_Side_Coordinates = Name) %>% 
   select(-'Description')
 
+
+  
 #trying to eliminate a row from left side
 kml_data <- sf::st_read('Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml') %>% dplyr::rename(Coordinates =geometry, Left_Side_Coordinates = Name) %>% 
   select(-'Description')
 
+
+#for when the file is not found ~ eliminating row for left side reef
+kml_data <- sf::st_read('C:/Users/kelly.roper/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/raw_data/Bed_area/0624ASHC_Left.kml') %>% dplyr::rename(Coordinates =geometry, Left_Side_Coordinates = Name) %>% 
+  select(-'Description')
+
+#for when the file is not found right side ashc ~ eliminating description column
+kml_data2 <- sf::st_read('C:/Users/kelly.roper/Documents/GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/raw_data/Bed_area/0624ASHC_Right.kml') %>% dplyr::rename(Coordinates =geometry, Right_Side_Coordinates = Name) %>% 
+  select(-'Description')
 
 kml_data
 
@@ -545,7 +556,7 @@ mapgoldstar<- paste(sep = "<br/>","<b><a href='https://www.fisheries.noaa.gov/ne
 
 leaflet() %>% addTiles(group = "One") %>%
    addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
-  addPopups(-73.43414331536832, 40.89684920400523, mapgoldstar, group = "Gold Star") %>% 
+  addPopups(-73.435303, 40.897870, mapgoldstar, group = "Gold Star") %>% 
   addLayersControl(baseGroups = c("One", "Two"),
                    overlayGroups = c("Gold Star"),
                    options = popupOptions(closeButton = FALSE))
@@ -558,6 +569,20 @@ kml_final %>%
   addTiles(group="One") %>%
   addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
   addHeatmap(lng = kml_final$Long, lat = kml_final$Lat, blur = 40, max = 0.05, radius = 15, group = "Ash Creek") %>% 
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Ash Creek"), 
+                   options=layersControlOptions(collapsed=FALSE))
+
+#this does not work
+library(leaflet.extras)
+kml_final %>%
+  leaflet() %>% 
+  addTiles(group="One") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  addHeatmap(lng = kml_final$Long, lat = kml_final$Lat, blur = 40, max = 0.05, radius = 15, group = "Ash Creek") %>% 
+   interp2xyz() |> as.data.frame()+
+  scale_fill_gradientn("Long", na.value = NA,
+  colours = c("blue", "green", "yellow", "orange")) %>% 
   addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c("Ash Creek"), 
                    options=layersControlOptions(collapsed=FALSE))
@@ -577,6 +602,77 @@ ggmap() +
   scale_fill_gradientn("Temperature", na.value = NA,
                        colours = c("blue", "green", "yellow", "orange"))
 
+
+
+
+
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance')
+
+tempmap <- read.csv("Field_Data_Biological\\raw_data\\Bed_area\\tempmap.csv")
+
+view(tempmap)
+
+
+#removed empty column
+tempmap<- tempmap[, -6]
+view(tempmap)
+
+
+#can you just add "addheatmaps" to this and then it would work?
+leaflet(tempmap) %>%
+  # Add first tile
+  addTiles(group="One") %>%
+  # Add second tile
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  # Add first marker
+  addMarkers(lng=-72.5863, lat=41.2719, group="Fence Creek",popup="Fence Creek, Madison") %>%
+  # Add second marker
+  addMarkers(lng=-73.2355, lat=41.1465, group="Ash Creek", popup = "Ash Creek, Fairfield") %>%
+  # Add a third marker
+  addMarkers(lng =-73.435313, lat = 40.89795, group = "Goldstar", popup = "Goldstar, Port Jeff")  %>%
+  # Add Layer controls
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Fence Creek", "Ash Creek", "Goldstar"), 
+                   options=layersControlOptions(collapsed=FALSE))
+
+#not sure
+hottempmap <- map_data("world") #ggplot2
+
+view(hottempmap)
+
+hottempmap <- left_join(hottempmap,tempmap, by= "lat")
+
+#not sure if we need to remove the na in the lat and long
+heatedmap <- tempmap %>% filter(!is.na(tempmap$Lat))
+
+tempmap1<- ggplot(tempmap,aes(x = Long, y= Lat, group=Site))+
+  geom_polygon(aes(fill=Temperature), color = "blue")
+
+tempmap1
+
+
+
+mapstatetemp <- colorNumeric("viridis", tempmap$Temperature)
+
+label_state <- function(Lat,Long){
+  str_glue("{Lat} with temperature of {Long}")
+}
+
+tempmap %>% 
+  leaflet() %>% 
+  addPolygons(weight = 1,
+              color = "white",
+              fillColor = ~mapstatetemp(Temperature),
+              fillOpacity = 1,
+              popup = ~label_state(Sites, temperature)) %>% 
+  addLegend(pal = mapstatetemp(),
+            values = ~temperature,
+            opacity = 1)
+
+
+#leag add ons could be an option but we have to download from website
+# leaflet-heatmap.js.
+#
 
 ```
 
