@@ -7,8 +7,8 @@ output: html_document
 Description: This code is used for molecular sample DNA quanitification quality control and assurance for the LISS funded Oyster Health Project. This samples were extracted using a Qiagen blood and tissue extraction kit. Quanitify of nucleic acids were determined using a Nanodrop2000 and dsDNA using a Qubit Flex. 
 
 
-Updated: 06/21/24 K. Lenderman
-  - combined new Qubit Files created on 6/20/24
+Updated: 08/21/24 K. Lenderman
+  - combined new Qubit Files created on 6/21/24
 
 ---
 
