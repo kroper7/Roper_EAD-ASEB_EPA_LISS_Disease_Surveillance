@@ -610,7 +610,8 @@ ggmap() +
 
 knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance')
 
-tempmap <- read.csv("Field_Data_Biological\\raw_data\\Bed_area\\tempmap.csv")
+#pulling the temp data from sonde from one day from all three sites
+tempmap <- read.csv("C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/raw_data/Bed_area/tempmap.csv")
 
 view(tempmap)
 
@@ -620,18 +621,14 @@ tempmap<- tempmap[, -6]
 view(tempmap)
 
 
-#can you just add "addheatmaps" to this and then it would work?
+#can you just add "addheatmaps" to this and then it would work? -> have to delete N/A from coordinates
 leaflet(tempmap) %>%
   # Add first tile
   addTiles(group="One") %>%
   # Add second tile
-  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
-  # Add first marker
-  addMarkers(lng=-72.5863, lat=41.2719, group="Fence Creek",popup="Fence Creek, Madison") %>%
-  # Add second marker
-  addMarkers(lng=-73.2355, lat=41.1465, group="Ash Creek", popup = "Ash Creek, Fairfield") %>%
-  # Add a third marker
-  addMarkers(lng =-73.435313, lat = 40.89795, group = "Goldstar", popup = "Goldstar, Port Jeff")  %>%
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
+  #add heat map 
+  addHeatmap(lng = tempmap$Long, lat = tempmap$Lat, blur = 40, max = 0.05, radius = 15, group = "Site") %>%
   # Add Layer controls
   addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c("Fence Creek", "Ash Creek", "Goldstar"), 
@@ -659,7 +656,7 @@ mapstatetemp <- colorNumeric("viridis", tempmap$Temperature)
 label_state <- function(Lat,Long){
   str_glue("{Lat} with temperature of {Long}")
 }
-
+#doesnt work
 tempmap %>% 
   leaflet() %>% 
   addPolygons(weight = 1,
@@ -674,11 +671,10 @@ tempmap %>%
 
 #comparison of temp between the sites from tempmap excel sheet
 ggplot(tempmap, aes(x = tempmap$Date, y = tempmap$Temperature, color = Site ))+ geom_point() + labs(x = "Date (hours)", y = "Temperature (C)", title = "Date vs Temperature at 3 sites") +geom_smooth(method = "lm", se = FALSE)
-
+#same but with facet wrap
 ggplot(tempmap, aes(x = tempmap$Date, y = tempmap$Temperature, color = Site))+ geom_bin_2d() + labs(x = "Date (hours)", y = "Temperature (C)", title = "Date vs Temperature at 3 sites") +geom_smooth(method = "lm", se = FALSE)+ facet_wrap(~tempmap$Site)
 
-
-
+#the date/time does not look right on the x axis
 ggplot(
   tempmap = tempmap,
   mapping = aes(x = tempmap$Date, y = tempmap$Temperature)
@@ -692,10 +688,29 @@ ggplot(
     color = "Site", shape = "Site"
   ) 
 
+#not working 
+ggplot(tempmap) +
+ geom_histogram(bins = 50, aes(x = tempmap$Site, y = tempmap$Temperature)) +
+ xlab("Date") +
+ ylab("Distribution") +
+ ggtitle("Distribution of Temperature at three sites ") +
+ theme_minimal() 
+
 
 #leag add ons could be an option but we have to download from website
 # leaflet-heatmap.js.
 #
+library(ggplot2)
+library(gganimate)
+library(gapminder)
+library(plotly)
+library(leaflet)
+library(tidyverse)
+library(sf)
+library(mapview)
+
+#does not work #cordtempmap <- st_as_sf(tempmap, coords = c(tempmap$"Long", tempmap$"Lat"),  crs = 4326)
+
 
 ```
 
