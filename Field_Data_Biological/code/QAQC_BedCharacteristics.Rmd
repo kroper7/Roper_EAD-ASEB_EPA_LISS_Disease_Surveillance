@@ -617,18 +617,24 @@ view(tempmap)
 
 
 #removed empty column
-tempmap<- tempmap[, -6]
+tempmap<- tempmap[, -7]
+tempmap<- tempmap[, -7]
 view(tempmap)
 
+cleaned_tempmap <- tempmap %>% drop_na(Long, Lat)
 
-#can you just add "addheatmaps" to this and then it would work? -> have to delete N/A from coordinates
-leaflet(tempmap) %>%
+view(cleaned_tempmap)
+
+#can you just add "addheatmaps" to this and then it would work? -> had to delete N/A from coordinates this is just needs the temperature on top and a way to click the sights on and off
+#add popups like (popup="Ash Creek, Fairfield", "Fence Creek, Madison", "Gold Star, Huntington")
+
+leaflet(cleaned_tempmap) %>%
   # Add first tile
   addTiles(group="One") %>%
   # Add second tile
   addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
   #add heat map 
-  addHeatmap(lng = tempmap$Long, lat = tempmap$Lat, blur = 40, max = 0.05, radius = 15, group = "Site") %>%
+  addHeatmap(lng = cleaned_tempmap$Long, lat = cleaned_tempmap$Lat, blur = 40, max = 0.05, radius = 15, group = cleaned_tempmap$"Site") %>%
   # Add Layer controls
   addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c("Fence Creek", "Ash Creek", "Goldstar"), 
