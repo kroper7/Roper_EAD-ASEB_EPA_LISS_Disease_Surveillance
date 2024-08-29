@@ -20,8 +20,8 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE)
 
 #knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 ```
 
@@ -1938,7 +1938,7 @@ FENC_Temperature_2024 <-FENC_Temperature %>% na.omit() %>%
                                 ymax=(mean)+(se)), 
                             width=0,position=position_dodge(.4)) +
               facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("Temperature") +
+              ggtitle("Temperature 2024") +
               labs(x = "Time", y = "Temperature (Celcius)") +
               theme_classic() +
               theme(legend.position = "none", axis.text= element_text(size= 15))
