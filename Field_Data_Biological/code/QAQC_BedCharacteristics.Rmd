@@ -731,9 +731,14 @@ library(mapview)
 
 ggplot(cleaned_tempmap, aes(x = cleaned_tempmap$Site)) + geom_bar()
 
-ggplot(tempmap, aes(x= tempmap$Site, y = tempmap$Temperature)) 
+ggplot(tempmap, aes(x= tempmap$"Site", y = tempmap$"Temperature")) +geom_line()
 
 
+library("ggpubr")
+ggline(cleaned_tempmap, x = "Site", y = "Temperature",
+       add = c("mean_se", "jitter"),
+       order = c("Ashc", "Gold", "Fenc"),
+       ylab = "Temperature", xlab = "Site")
 
 
 #does not work #cordtempmap <- st_as_sf(tempmap, coords = c(tempmap$"Long", tempmap$"Lat"),  crs = 4326)
