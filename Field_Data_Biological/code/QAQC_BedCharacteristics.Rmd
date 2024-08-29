@@ -735,7 +735,7 @@ ggplot(tempmap, aes(x= tempmap$"Site", y = tempmap$"Temperature")) +geom_line()
 
 
 library("ggpubr")
-ggline(cleaned_tempmap, x = "Site", y = "Temperature",
+ggline(tempmap, x = "Site", y = "Temperature",
        add = c("mean_se", "jitter"),
        order = c("Ashc", "Gold", "Fenc"),
        ylab = "Temperature", xlab = "Site")
