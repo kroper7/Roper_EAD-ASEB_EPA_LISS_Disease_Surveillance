@@ -5,8 +5,7 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 8/12/2024 by M.Kachmar
--Added code for FENC, ASHC, and GOLD facet wrap of different year with the same enviromental data
+Last updated 8/29/2024 by M.Kachmar
 
 
 ## Setup: 

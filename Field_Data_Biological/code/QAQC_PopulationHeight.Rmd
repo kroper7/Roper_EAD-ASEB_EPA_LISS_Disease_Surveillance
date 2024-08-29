@@ -206,7 +206,7 @@ write_csv(Height_master, path= "Master_files/height_all_data.csv") #row.names=FA
 
 #Sum total number of oyster counter per quadrat
 quadratdensity_all<- Height_master %>%
-  dplyr::group_by(Quadrat, Season, Survival_status, Site, Date_collected, State) %>%
+  dplyr::group_by(Quadrat, Season, Year, Survival_status, Site, Date_collected, State) %>%
   dplyr::summarize(Count = n())
 quadratdensity_all
 
@@ -596,13 +596,13 @@ df_quadrat_GOLD
 #Quadrat size is 25 x25cm (.0625 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 16
 
 df_density_GOLD <- df_quadrat_GOLD %>%
-  dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
+  dplyr::group_by(Site, Season, Year, Date_collected, Quadrat, Survival_status) %>% 
   dplyr::summarize(Density = sum(Count)*16)
 df_density_GOLD
 
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_GOLD <- df_density_GOLD %>%
-  dplyr::group_by(Site, Season, Survival_status) %>%
+  dplyr::group_by(Site, Season, Year, Date_collected, Survival_status) %>%
   dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_GOLD
  
@@ -613,8 +613,10 @@ ggplot(data=df_quadrat_GOLD, aes(x= Survival_status, y = Count, fill = Survival_
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Gold Star Beach Count ", x ="Survival status", y= "Density")+
-  facet_wrap(~ Season, scales = "free")
+  facet_wrap(~ Season+Year, scales = "free")
 ```
+
+
 #LAUR
 ```{r}
 #graphing shell height LAUR

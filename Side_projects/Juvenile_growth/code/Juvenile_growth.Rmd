@@ -9,7 +9,8 @@ description: This code is for the Juvenille Growth Study looking at growth rates
 Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
 
 ---
-Last updated 08/13/24 by M.Kachmar
+Last updated 08/29/24 by M.Kachmar
+  -updated August 
   - attempted to calculate the growth rates (:
   
  
@@ -31,6 +32,7 @@ knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-AS
 #this code loads all packages that the code will need
 #make sure all packages are installed before running this code
 library("ggplot2")
+library("ggpubr")
 library("readxl")
 library("plyr")                                     
 library("dplyr")
@@ -67,6 +69,7 @@ data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs only in column "Da
 
 data_all <- data_all %>% select(where(~ !all(is.na(.)))) #removing excess columns with NA
 
+View(data_all)
 
 write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #creating/printing csv file of all raw data merged together
 ```
@@ -83,7 +86,7 @@ data_all <- data_all %>% dplyr::mutate(Month = month(Date))
 
 #changing numeric month to month name
 #data_all$Month <- factor(data_all$Month, levels = c("1","2","3","4","5","6","7", "8", "9", "10", "11", "12"),
-        labels=c("Jan","Feb", "March","April","May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"))
+    #    labels=c("Jan","Feb", "March","April","May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"))
 
 #data_all
 
@@ -120,14 +123,25 @@ ggplot(data=data_all, aes(x=Site, y=Shell_length, fill=Site)) +
 ```{r}
 # size class distribution graph per site per month
 
-ggplot(data=data_all, aes(x=Shell_length)) +
+ASHC<- data_all %>% filter(Site == "ASHC")
+FENC<- data_all %>% filter(Site == "FENC")
+
+ggplot(data=ASHC, aes(x=Shell_length)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Juvenile Shell Height", x ="Height (mm)")+ scale_x_continuous(limits= c(0,80), breaks = seq(0,80, by =5) )+
+  labs(title="Juvenile Shell Height - Ash Creek", x ="Height (mm)")+ scale_x_continuous(limits= c(0,80), breaks = seq(0,80, by =5) )+
   scale_y_continuous(limits = c(0,70), breaks = seq(0,70, by = 5))+
- facet_wrap(~ Site + Month, scales = "free", ncol = 1)
+ facet_wrap(~ Month, scales = "free", ncol = 1)
 # add date to facet wrap after July collection
+
+ggplot(data=FENC, aes(x=Shell_length)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Juvenile Shell Height - Fence Creek", x ="Height (mm)")+ scale_x_continuous(limits= c(0,80), breaks = seq(0,80, by =5) )+
+  scale_y_continuous(limits = c(0,70), breaks = seq(0,70, by = 5))+
+ facet_wrap(~ Month, scales = "free", ncol = 1)
 ```
 
 #Survival calculations
@@ -224,18 +238,33 @@ growth.rate
 ```{r}
 
 # Create a survival object per bag and plot 
-data_all$survival <-as.numeric(data_all$Survival) #need to make sure everything is in numeric format
-data_all$Month <-as.numeric(data_all$Month)
+ASHC$survival <-as.numeric(ASHC$Survival) #need to make sure everything is in numeric format
+ASHC$Month <-as.numeric(ASHC$Month)
+FENC$survival <-as.numeric(FENC$Survival) #need to make sure everything is in numeric format
+FENC$Month <-as.numeric(FENC$Month)
 
-Surv1 <- Surv(time = data_all$Month, event = data_all$Survival)
-fit.surv1 <- survfit(formula = Surv1 ~ Bag_number, data = data_all)
+# Ash Creek survival
 
-Survival_plot<-ggsurvplot(fit.surv1, data = data_all, break.x.by = 1,
-           linetype= c(1, 2, 3),xlab = NULL, ylab= NULL, xlim = c(5,7), legend.labs= c("bag 1", "bag 2",
+Surv_ASHC <- Surv(time = ASHC$Month, event = ASHC$Survival)
+fit.surv_ASHC <- survfit(formula = Surv_ASHC ~ Bag_number, data = ASHC)
+
+ASHC_survival_plot<-ggsurvplot(fit.surv_ASHC, data = ASHC, break.x.by = 1,
+           linetype= c(1, 2, 3),xlab = NULL, ylab= NULL, xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
                                                                  "bag 3"),
-           legend.title = "Replicate:", legend = "top", risk.table =TRUE )+ theme_survminer(base_size = 20,font.legend = c(15))
-Survival_plot
-plot + labs(title= "Eastern Oyster FRA")
+           legend.title = "Replicate:", legend = "top", risk.table =TRUE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Ash Creek, CT")
+ASHC_survival_plot
+
+
+# Fence Creek survival
+Surv_FENC <- Surv(time = FENC$Month, event = FENC$Survival)
+fit.surv_FENC <- survfit(formula = Surv_FENC ~ Bag_number, data = FENC)
+
+FENC_survival_plot<-ggsurvplot(fit.surv_FENC, data = FENC,break.x.by = 1,
+           linetype= c(1, 2, 3),xlab = NULL, ylab= NULL, xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
+                                                                 "bag 3"),
+           legend.title = "Replicate:", legend = "top", risk.table =TRUE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Fence Creek, CT")
+FENC_survival_plot
+
 
 
 ```
