@@ -634,26 +634,40 @@ leaflet(cleaned_tempmap) %>%
   # Add second tile
   addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
   #add heat map 
+  addHeatmap(lng = cleaned_tempmap$Long, lat = cleaned_tempmap$Lat, blur = 40, max = 0.05, radius = 15, group = "Site") %>%
+  # Add Layer controls
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Site"), 
+                   options=layersControlOptions(collapsed=FALSE))
+
+
+
+
+leaflet(cleaned_tempmap) %>%
+  # Add first tile
+  addTiles(group="One") %>%
+  # Add second tile
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>% 
+  #add heat map 
   addHeatmap(lng = cleaned_tempmap$Long, lat = cleaned_tempmap$Lat, blur = 40, max = 0.05, radius = 15, group = cleaned_tempmap$"Site") %>%
   # Add Layer controls
   addLayersControl(baseGroups=c("One", "Two"), 
-                   overlayGroups=c("Fence Creek", "Ash Creek", "Goldstar"), 
+                   overlayGroups=c(cleaned_tempmap$"Site"), 
                    options=layersControlOptions(collapsed=FALSE))
-
 #not sure
-hottempmap <- map_data("world") #ggplot2
+#hottempmap <- map_data("world") #ggplot2
 
-view(hottempmap)
+#view(hottempmap)
 
-hottempmap <- left_join(hottempmap,tempmap, by= "lat")
+#hottempmap <- left_join(hottempmap,tempmap, by= "lat")
 
-#not sure if we need to remove the na in the lat and long
-heatedmap <- tempmap %>% filter(!is.na(tempmap$Lat))
+#not sure if we need to remove the na in the lat and long -> update 8/29 "cleaned_tempmap" has N/A removed
+#heatedmap <- tempmap %>% filter(!is.na(tempmap$Lat))
 
-tempmap1<- ggplot(tempmap,aes(x = Long, y= Lat, group=Site))+
+#tempmap1<-
+  ggplot(cleaned_tempmap,aes(x = Long, y= Lat, group=Site))+
   geom_polygon(aes(fill=Temperature), color = "blue")
 
-tempmap1
 
 
 
@@ -682,14 +696,14 @@ ggplot(tempmap, aes(x = tempmap$Date, y = tempmap$Temperature, color = Site))+ g
 
 #the date/time does not look right on the x axis
 ggplot(
-  tempmap = tempmap,
-  mapping = aes(x = tempmap$Date, y = tempmap$Temperature)
+  cleaned_tempmap = cleaned_tempmap ,
+  mapping = aes(x = cleaned_tempmap$Time, y = cleaned_tempmap$Temperature)
 ) +
-  geom_point(aes(color = tempmap$Site, shape= tempmap$Site)) +
+  geom_point(aes(color = cleaned_tempmap$Site, shape= cleaned_tempmap$Site)) +
   geom_smooth(method = "lm") +
   labs(
-    title = "Total weight and height",
-    subtitle = "Dimensions for Eastern Oysters at Ash Creek",
+    title = "Three Sites vs Water Temp",
+    subtitle = "Fence Creek, Ash Creek, and Gold Star",
     x = "Date (hours)", y = "Temperature (C)",
     color = "Site", shape = "Site"
   ) 
@@ -714,6 +728,18 @@ library(leaflet)
 library(tidyverse)
 library(sf)
 library(mapview)
+
+ggplot(cleaned_tempmap, aes(x = cleaned_tempmap$Site)) + geom_bar()
+
+ggplot(tempmap, aes(x= tempmap$"Site", y = tempmap$"Temperature")) +geom_line()
+
+
+library("ggpubr")
+ggline(tempmap, x = "Site", y = "Temperature",
+       add = c("mean_se", "jitter"),
+       order = c("Ashc", "Gold", "Fenc"),
+       ylab = "Temperature", xlab = "Site")
+
 
 #does not work #cordtempmap <- st_as_sf(tempmap, coords = c(tempmap$"Long", tempmap$"Lat"),  crs = 4326)
 

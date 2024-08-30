@@ -5,9 +5,9 @@ output: html_notebook
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 08/16/24 by K. Lenderman
+Updated 08/29/24 by K. Lenderman
 - all code up to date & graphs generated
-- 0824GOLD QAQC
+- 0824ASHC & 0824FENC QAQC
 
  
 
@@ -219,9 +219,9 @@ BCS_proportion_all_2023<- ggplot(data=df_BCS_proportions2023, aes(x=month, y= Pr
 
 BCS_proportion_all_2023
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2023.pdf"), height = 7, width = 13)
-print(BCS_proportion_all_2023)
-dev.off()
+#pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2023.pdf"), height = 7, width = 13)
+#print(BCS_proportion_all_2023)
+#dev.off()
 ```
 ```{r}
 #Proportions graph Body condition scores - 2024
