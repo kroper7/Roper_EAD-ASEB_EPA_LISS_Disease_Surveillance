@@ -42,18 +42,23 @@ path_out <- 'HOBO_Data/output/'
 
 #### Fence Creek ####
 ```{r}
-FENC_HOBO <- read_csv("HOBO_Data\\raw_data\\082024_FENC_HOBO.csv", col_names = TRUE)   
-
-as.data.frame(FENC_HOBO)
-
-
-
-#Change column names
-
-FENC_HOBO <- FENC_HOBO %>%
+#Clean up and merged data sheets
+df1<-read_csv("HOBO_Data\\raw_data\\062024_FENC_HOBO.csv", col_names = TRUE)%>% # do not change this df 2023-2024 data before we changed out the HOBO
+  dplyr::select( -c("Host Connected", "Water Detect", "Button Down", "Button Up", "End of File"))%>% 
   dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
-  dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
-FENC_HOBO_23
+  dplyr::rename(Date_Time = `Date-Time (EST/EDT)`)
+
+df2<-read_csv("HOBO_Data\\raw_data\\082024_FENC_HOBO.csv", col_names = TRUE)%>%  # update this csv when new data comes in from the new HOBO
+  dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
+  dplyr::rename(Date_Time = `Date-Time (EDT)`)%>%
+  dplyr::select( -c("Host Connected", "Button Down", "Button Up", "End of File", "Started Offset"))
+
+FENC_HOBO <- rbind(df1,df2)   #Combine the two data sheets
+
+as.data.frame(FENC_HOBO) #make a data frame
+
+
+#Date formatting
 
 FENC_HOBO$Date_Time <- as.character(FENC_HOBO$Date_Time)
 date_time <- strsplit(FENC_HOBO$Date_Time, " ")  # Split at the space
@@ -67,11 +72,7 @@ FENC_HOBO$Time <- sapply(date_time, function(x) {
 })
 print(FENC_HOBO)
 
-## removing unneeded columns with NAs
-
-FENC_HOBO <- FENC_HOBO %>%
-  dplyr::select( -c("Host Connected", "Water Detect", "Button Down", "Button Up", "End of File"))
-
+#remove NAs
 FENC_HOBO <- na.omit(FENC_HOBO)
 
 #### Lets look at the data 
@@ -139,14 +140,26 @@ ASHC_HOBO <- read_csv("HOBO_Data\\raw_data\\082024_ASHC_HOBO.csv", col_names = T
 
 as.data.frame(ASHC_HOBO)
 
+## removing unneeded columns with NAs
+
+ASHC_HOBO <- ASHC_HOBO %>%
+  dplyr::select( -c( "Button Down", "Button Up", "End of File", "Started Offset"))
+
+ASHC_HOBO <- na.omit(ASHC_HOBO)
 
 
 #Change column names
 
-ASHC_HOBO<- ASHC_HOBO %>%
-  dplyr::rename(Temperature = `Ch:1 - Temperature (°C)`) %>%
-  dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
-ASHC_HOBO
+if ("Date-Time (EDT)" %in% names(ASHC_HOBO) && "Ch:1 - Temperature (°C)" %in% names(ASHC_HOBO)) {
+  ASHC_HOBO <- ASHC_HOBO %>%
+    rename(
+      Date_Time = `Date-Time (EDT)`,
+      Temperature = `Ch:1 - Temperature (°C)`
+    )
+} else {
+  warning("One or more columns to rename do not exist.")
+}
+
 
 ASHC_HOBO$Date_Time <- as.character(ASHC_HOBO$Date_Time)
 date_time <- strsplit(ASHC_HOBO$Date_Time, " ")  # Split at the space
@@ -160,12 +173,6 @@ ASHC_HOBO$Time <- sapply(date_time, function(x) {
 })
 print(ASHC_HOBO)
 
-## removing unneeded columns with NAs
-
-ASHC_HOBO <- ASHC_HOBO %>%
-  dplyr::select( -c("Host Connected", "Button Down", "Button Up", "End of File"))
-
-ASHC_HOBO <- na.omit(ASHC_HOBO)
 
 #### Lets look at the data 
 
