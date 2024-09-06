@@ -610,7 +610,7 @@ ggmap() +
 
 knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance')
 
-#pulling the temp data from sonde from one day from all three sites
+#pulling the temp data from sonde from one day from all three sites June 10 2024
 tempmap <- read.csv("C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Field_Data_Biological/raw_data/Bed_area/tempmap.csv")
 
 view(tempmap)
@@ -741,8 +741,82 @@ ggline(tempmap, x = "Site", y = "Temperature",
        ylab = "Temperature", xlab = "Site")
 
 
-#does not work #cordtempmap <- st_as_sf(tempmap, coords = c(tempmap$"Long", tempmap$"Lat"),  crs = 4326)
 
+
+#does not work #cordtempmap <- st_as_sf(tempmap, coords = c(tempmap$"Long", tempmap$"Lat"),  crs = 4326)
+library(gganimate)
+library(ggplot2)
+library(dplyr)
+library(gapminder)
+library(ggthemes)
+library(leaflet)
+
+graphgapminder = gapminder %>%
+  ggplot(aes(x= gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.7, stroke = 0)+
+  theme_fivethirtyeight()+
+  scale_size(range =c(2,12), guide = "none")+
+  scale_x_log10()+
+  labs(title = "Life Expectancy vs GDP Per Capita by Country",
+       x= "Income per person (GDP/capital)",
+       y = "Life expectancy (years)",
+       color = "Continent",
+       caption = "Source: Gapminder")+
+  theme(axis.title = element_text(),
+        text = element_text(family = "Rubik"),
+        legend.text = element_text(size = 10)) +
+  scale_color_brewer(palette = "Set2")
+
+graphgapminder
+
+graphgapminder.animation = graphgapminder+
+transition_time(year) +
+  labs(subtitle = "Year: {frame_time}")+
+  shadow_wake(wake_length = 0.1)
+
+animate(graphgapminder.animation, height = 500, width = 800, fps = 30, duration = 10,
+        end_pause = 60, res = 100)
+
+pal <- colorNumeric(palette = "YlOrRd", domain = tempmap$Temperature)
+
+leaflet(tempmap) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addCircleMarkers(lng = ~tempmap$Long, lat = tempmap$Lat, 
+                   stroke = FALSE, radius = 6, fillOpacity = 0.8,
+                   color = ~pal(Temperature))
+
+leaflet(tempmap) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addCircleMarkers(lng = ~tempmap$Long, lat = ~tempmap$Lat, stroke = FALSE, radius = 6, 
+                   color = ~pal(Temperature), fillOpacity = 0.7) %>%
+  addLegend(position = "bottomright",
+            pal = pal, values = ~Temperature, opacity = 1)
+
+leaflet(cleaned_tempmap) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addCircleMarkers(lng = ~cleaned_tempmap$Long, lat = ~cleaned_tempmap$Lat, stroke = FALSE, radius = 6, color = ~pal(Temperature), fillOpacity = 0.7, 
+                   popup = ~Temperature) %>%
+  addLegend(position = "bottomright",
+            pal = pal, values = ~Temperature, opacity = 1)
+
+
+pal.gen <- colorFactor(palette = "Dark2", domain = cleaned_tempmap$Temperature)
+
+  
+leaflet(cleaned_tempmap) %>%
+  # Add first tile
+  addTiles(group="One") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  setView(lng = -6, lat = 37.38, zoom = 15) %>%
+  addCircleMarkers(lng = ~cleaned_tempmap$Long, lat = ~cleaned_tempmap$Lat, stroke = FALSE, radius = 8, 
+                   color = ~pal.gen(cleaned_tempmap$Temperature), fillOpacity = 0.7,
+                   popup = ~leafpop::popupTable(cleaned_tempmap,
+                                       zcol = c("Site", "Time", "Temperature"),
+                                       row.numbers = FALSE, feature.id = FALSE)) %>% 
+addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c(cleaned_tempmap$"Site"), 
+                   options=layersControlOptions(collapsed=FALSE))
+#not sure
 
 ```
 
