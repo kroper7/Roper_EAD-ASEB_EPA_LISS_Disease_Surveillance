@@ -69,7 +69,7 @@ data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs only in column "Da
 
 data_all <- data_all %>% select(where(~ !all(is.na(.)))) #removing excess columns with NA
 
-View(data_all)
+#View(data_all)
 
 write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #creating/printing csv file of all raw data merged together
 ```
@@ -80,7 +80,7 @@ write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #
 ```{r}
 #The dates in the data files are reading as a character "chr" so we need to change them to date format
 
-data_all <- data_all %>% dplyr::mutate(Month = month(Date))
+data_all <- data_all %>% dplyr::mutate(Month = month(Date,label = TRUE, abbr = FALSE))
 
 
 
@@ -249,10 +249,16 @@ Surv_ASHC <- Surv(time = ASHC$Month, event = ASHC$Survival)
 fit.surv_ASHC <- survfit(formula = Surv_ASHC ~ Bag_number, data = ASHC)
 
 ASHC_survival_plot<-ggsurvplot(fit.surv_ASHC, data = ASHC, break.x.by = 1,
-           linetype= c(1, 2, 3),xlab = NULL, ylab= NULL, xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
+           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
                                                                  "bag 3"),
-           legend.title = "Replicate:", legend = "top", risk.table =TRUE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Ash Creek, CT")
+           legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Ash Creek, CT")
 ASHC_survival_plot
+
+#output of graph
+pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"ASHC_Kaplan_Survival.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
+print(ASHC_survival_plot) #specify the graph
+dev.off()
+
 
 
 # Fence Creek survival
@@ -260,12 +266,15 @@ Surv_FENC <- Surv(time = FENC$Month, event = FENC$Survival)
 fit.surv_FENC <- survfit(formula = Surv_FENC ~ Bag_number, data = FENC)
 
 FENC_survival_plot<-ggsurvplot(fit.surv_FENC, data = FENC,break.x.by = 1,
-           linetype= c(1, 2, 3),xlab = NULL, ylab= NULL, xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
+           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
                                                                  "bag 3"),
-           legend.title = "Replicate:", legend = "top", risk.table =TRUE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Fence Creek, CT")
+           legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Fence Creek, CT") 
 FENC_survival_plot
 
-
+#output of graph
+pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"FENC_Kaplan_Survival.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
+print(FENC_survival_plot) #specify the graph
+dev.off()
 
 ```
 
