@@ -24,8 +24,8 @@ library("tidyverse")
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 ### This code chunk merges all .csv files within the Tissue processing folder into one data frame and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
 # reading in .csv files from local folder
@@ -38,6 +38,10 @@ data_all                                            # Print data to RStudio cons
 
 
 as.data.frame(data_all)                            # Convert tibble to data.frame
+
+View(data_all)
+
+data_all <- data_all %>% filter(!is.na(Count_1))
 
 ```
 
@@ -68,7 +72,8 @@ ggplot(data=data_all, aes(x=Site, y=Count_1, fill=Site)) +
   geom_boxplot()+  
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Recruitment ", x ="Site", y = "Mean Recruitment (spat/shell)")
+  labs(title="Mean Recruitment ", x ="Site", y = "Mean Recruitment (spat/shell)")+
+  facet_wrap(~date_collected)
 
 ```
 
