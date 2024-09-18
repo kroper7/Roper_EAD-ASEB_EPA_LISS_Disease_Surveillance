@@ -68,12 +68,27 @@ Avg_spat_stringer
 ```
 
 ```{r}
-ggplot(data=data_all, aes(x=Site, y=Count_1, fill=Site)) +
+Avg_spat_stringer <- Avg_spat_stringer %>% dplyr::mutate(Year = year(date_collected))
+
+
+#2023
+spat_2023<- Avg_spat_stringer%>% filter(Year == 2023)
+ggplot(data=spat_2023, aes( y=Count_1)) +
   geom_boxplot()+  
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Mean Recruitment ", x ="Site", y = "Mean Recruitment (spat/shell)")+
-  facet_wrap(~date_collected)
+  labs(title="Mean Recruitment 2023", x ="Site", y = "Mean Recruitment (spat/shell)")+
+  facet_wrap(~Site)
+
+
+#2024
+spat_2024<- Avg_spat_stringer%>% filter(Year == 2024)
+ggplot(data=spat_2024, aes( y=Count_1 )) +
+  geom_boxplot()+  
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Recruitment 2024", x ="Site", y = "Mean Recruitment (spat/shell)")+
+  facet_wrap(~Site)
 
 ```
 
