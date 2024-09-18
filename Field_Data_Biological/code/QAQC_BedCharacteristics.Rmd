@@ -10,9 +10,9 @@ description: This R code is used to important and summarize bed characteristics 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 
@@ -529,7 +529,7 @@ kml_fence <- as.data.frame(kml_fenc[[2]][[1]][[1]]) %>%
 
 #map<- paste(sep = "<br/>","fisheries.noaa.gov", "212 Rogers Ave", "Milford, CT")
 
-
+#code for popup with url on ash creek and above is for noaa in milford
 map2<- paste(sep = "<br/>","<b><a href='https://www.fisheries.noaa.gov/new-england-mid-atlantic/habitat-conservation/understanding-health-long-island-sounds-oyster-beds'>N.O.A.A.</a></b>", "Ash Creek","Fairfield, CT")
 
 leaflet() %>% addTiles(group = "One") %>%
@@ -538,7 +538,6 @@ leaflet() %>% addTiles(group = "One") %>%
     options = popupOptions(closeButton = FALSE))
 
 #beneath says invalid map
-
 leaflet(map2) %>% addTiles(group="One") %>%
    addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
   addPopups(-73.23568, 41.14643, map2,
@@ -546,6 +545,14 @@ leaflet(map2) %>% addTiles(group="One") %>%
   addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c("Ash Creek"), 
                    options=layersControlOptions(collapsed=FALSE)))
+
+#this works for ash creek with popup and layer control
+leaflet() %>% addTiles(group="One") %>%
+   addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  addPopups(-73.23568, 41.14643, map2, group = "Ash Creek") %>% 
+  addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c("Ash Creek"), 
+                   options=layersControlOptions(collapsed=FALSE))
   
 
 #<br/>","<b><a href='https://www.fisheries.noaa.gov/'>N.O.A.A.</a></b>", "Goldstar","Huntington, NY")
@@ -627,6 +634,7 @@ view(cleaned_tempmap)
 
 #can you just add "addheatmaps" to this and then it would work? -> had to delete N/A from coordinates this is just needs the temperature on top and a way to click the sights on and off
 #add popups like (popup="Ash Creek, Fairfield", "Fence Creek, Madison", "Gold Star, Huntington")
+library(ggplot2)
 
 leaflet(cleaned_tempmap) %>%
   # Add first tile
@@ -653,7 +661,31 @@ leaflet(cleaned_tempmap) %>%
   # Add Layer controls
   addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c(cleaned_tempmap$"Site"), 
-                   options=layersControlOptions(collapsed=FALSE))
+                   options=layersControlOptions(collapsed=FALSE)) %>% 
+  leaflet.extras2::addPlayback(cleaned_tempmap,
+                               time = "Date",
+                               options = leaflet.extras2::playbackOptions(speed = 100))
+library(sf)
+df <- cleaned_tempmap %>% 
+  dplyr::select(!X.1) %>% 
+  dplyr::rename(lon = Long,
+                lat = Lat) %>% 
+  dplyr::mutate(datetime = lubridate::mdy_hm(Date)) %>% 
+                # lat = signif(lat, digits = 3),
+                # lon = signif(lon, digits = 3)) %>% 
+  sf::st_as_sf(coords = c("lon", "lat"), crs = "WGS84", remove= F)
+
+leaflet() %>% 
+  addTiles() %>% 
+  leaflet.extras2::addPlayback(data = df,
+                               time = "datetime",
+                               options = leaflet.extras2::playbackOptions(speed = 100000))
+
+```
+
+# more trying to make it into a temp map 
+```{r}
+
 #not sure
 #hottempmap <- map_data("world") #ggplot2
 
@@ -816,8 +848,22 @@ leaflet(cleaned_tempmap) %>%
 addLayersControl(baseGroups=c("One", "Two"), 
                    overlayGroups=c(cleaned_tempmap$"Site"), 
                    options=layersControlOptions(collapsed=FALSE))
-#not sure
 
+pal <- colorNumeric(palette = "YlOrRd", domain = cleaned_tempmap$Temperature)
+
+leaflet(cleaned_tempmap) %>%
+  # Add first tile
+  addTiles(group="One") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group="Two") %>%
+  setView(lng = -6, lat = 37.38, zoom = 15) %>%
+  addCircleMarkers(lng = ~cleaned_tempmap$Long, lat = ~cleaned_tempmap$Lat, stroke = FALSE, radius = 8, 
+                   color = ,~pal(cleaned_tempmap$Temperature), fillOpacity = 0.7,
+                   popup = ~leafpop::popupTable(cleaned_tempmap,
+                                       zcol = c("Site", "Time", "Temperature"),
+                                       row.numbers = FALSE, feature.id = FALSE)) %>% 
+addLayersControl(baseGroups=c("One", "Two"), 
+                   overlayGroups=c(cleaned_tempmap$"Site"), 
+                   options=layersControlOptions(collapsed=FALSE))
 ```
 
 
