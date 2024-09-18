@@ -5,7 +5,7 @@ date: "2023-10-03"
 output: html_document
 ---
 
-Last updated 8/29/2024 by M.Kachmar
+Last updated 9/18/2024 by M.Kachmar
 
 
 ## Setup: 
@@ -19,8 +19,8 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE)
 
 #knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
-#knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 #knitr::opts_knit$set(root.dir = "C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 ```
 
@@ -192,8 +192,6 @@ CT_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & S
 CT_Salinity    <- Master_table_LONG_means %>% dplyr::filter(variable == 'Salinity' & Site %in% c('FENC', 'ASHC'))
 CT_Temperature <- Master_table_LONG_means %>% dplyr::filter(variable == 'Temperature' & Site %in% c('FENC', 'ASHC'))
 CT_DO          <- Master_table_LONG_means %>% dplyr::filter(variable == 'RDO Concentration' & Site %in% c('FENC', 'ASHC'))
-CT_CHL         <- Master_table_LONG_means %>% dplyr::filter(variable == 'Chlorophyll-a Fluorescence' & Site %in% c('FENC', 'ASHC'))
-
 
 # View(CT_Temperature)
 # pH 
@@ -976,7 +974,6 @@ CT_DO_ASHC_yearly <- CT_DO_ASHC %>% na.omit() %>%
 CT_DO_ASHC_yearly
 ```
 
-
 # Clean ASHC for the LISS stakeholder reports (CT)
 ```{r, figs for LISS stakeholder reports}
 
@@ -1503,67 +1500,6 @@ ASHC_CHLA_2024
 pdf(paste0(path = "output/raw_plots/Report_plots/ASHC_CHLA_2024.pdf"), height = 7, width = 14)
 print(ASHC_CHLA_2024)
 ```
-```{r}
-#Trying to overlay rftm graph with sonde salinity code
-ASHC_Salinity_2024 <- ASHC_Salinity %>% na.omit() %>%
-             dplyr::filter(`Date Time` > '2024-03-01 00:00:00' & `Date Time` < '2024-11-30 00:00:00' ) %>% # change date range needed here
-             dplyr::mutate(Site = case_when(Site == 'ASHC' ~ 'Ash Creek', .default = 'Fence Creek')) %>% 
-             ggplot(aes(x=`Date Time`, 
-                       y=mean, # the mean values
-                       group=Site)) + # call the new mean
-              geom_line(aes(group = factor(Site), # lines for site
-                                linetype = Site), 
-                            size = 0.2, 
-                            position=position_dodge(.4)) + 
-              # scale_linetype_manual(values=c("solid", "dashed")) +
-              geom_point(aes(shape=Site, 
-                             fill=Site)) + 
-              scale_shape_manual(values=c(21, 22, 24, 25)) + 
-              scale_fill_manual(values=c("#D55E00",  "#0072B2")) + # "#CC79A7","#009E73"
-              geom_errorbar(aes(ymin=(mean)-(se), 
-                                ymax=(mean)+(se)), 
-                            width=0,position=position_dodge(.4)) +
-              facet_grid(rows = vars(Site)) + # , scales = "free_y" - if you wnat different y axis labels
-              ggtitle("Salinity 2024") +
-              labs(x = "Time", y = "Salinity") +
-              theme_classic() +
-              theme(legend.position = "none", axis.text= element_text(size= 15))
-
-ASHC_Salinity <- na.omit(ASHC_Salinity)
-ASHC_Salinity_2024 <- ASHC_Salinity %>%
-  mutate(date_collected= as.Date(`Date Time`), year = year (date_collected))
-
-#this chunk was working, but now it is not. It divided by date and gave a mean for each date.
-ASHC_Salinity_2024 <- ASHC_Salinity_2024 %>%
-  mutate(date = floor_date(date_collected)) %>%
-  group_by(date) %>%
-  summarize(mean_salinity = mean(mean))
-  #filter(!year == "2023")
-
-
-ASHC_Salinity_2024 <- ASHC_Salinity %>%
-  mutate(date_collected= as.Date(`Date Time`), month = month(date_collected), year = year(date_collected), day = day(date_collected), date = month(date_collected))%>%filter(!year == "2023") 
-
-
-
-# Proportion per month of intensity scores in 2024
-df_intensity_proportions2024ashc<- df_intensity_proportions %>% filter(!year=="2023")
-df_intensity_proportions2024ashc<- df_intensity_proportions2024ashc %>% filter(site=="ASHC")
-
-ggplot(data=df_intensity_proportions2024ashc, aes(x=date_collected, y= Proportion, fill=intensity_bin)) +
-  geom_bar(width = 7, stat="identity", position = "fill",colour = "black")+
-   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(fill ="Dermo Intensity")+
-  labs(title="Proportion of Intensity scores of Dermo infection in 2024", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))+
-scale_fill_brewer(palette = "YlOrBr")
-   #scale_x_continuous("Month", breaks = c(3,4,5,6,7,8,9,10))
-
-  scale_y_continuous("mean", sec.axis = sec_axis(~ (. - a)/b, name = "Proportion"))
-
-```
-
 ```{r}
 
 ## DAILY AVERAGES OF DO - ASHC###
@@ -2805,8 +2741,8 @@ DO_2024
 
 ## DAILY AVERAGES OF DO - GOLD###
 
-GOLD_DO$Date Time <- as.character(GOLD_DO$Date Time)
-date_time <- strsplit(GOLD_DO$Date Time, " ")  # Split at the space
+GOLD_DO$`Date Time` <- as.character(GOLD_DO$`Date Time`)
+date_time <- strsplit(GOLD_DO$`Date Time`, " ")  # Split at the space
 print(GOLD_DO)
 
 # Create separate columns for date and time
