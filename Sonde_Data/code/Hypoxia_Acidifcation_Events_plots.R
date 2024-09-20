@@ -3,7 +3,7 @@
 
 # HYPOXIA PLOTS ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-path.p              <- "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Hypoxic_events" #the location of all your respirometry files 
+path.p              <- "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Hypoxic_events" #the location of all your respirometry files 
 file.names.table    <- data.frame(txt.files = (basename(list.files(path = paste(path.p,'/',sep=''), pattern = "Summary.csv$", recursive = FALSE)))) 
 
 
@@ -42,8 +42,8 @@ Duration_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("Duration of hypoxic events") +
-  ylab("Duration of events (hours; minimum 1 hour)") +
-  facet_wrap(~Date)
+  ylab("Duration of events (hours; minimum 1 hour)")# +
+  # facet_wrap(~Date)
 # Duration_plot
 
 Frequency_plot <- Summary.table.final %>% 
@@ -52,8 +52,8 @@ Frequency_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("Frequency of hypoxic events") +
-  ylab("Number of events") +
-  facet_wrap(~Date)
+  ylab("Number of events") #+
+  # facet_wrap(~Date)
 # Frequency_plot
 
 EQ_plot <- Summary.table.final %>% 
@@ -62,12 +62,12 @@ EQ_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("(F*D)/M of hypoxic events") +
-  ylab("[Freq*Duration/Mean_magnitude]") +
-  facet_wrap(~Date) 
+  ylab("[Freq*Duration/Mean_magnitude]")#  +
+  # facet_wrap(~Date) 
 # EQ_plot
 
 library(ggpubr)
-pdf("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Hypoxic_events/Summary_plots.pdf", 
+pdf("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Hypoxic_events/2023_Summary_plots.pdf", 
     height = 12, width =10)
 ggarrange(Duration_plot,
           Frequency_plot,
@@ -92,7 +92,7 @@ dev.off()
 
 
 
-path.p              <- "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Acidification_events" #the location of all your respirometry files 
+path.p              <- "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Acidification_events" #the location of all your respirometry files 
 file.names.table    <- data.frame(txt.files = (basename(list.files(path = paste(path.p,'/',sep=''), pattern = "Summary.csv$", recursive = FALSE)))) 
 
 
@@ -131,8 +131,8 @@ Duration_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("Duration of acidifcation events") +
-  ylab("Duration of events (hours; minimum 1 hour)") +
-  facet_wrap(~Date)
+  ylab("Duration of events (hours; minimum 1 hour)")# +
+  # facet_wrap(~Date)
 # Duration_plot
 
 Frequency_plot <- Summary.table.final %>% 
@@ -140,9 +140,9 @@ Frequency_plot <- Summary.table.final %>%
   ggplot(aes(x= as.factor(threshold), y = as.numeric(frequency), fill = as.factor(Site))) + 
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
-  ggtitle("Frequency of acidifcation events") +
-  ylab("Number of events") +
-  facet_wrap(~Date)
+  ggtitle("Frequency of acidifcation events")  +
+  ylab("Number of events") # +
+  # facet_wrap(~Date)
 # Frequency_plot
 
 EQ_plot <- Summary.table.final %>% 
@@ -151,12 +151,12 @@ EQ_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("(F*D)/M of acidifcation events") +
-  ylab("[Freq*Duration/Mean_magnitude]") +
-  facet_wrap(~Date)
+  ylab("[Freq*Duration/Mean_magnitude]") #+
+  # facet_wrap(~Date)
 # EQ_plot
 
 library(ggpubr)
-pdf("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Acidification_events/Summary_plots.pdf", 
+pdf("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Acidification_events/2023_Summary_plots.pdf", 
     height = 12, width =10)
 ggarrange(Duration_plot,
           Frequency_plot,
@@ -174,7 +174,7 @@ dev.off()
 
 
 
-path.p              <- "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/LowSalinity_events" #the location of all your respirometry files 
+path.p              <- "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/LowSalinity_events" #the location of all your respirometry files 
 file.names.table    <- data.frame(txt.files = (basename(list.files(path = paste(path.p,'/',sep=''), pattern = "Summary.csv$", recursive = FALSE)))) 
 
 
@@ -213,8 +213,8 @@ Duration_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("Duration of low salinity  events") +
-  ylab("Duration of events (hours; minimum 1 hour)") +
-  facet_wrap(~Date)
+  ylab("Duration of events (hours; minimum 1 hour)") #+
+  # facet_wrap(~Date)
 # Duration_plot
 
 Frequency_plot <- Summary.table.final %>% 
@@ -223,8 +223,8 @@ Frequency_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("Frequency of low salinity  events") +
-  ylab("Number of events") +
-  facet_wrap(~Date)
+  ylab("Number of events") #+
+  # facet_wrap(~Date)
 # Frequency_plot
 
 EQ_plot <- Summary.table.final %>% 
@@ -233,12 +233,12 @@ EQ_plot <- Summary.table.final %>%
   geom_bar(stat="identity", position = position_dodge2(preserve = "single")) + 
   theme_classic() + 
   ggtitle("(F*D)/M of low salinity events") +
-  ylab("[Freq*Duration/Mean_magnitude]") +
-  facet_wrap(~Date)
+  ylab("[Freq*Duration/Mean_magnitude]") #+
+  # facet_wrap(~Date)
 # EQ_plot
 
 library(ggpubr)
-pdf("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/LowSalinity_events/Summary_plots.pdf", 
+pdf("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/LowSalinity_events/2023_Summary_plots.pdf", 
     height = 12, width =10)
 ggarrange(Duration_plot,
           Frequency_plot,
