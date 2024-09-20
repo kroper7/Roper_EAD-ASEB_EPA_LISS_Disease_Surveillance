@@ -67,7 +67,7 @@ EQ_plot <- Summary.table.final %>%
 # EQ_plot
 
 library(ggpubr)
-pdf("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Hypoxic_events/2023_Summary_plots.pdf", 
+pdf("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data/output/Hypoxic_events/2023_Summary_plots.pdf", 
     height = 12, width =10)
 ggarrange(Duration_plot,
           Frequency_plot,
