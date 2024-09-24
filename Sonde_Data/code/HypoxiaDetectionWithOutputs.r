@@ -24,20 +24,13 @@ MinEvent<-59.9; #defined in minutes, the minimum duration of hypoxia to be consi
 Interval<-60; #defined in minutes, the maximum distance (<=) between two measured hypoxic points that are part of same event
 timeDigits<-5; #specifies the number of decimal places to which the time data are accurate.
 #For reference, 5 decimal places is a resolution of slightly smaller than seconds.
-
 #Define some desired outputs here as booleans. Don't worry about it for now.
 #Might exclude this entirely. Not sure.
 
-#USER SHOULD NOT TOUCH ANYTHING BELOW THIS LINE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-# CHANGES MADE September 26 2023 to cater script for LISS Sonde data - by Samuel Gurr
-# most changes pertain to the inconsistencies in date formatting between sensors 
-
-#Imports the data.
-#Note that the following functions expect the columns to be 
-#TIME, TIME_NUM_FORMAT, and DO in that order.
+# CHANGE YOUR WORKING DIRECTORY TO THE SONDE DATA FOLDER
 getwd()
-setwd("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+setwd("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 filename <- as.character(file.choose())
 D        <- readLines(filename)
 ind      <- grep('Date Time',D)
@@ -47,6 +40,9 @@ raw_df   <- as.data.frame(raw)
 raw_df[2:(ncol(raw_df))] <- lapply(raw_df[2:(ncol(raw_df))],as.numeric)
 names(raw_df) <- gsub(" \\([0-9]+\\)", "", columns) # ommit the numeric information from all column names 
 
+
+# IMFORTANT HERE THAT THE DATA FORMAT CHANGES ARE ACCORDING THE THE FILE INPUT 
+# SOME FILES REQUIRE 'mdy_hm' OTHER FILES REQUIRE 'mdy_hms' OR 'ymd_hms'
 if(gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% c('082023_ASHC_Sonde.csv', 
                                                              '082023_LAUR_Sonde.csv', 
                                                              '092023_ASHC_Sonde.csv',
@@ -57,6 +53,16 @@ if(gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% c('082023_ASHC_Sonde.
   raw_df[,1] <- mdy_hms(raw_df[,1]) # with_tz(force_tz(mdy_hms(raw_df[,1]),tz='America/New_York'),'UTC')
 } else (raw_df[,1] <- ymd_hms(raw_df[,1])  #with_tz(force_tz(ymd_hms(raw_df[,1]),tz='America/New_York'),'UTC') # all other data files that are formatted as ymd_hm
 )
+
+
+#USER SHOULD NOT TOUCH ANYTHING BELOW THIS LINE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# CHANGES MADE September 26 2023 to cater script for LISS Sonde data - by Samuel Gurr
+# most changes pertain to the inconsistencies in date formatting between sensors 
+
+#Imports the data.
+#Note that the following functions expect the columns to be 
+#TIME, TIME_NUM_FORMAT, and DO in that order.
 
 data <- as.data.frame(raw_df[!is.na(raw_df$`Date Time`),] %>% 
   dplyr::mutate(TIME = as_datetime(`Date Time`), # convert time and rename 
