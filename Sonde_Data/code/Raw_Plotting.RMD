@@ -2213,6 +2213,7 @@ FENC_Monthly_Salinity
 
 
 # Clean GOLD for the LISS stakeholder reports (NEW YORK)
+#I want to create code to remove outliers for these graphs. Outliers are obvious temperature drops when the sonde is removed from the water. 
 ```{r, figs for LISS stakeholder reports}
 
 GOLD_pH          <- Master_table_LONG_means %>% dplyr::filter(variable == 'pH' & Site %in% c('GOLD')) 

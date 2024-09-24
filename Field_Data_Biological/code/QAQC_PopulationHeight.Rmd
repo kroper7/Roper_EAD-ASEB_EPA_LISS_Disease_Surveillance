@@ -119,7 +119,7 @@ height_all <- lapply(file_paths, function(file_path) {
   bind_rows
 as.data.frame(height_all) 
 
-View(height_all)
+#View(height_all)
 
 #height_all <- list.files(path = "Field_Data_Biological/raw_data/Height",                           # Identify all CSV files
 #  pattern = "*.csv", full.names = TRUE) %>% 
@@ -223,7 +223,7 @@ all_density_SE$PSE_all <- 100*(all_density_SE$se/all_density_SE$Count)
 densitysummary
 
 
-write_csv(densitysummary, "Field_Data_Biological/output/populationdensity_summary.csv") #, row.names=FALSE)
+write_csv(densitysummary, "Field_Data_Biological/Output/populationdensity_summary.csv") #, row.names=FALSE)
 
 ```
 #oyster size distribution
@@ -280,7 +280,7 @@ shellsize_summary
 
 #size distribution summary
 #note that calculating PSE and accuracy do not make sense for size distributions. Will need to figure out new metrics for the QAPP
-write_csv(shellsize_summary, "Field_Data_Biological/output/shellsize_summary.csv") #, row.names=FALSE)
+write_csv(shellsize_summary, "Field_Data_Biological/Output/shellsize_summary.csv") #, row.names=FALSE)
 ```
 
 #graphing shell height all sites
@@ -349,7 +349,7 @@ ggplot(data=height_ASHC_Live, aes(x= Height)) +
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
- facet_wrap(~ Season + Year, scales = "free", ncol = 1)
+ facet_wrap(~ Season + Year, scales = "free", ncol = 2, nrow=2)
 
 #Distribution Dead
 ggplot(data=height_ASHC_Dead, aes(x= Height)) +
@@ -358,7 +358,7 @@ ggplot(data=height_ASHC_Dead, aes(x= Height)) +
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
-   facet_wrap(~ Season + Year, scales = "free", ncol = 1)
+   facet_wrap(~ Season + Year, scales = "free", ncol = 2, nrow=2)
 
 ```
 

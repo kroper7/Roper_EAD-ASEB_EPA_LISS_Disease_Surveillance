@@ -1,6 +1,6 @@
 ---
 title: "Juvenile Growth"
-author: Kyra Lenderman
+author: Kyra Lenderman + Mariah Kachmar
 date: "6/20/2024"
 output: html_document
 
@@ -9,9 +9,9 @@ description: This code is for the Juvenille Growth Study looking at growth rates
 Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
 
 ---
-Last updated 08/29/24 by M.Kachmar
-  -updated August 
-  - attempted to calculate the growth rates (:
+Last updated 09/24/24 by M.Kachmar
+  -updated September for ASHC 
+
   
  
 
@@ -64,6 +64,7 @@ data_all <- lapply(file_paths, function(file_path) {
 
 as.data.frame(data_all)  # Convert tibble to data.frame
 
+View(data_all)
 
 data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs only in column "Date"
 
@@ -117,7 +118,7 @@ ggplot(data=data_all, aes(x=Site, y=Shell_length, fill=Site)) +
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Mean Shell Height ", x ="Site", y = "Mean Shell Height (mm)") +
-  facet_wrap(~Month)
+  facet_wrap(~Month, ncol = 4)
 ```
 
 ```{r}
