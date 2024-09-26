@@ -1,7 +1,7 @@
 ---
 title: "LIS Oyster Lab Tissue Processing"
 output: html_notebook
-
+Authot : Mariah Kachmar
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 

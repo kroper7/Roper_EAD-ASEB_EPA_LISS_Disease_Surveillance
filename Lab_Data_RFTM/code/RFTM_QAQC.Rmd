@@ -1,6 +1,6 @@
 ---
 title: "RFTM"
-author: "Katie McFarland"
+author: "Katie McFarland & Mariah Kachmar"
 date: "6/29/2023"
 output: html_document
 

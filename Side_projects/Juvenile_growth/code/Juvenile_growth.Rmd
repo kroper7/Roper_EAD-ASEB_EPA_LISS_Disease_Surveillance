@@ -250,7 +250,7 @@ Surv_ASHC <- Surv(time = ASHC$Month, event = ASHC$Survival)
 fit.surv_ASHC <- survfit(formula = Surv_ASHC ~ Bag_number, data = ASHC)
 
 ASHC_survival_plot<-ggsurvplot(fit.surv_ASHC, data = ASHC, break.x.by = 1,
-           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
+           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,9), legend.labs= c("bag 1", "bag 2",
                                                                  "bag 3"),
            legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Ash Creek, CT")
 ASHC_survival_plot
@@ -267,7 +267,7 @@ Surv_FENC <- Surv(time = FENC$Month, event = FENC$Survival)
 fit.surv_FENC <- survfit(formula = Surv_FENC ~ Bag_number, data = FENC)
 
 FENC_survival_plot<-ggsurvplot(fit.surv_FENC, data = FENC,break.x.by = 1,
-           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,8), legend.labs= c("bag 1", "bag 2",
+           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,9), legend.labs= c("bag 1", "bag 2",
                                                                  "bag 3"),
            legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Fence Creek, CT") 
 FENC_survival_plot

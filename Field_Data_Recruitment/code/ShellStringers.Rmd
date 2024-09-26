@@ -1,6 +1,6 @@
 ---
 title: "Recruitment"
-author: "Katie McFarland"
+author: "Katie McFarland & Mariah Kachmar"
 date: "11/17/2023"
 output: html_document
 

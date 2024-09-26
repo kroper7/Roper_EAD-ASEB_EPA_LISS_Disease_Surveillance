@@ -300,11 +300,11 @@ as.data.frame(GOLD_HOBO)
 
 View(GOLD_HOBO)
 
-
+names(GOLD_HOBO)
 #Change column names
 
 GOLD_HOBO <- GOLD_HOBO %>%
-  dplyr::rename(Temperature = `Temperature (°C)`) %>%
+  dplyr::rename(Temperature = `Temperature   (°C)`) %>%
   dplyr:: rename(Date_Time = `Date-Time (EST/EDT)`)
 GOLD_HOBO
 
