@@ -48,10 +48,10 @@ df1<-read_csv("HOBO_Data\\raw_data\\062024_FENC_HOBO.csv", col_names = TRUE)%>% 
   dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
   dplyr::rename(Date_Time = `Date-Time (EST/EDT)`)
 
-df2<-read_csv("HOBO_Data\\raw_data\\082024_FENC_HOBO.csv", col_names = TRUE)%>%  # update this csv when new data comes in from the new HOBO
+df2<-read_csv("HOBO_Data\\raw_data\\092024_FENC_HOBO.csv", col_names = TRUE)%>%  # update this csv when new data comes in from the new HOBO
   dplyr::rename(Temperature = `Ch:1 - Temperature   (°C)`) %>%
-  dplyr::rename(Date_Time = `Date-Time (EDT)`)%>%
-  dplyr::select( -c("Host Connected", "Button Down", "Button Up", "End of File", "Started Offset"))
+  dplyr::rename(Date_Time = `Date-Time (EST/EDT)`)%>%
+  dplyr::select( -c("Host Connected", "Button Down", "Button Up", "End of File", "Water Detect"))
 
 FENC_HOBO <- rbind(df1,df2)   #Combine the two data sheets
 

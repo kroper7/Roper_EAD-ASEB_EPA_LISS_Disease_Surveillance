@@ -156,8 +156,9 @@ write.csv(bedheight_summary, "Field_Data_Biological/output/bedheight_summary.csv
 rugosity_all <- select(data_all, -c("Field ID", "Quadrat_size", "Percent_coverage", "Live_count",
                                   "Box_count", "Gaper_count","Bed_height", "Quadrat"))
 
-rugosity_all <- na.omit(rugosity_all)
-head(rugosity_all)
+rugosity_all <- rugosity_all %>% select(where(~ !all(is.na(.))))
+rugosity_all <- rugosity_all%>% filter(!is.na(Rugosity))
+#head(rugosity_all)
 ```
 #June 2023 (spring) survey - rugosity data. Changing June 2023 data to match formate of the data later collected. All data pulled form June 2023 is from the original file.
 ```{r}
