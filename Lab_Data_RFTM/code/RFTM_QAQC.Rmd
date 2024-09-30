@@ -6,8 +6,8 @@ output: html_document
 
 description: This R code is used to import and summarize RFTM (Rays Fluid Thioglycollate Medium) intensity scoring from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. The scale used to score intensity for individuals is the Mackins Scale (citation). This score can be used to calculate prevalence, weighted prevalence and intensity across the population. 
 ---
-Last updated 09/25/24 by K. Lenderman
-  - Accuracy 79.0%
+Last updated 09/30/24 by K. Lenderman
+  - Accuracy 79.2%
   - Master file and Completeness file are up to date.
 
 
@@ -714,6 +714,26 @@ rftm_proportion_table
 
 
 ```
+
+```{r}
+#for overlay graph with sonde data
+mean_rftm_ashc <- data_all %>%
+  filter(site == "ASHC") %>%
+  filter(year == "2024")
+
+mean_rftm_ashc <- mean_rftm_ashc %>%
+  dplyr::group_by(site, month, year)%>%
+  dplyr::summarize(mean_rftm = mean(rftm_final, na.rm = TRUE))
+
+mean_rftm_fenc <- data_all %>%
+  filter(site == "FENC") %>%
+  filter(year == "2024")
+
+mean_rftm_fenc <- mean_rftm_fenc %>%
+  dplyr::group_by(site, month, year)%>%
+  dplyr::summarize(mean_rftm = mean(rftm_final, na.rm = TRUE))
+```
+
 
 Version
 ```{r}
