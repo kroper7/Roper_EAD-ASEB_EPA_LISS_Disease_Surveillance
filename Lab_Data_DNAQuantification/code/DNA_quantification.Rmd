@@ -63,10 +63,12 @@ write.csv(data_all, "Master_files\\qubit_all_data.csv", row.names=FALSE)
 ```
 
 ```{r}
-#Determining mean concetration of duplicate qubit runs
-data_means <- aggregate(Concentration~Sample_ID,data=data_all,FUN=mean)
-data_means <- data_means %>% rename(Concentration_ng.uL = Concentration)
-  
+#Determining mean/sd concentration of duplicate qubit runs
+qubit_summary <- summarySE(data = data_all, measurevar = "Concentration", groupvars = c( "Sample_ID"))
+qubit_summary <- qubit_summary %>% rename(mean_concentration_ng.uL = Concentration)
+
+write.csv(qubit_summary, "Lab_Data_DNAQuantification//output\\qubit_summary.csv", row.names=FALSE)
+
 ```
 
 
