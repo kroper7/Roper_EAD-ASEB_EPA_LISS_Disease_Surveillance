@@ -335,7 +335,7 @@ height_ASHC_Dead <- height_ASHC[height_ASHC$Survival_status == "Box"|height_ASHC
 print(height_ASHC_Dead)
 
 #plots
-ggplot(height_ASHC, aes(x=Season, y=Height, fill=Season)) +
+ggplot(height_ASHC, aes(x=factor(Season, levels = c("Spring", "Fall")), y=Height, fill=Season)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
@@ -343,22 +343,30 @@ ggplot(height_ASHC, aes(x=Season, y=Height, fill=Season)) +
   theme(axis.text=element_text(size=12)) + facet_wrap(~Year)
 
 #Distribution Live
-ggplot(data=height_ASHC_Live, aes(x= Height)) +
+ASHC_Distribution_Live<-ggplot(data=height_ASHC_Live, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
- facet_wrap(~ Season + Year, scales = "free", ncol = 2, nrow=2)
+ facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year, scales = "free", ncol = 2, nrow=2)
+ASHC_Distribution_Live
+pdf(paste0(path = "Field_Data_Biological/Output/ASHC_Distribution_Live.pdf"), height = 6, width = 11)
+print(ASHC_Distribution_Live)
+dev.off()
 
 #Distribution Dead
-ggplot(data=height_ASHC_Dead, aes(x= Height)) +
+ASHC_Distribution_Dead<-ggplot(data=height_ASHC_Dead, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
-   facet_wrap(~ Season + Year, scales = "free", ncol = 2, nrow=2)
+   facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year, scales = "free", ncol = 2, nrow=2)
+ASHC_Distribution_Dead
+pdf(paste0(path = "Field_Data_Biological/Output/ASHC_Distribution_Dead.pdf"), height = 6, width = 11)
+print(ASHC_Distribution_Dead)
+dev.off()
 
 ```
 
@@ -390,7 +398,7 @@ ggplot(data=df_quadrat_ASHC, aes(x= Survival_status, y = Count, fill = Survival_
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Count ", x ="Survival status", y= "Density")+
-  facet_wrap(~ Season, scales = "free")
+  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
 
 #Density of oysters per meter squared
 ggplot(data=mean_total_oysters_ASHC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
@@ -398,7 +406,7 @@ ggplot(data=mean_total_oysters_ASHC, aes(x= Survival_status, y = Total_Density, 
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Ash Creek Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
-  facet_wrap(~ Season, scales = "free")
+  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
 
 ```
 #FENC
@@ -408,11 +416,13 @@ ggplot(data=mean_total_oysters_ASHC, aes(x= Survival_status, y = Total_Density, 
 
 height_FENC<- Height_master %>% filter(Site == "FENC")
 
-height_FENC<- height_FENC %>%
-  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
+#View(height_FENC)
+
+#height_FENC<- height_FENC %>%
+#  mutate(Month = recode(Season, "fall" = "October", "spring" = "June")) 
 
 live_height_FENC<- height_FENC %>%
- group_by(Site, Season)%>%
+ group_by(Site, Season, Year)%>%
   filter(Survival_status == "Live")%>%
   summarize(Mean_Height = mean(Height))
 live_height_FENC
@@ -438,43 +448,47 @@ height_FENC_Dead <- height_FENC[height_FENC$Survival_status == "Box"|height_FENC
 print(height_FENC_Dead)
 
 #plots
-ggplot(height_FENC, aes(x=Season, y=Height, fill=Season)) +
+ggplot(height_FENC, aes(x=factor(Season, levels = c("Spring", "Fall")), y=Height, fill=Season)) +
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))
+  theme(axis.text=element_text(size=12))+
+ facet_wrap(~ Year, scales = "free", ncol = 1)
 
 #Distribution Live
-ggplot(data=height_FENC_Live, aes(x= Height)) +
+FENC_Distribution_Live<-ggplot(data=height_FENC_Live, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Fence Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,210), breaks = seq(0,210, by =10) )+
   scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))+
- facet_wrap(~ Month, scales = "free", ncol = 1)
+ facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year, scales = "free", ncol = 1)
+FENC_Distribution_Live
+pdf(paste0(path = "Field_Data_Biological/Output/FENC_Distribution_Live.pdf"), height = 6, width = 11)
+print(FENC_Distribution_Live)
+dev.off()
 
 #Distribution Dead
-ggplot(data=height_FENC_Dead, aes(x= Height)) +
+FENC_Distribution_Dead<-ggplot(data=height_FENC_Dead, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
+  labs(title="Fence Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
   scale_y_continuous(limits = c(0,60), breaks = seq(0,60, by = 5))+
-   facet_wrap(~ Month, scales = "free", ncol = 1)
-ggplot(height_FENC, aes(x=Season, y=Height, fill=Season)) +
-  geom_boxplot()+  
-   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
-  theme(axis.text=element_text(size=12))
+   facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year, scales = "free", ncol = 1)
+FENC_Distribution_Dead
+pdf(paste0(path = "Field_Data_Biological/Output/FENC_Distribution_Dead.pdf"), height = 6, width = 11)
+print(FENC_Distribution_Dead)
+dev.off()
 
-ggplot(data=height_FENC, aes(x= Height)) +
-  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
-  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Creek Height ", x ="Height (mm)")+
-  facet_wrap(~ Season, scales = "free", ncol = 1)
+
+#ggplot(data=height_FENC, aes(x= Height)) +
+#  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+#  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+#  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+#  labs(title="Fence Creek Creek Height ", x ="Height (mm)")+
+ # facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year, scales = "free", ncol = 1)
 
 ```
 
