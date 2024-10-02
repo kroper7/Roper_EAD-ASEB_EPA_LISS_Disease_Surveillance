@@ -461,9 +461,9 @@ FENC_Distribution_Live<-ggplot(data=height_FENC_Live, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,210), breaks = seq(0,210, by =10) )+
+  labs(title="Fence Creek Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,200), breaks = seq(0,200, by =10) )+
   scale_y_continuous(limits = c(0,100), breaks = seq(0,100, by = 10))+
- facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year, scales = "free", ncol = 1)
+ facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year,  scales = "free", ncol = 2, nrow=2)
 FENC_Distribution_Live
 pdf(paste0(path = "Field_Data_Biological/Output/FENC_Distribution_Live.pdf"), height = 6, width = 11)
 print(FENC_Distribution_Live)
@@ -474,9 +474,9 @@ FENC_Distribution_Dead<-ggplot(data=height_FENC_Dead, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Fence Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,190), breaks = seq(0,190, by =10) )+
-  scale_y_continuous(limits = c(0,60), breaks = seq(0,60, by = 5))+
-   facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year, scales = "free", ncol = 1)
+  labs(title="Fence Creek Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,180), breaks = seq(0,180, by =10) )+
+  scale_y_continuous(limits = c(0,50), breaks = seq(0,50, by = 5))+
+   facet_wrap(~ factor(Season, levels = c("Spring", "Fall")) + Year,  scales = "free", ncol = 2, nrow=2)
 FENC_Distribution_Dead
 pdf(paste0(path = "Field_Data_Biological/Output/FENC_Distribution_Dead.pdf"), height = 6, width = 11)
 print(FENC_Distribution_Dead)
@@ -520,7 +520,7 @@ ggplot(data=df_quadrat_FENC, aes(x= Survival_status, y = Count, fill = Survival_
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Fence Creek Count ", x ="Survival status", y= "Density")+
-  facet_wrap(~ Season, scales = "free")
+  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
 
 #Density of oysters per meter squared
 ggplot(data=mean_total_oysters_FENC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
@@ -528,7 +528,7 @@ ggplot(data=mean_total_oysters_FENC, aes(x= Survival_status, y = Total_Density, 
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Fence Creek Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
-  facet_wrap(~ Season, scales = "free")
+  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
 
 
 ```
@@ -572,33 +572,40 @@ print(height_GOLD_Live)
 height_GOLD_Dead <- height_GOLD[height_GOLD$Survival_status == "Box"|height_GOLD$Survival_status == "Gaper",]
 print(height_GOLD_Dead)
 
-ggplot(height_GOLD, aes(x = Date_collected, y = Height, color = Date_collected)) +
+ggplot(height_GOLD, aes(x = Year, y = Height, fill = Year)) +
   geom_boxplot() +  
   theme_bw() +  
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
-  labs(title = "Shell Height", x = "Month", y = "Height (mm)") +
+  labs(title = "Shell Height", x = "Year", y = "Height (mm)") +
   theme(axis.title.y = element_text(size = rel(1.3), angle = 90), axis.title.x = element_text(size = rel(1.3), angle = 0)) +
   theme(axis.text = element_text(size = 12))
 
 #Distribution Live
-ggplot(data=height_GOLD_Live, aes(x= Height)) +
+GOLD_Distribution_Live<-ggplot(data=height_GOLD_Live, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Gold Star Beach Height Live Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,170), breaks = seq(0,170, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
   facet_wrap(~ Year, scales = "free", ncol = 1)
+GOLD_Distribution_Live
+pdf(paste0(path = "Field_Data_Biological/Output/GOLD_Distribution_Live.pdf"), height = 6, width = 11)
+print(GOLD_Distribution_Live)
+dev.off()
 
 #Distribution Dead
-ggplot(data=height_GOLD_Dead, aes(x= Height)) +
+GOLD_Distribution_Dead<-ggplot(data=height_GOLD_Dead, aes(x= Height)) +
   geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Gold Star Beach Height Dead Oysters ", x ="Height (mm)")+ scale_x_continuous(limits= c(0,170), breaks = seq(0,170, by =10) )+
   scale_y_continuous(limits = c(0,20), breaks = seq(0,20, by = 5))+
   facet_wrap(~ Year, scales = "free", ncol = 1)
-
+GOLD_Distribution_Dead
+pdf(paste0(path = "Field_Data_Biological/Output/GOLD_Distribution_Dead.pdf"), height = 6, width = 11)
+print(GOLD_Distribution_Dead)
+dev.off()
 
 ```
 #GOLD density & mortality
@@ -607,11 +614,11 @@ df_quadrat_GOLD <- quadratdensity_all%>%
   filter(Site == "GOLD")
 df_quadrat_GOLD
 
-#Quadrat size is 25 x25cm (.0625 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 16
+#Quadrat size is 50 x50cm (.25 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 4 to = 1 meter
 
 df_density_GOLD <- df_quadrat_GOLD %>%
   dplyr::group_by(Site, Season, Year, Date_collected, Quadrat, Survival_status) %>% 
-  dplyr::summarize(Density = sum(Count)*16)
+  dplyr::summarize(Density = sum(Count)*4)
 df_density_GOLD
 
 #Mean of Oysters per m^2 across all quadrats
@@ -626,8 +633,16 @@ ggplot(data=df_quadrat_GOLD, aes(x= Survival_status, y = Count, fill = Survival_
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Gold Star Beach Count ", x ="Survival status", y= "Density")+
-  facet_wrap(~ Season+Year, scales = "free")
+  labs(title="Gold Star Count ", x ="Survival status", y= "Density")+
+  facet_wrap(~ Year, scales = "free")
+
+#Density of oysters per meter squared
+ggplot(data=mean_total_oysters_GOLD, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
+  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Gold Star Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  facet_wrap(~ Year, scales = "free")
 ```
 
 
