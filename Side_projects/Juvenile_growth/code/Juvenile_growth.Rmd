@@ -9,8 +9,8 @@ description: This code is for the Juvenille Growth Study looking at growth rates
 Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
 
 ---
-Last updated 09/25/24 by M.Kachmar
-  -updated September for ASHC & FENC
+Last updated 10/9/24 by M.Kachmar
+  -incorporated Kaplan Meier survival statistics and curves
 
   
  
@@ -145,7 +145,7 @@ ggplot(data=FENC, aes(x=Shell_length)) +
  facet_wrap(~ Month, scales = "free", ncol = 1)
 ```
 
-#Survival calculations
+#Mortality calculations
 ```{r}
 #Lets great some summaries to see numbers and calculate the survival %
 #Create a summary of counts across all bags
@@ -234,11 +234,10 @@ growth.rate
 ```
 
 
-#Kaplan Meier Survival 
-#This needs some work - the counts are not correct
+#Kaplan Meier Survival Statistics
 ```{r}
 
-View(ASHC)
+#View(ASHC)
 #View(FENC)
 
 # Create a survival object per bag and plot 
@@ -290,7 +289,7 @@ Surv_CT <- Surv(time = data_all$Month, event = data_all$Survival)
 fit.surv_CT <- survfit(formula = Surv_CT ~ Site, data = data_all)
 
 CT_survival_plot<-ggsurvplot(fit.surv_CT, data = data_all, break.x.by = 1,
-           linetype= c(1, 2),xlab = "Month", ylab= "Survival", xlim = c(5,9), legend.labs= c("Fence Creek", "Ash Creek"),
+           linetype= c(1, 2),xlab = "Month", ylab= "Survival", xlim = c(5,9), legend.labs= c("Ash Creek", "Fence Creek"),
            legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Survival between Ash Creek, CT and Fence Creek, CT")
 CT_survival_plot
 
@@ -308,9 +307,11 @@ pc_site
 
 #Chi sq values
 surv_diff_site<-survdiff(Surv(Month, Survival) ~ Site, data = data_all)
+surv_diff_site
 
-## Survival probability for all of the species by species, virus, and dose
-summary(survfit(Surv(Month, Survival) ~ Site, data = data_all), times = 7)
+## Survival probability for all of sites & bags
+summary(survfit(Surv(Month, Survival) ~ Site, data = data_all))
+summary(survfit(Surv(Month, Survival) ~ Site + Bag_number, data = data_all))
 
 
 #Cox proportional hazard
