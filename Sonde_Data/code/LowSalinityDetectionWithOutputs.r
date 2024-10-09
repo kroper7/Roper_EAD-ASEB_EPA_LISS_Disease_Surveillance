@@ -38,7 +38,7 @@ timeDigits<-5; #specifies the number of decimal places to which the time data ar
 #Note that the following functions expect the columns to be 
 #TIME, TIME_NUM_FORMAT, and Salinity in that order.
 getwd()
-setwd("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+# setwd("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
 filename <- as.character(file.choose())
 D        <- readLines(filename)
 ind      <- grep('Date Time',D)
@@ -56,6 +56,8 @@ if(gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% c('082023_ASHC_Sonde.
   raw_df[,1] <- mdy_hm(raw_df[,1]) # with_tz(force_tz(mdy_hm(raw_df[,1]),tz='America/New_York'),'UTC')
   } else if (gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% '072023_ASHC_Sonde.csv') {
     raw_df[,1] <- mdy_hms(raw_df[,1]) # with_tz(force_tz(mdy_hms(raw_df[,1]),tz='America/New_York'),'UTC')
+  } else if (gsub(".*/","", (gsub("\\","/",filename, fixed=T))) %in% '0924_GOLD_Sonde.csv') {
+    raw_df[,1] <- dmy_hm(raw_df[,1]) # with_tz(force_tz(mdy_hms(raw_df[,1]),tz='America/New_York'),'UTC')
   } else (raw_df[,1] <- ymd_hms(raw_df[,1])  #with_tz(force_tz(ymd_hms(raw_df[,1]),tz='America/New_York'),'UTC') # all other data files that are formatted as ymd_hm
 )
 # with_tz(force_tz(ymd_hms(raw_df[,1]),tz='America/New_York'),'UTC')

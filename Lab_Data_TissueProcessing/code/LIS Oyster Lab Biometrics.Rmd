@@ -1,27 +1,28 @@
 ---
 title: "LIS Oyster Lab Tissue Processing"
 output: html_notebook
-
+Authot : Mariah Kachmar
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 04/15/24 by M. Kachmar
-  - QAQC 0424ASHC - height slightlight larger than March - weather conditions were difficult so we were just grabbing what we could - still under 120mm
-  -BCS seem to be slightly improving this month - more 3 scores. 
-
+Updated 09/27/24 by K. Lenderman
+- all code up to date & graphs generated
+- 0924FENC QAQC
 
  
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(echo = TRUE)
 #knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
-```{r}
+
+
+```{r, echo=FALSE}
 library("ggplot2")
 library("readxl")
 library("plyr")                                     
@@ -33,6 +34,7 @@ library("purrr")
 library(reshape2)
 library(stringr)
 library("RColorBrewer")
+library("tidyr")
 ```
 
 
@@ -169,9 +171,14 @@ ggplot(data=data_all, aes(x=site, y=condition_score, fill=site)) +
 ```{r}
 
 mean_body_condition <- data_all %>%
-  dplyr::group_by(site, month)%>%
+  dplyr::group_by(site, month, year)%>%
   dplyr::summarize(mean_bsc = mean(condition_score, na.rm = TRUE))
 mean_body_condition
+
+#for overlay graph
+mean_bcs_ashc <- mean_body_condition %>%
+  filter(site == "ASHC") %>%
+  filter(year == "2024")
 
 #Mean body condtion scores - 2023
 data_2023 <- data_all%>%  filter(!year=="2024")
@@ -217,9 +224,9 @@ BCS_proportion_all_2023<- ggplot(data=df_BCS_proportions2023, aes(x=month, y= Pr
 
 BCS_proportion_all_2023
 
-pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2023.pdf"), height = 7, width = 13)
-print(BCS_proportion_all_2023)
-dev.off()
+#pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2023.pdf"), height = 7, width = 13)
+#print(BCS_proportion_all_2023)
+#dev.off()
 ```
 ```{r}
 #Proportions graph Body condition scores - 2024
@@ -247,6 +254,20 @@ BCS_proportion_all_2024
 pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2024.pdf"), height = 7, width = 13)
 print(BCS_proportion_all_2024)
 dev.off()
+```
+
+#Shell Pathology - all data
+#Includes 2023 data and all data that is in the 2024 format
+```{r}
+shell_path <- list.files(path = "Lab_Data_TissueProcessing/raw_data/shell_pathology",                           # Identify all CSV files
+ pattern = "*.csv", full.names = TRUE) %>% 
+lapply(read_csv) %>%   # Store all files in list
+  bind_rows          # Combine data sets into one data set 
+
+shell_path <- shell_path %>% filter(!is.na(lab_id))
+
+write.csv(shell_path, "Master_files/shell_pathology_all_data.csv", row.names=FALSE)
+
 ```
 
 
@@ -484,16 +505,16 @@ BCS_proportion_FENC<- ggplot(data=FENC_BCS_proportions, aes(x=month, y= Proporti
 
 BCS_proportion_FENC
   
-pdf(paste0(path = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/output" ,"/FENC_BCS_proportion.pdf"), height = 7, width = 13)
+pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/FENC_BCS_proportion.pdf"), height = 7, width = 13)
 print(BCS_proportion_FENC)
 dev.off()
 ```
 # % of scores >3 at Fence Creek - all years
 ```{r}
 #removing 0823FENC_28 bcs was NA
-df_FENC. <- df_FENC%>%filter(!row_number() %in% c(208))
+df_FENC <- df_FENC %>% drop_na(condition)
 
-FENC_precent_greater_3 <- df_FENC. %>%
+FENC_precent_greater_3 <- df_FENC %>%
   dplyr::group_by(month, year) %>%
   dplyr::summarise(Percentage = mean(condition_score <= 3)*100)
 FENC_precent_greater_3
@@ -531,9 +552,12 @@ dev.off()
 
 
 # Gold Star Beach Summary
+# 0524GOLD has 46 samples - we attempted to sample from 2022 and 2023 planting and consider them seperate but it appeared that due to a storm the plantings mixed together. 
+
 ```{r}
 df_GOLD<- data_all%>%
   filter(site=="GOLD")
+df_GOLD <- df_GOLD %>% filter(!is.na(condition))
 
 #2023 data
 df_GOLD2023 <- df_GOLD%>%  filter(!year=="2024")
@@ -636,7 +660,7 @@ ggplot(data=df_GOLD2023, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Beach Body Condition Score - 2023 ", x ="Condition categorization")+
+  labs(title="Goldstar Beach  Body Condition Score - 2023 ", x ="Condition categorization")+
     facet_wrap(~ month, scales = "free")
 
 #Condition distribution across all sample months - 2024
@@ -644,17 +668,20 @@ ggplot(data=df_GOLD2024, aes(x= condition)) +
   geom_bar()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Goldstar Beach Body Condition Score - 2024", x ="Condition categorization")+
+  labs(title="Goldstar Beach  Body Condition Score - 2024", x ="Condition categorization")+
     facet_wrap(~ month, scales = "free")
 
 #Mean Body condition per month
 ggplot(data=df_GOLD, aes(x= month, y= condition_score, group = month)) +
   geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
-  labs(title="Goldstar Beach Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~year)
+  labs(title="Goldstar Beach  Mean Body Condition Score ", x ="month", y= " condition score (1-9)")+ scale_y_reverse() + facet_wrap(~year)
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 
 ```
+
+
+
 
 # Laurel Hollow Summary - NO LONGER A STUDY SITE
 ```{r}
@@ -818,15 +845,12 @@ f <- function(pal) brewer.pal(brewer.pal.info[pal, "maxcolors"], pal)
 
 df_3_prop<- select(data_2023, -c("site"))
 
-#Count and proportion table for 2023 rftm scores by month
+#Count and proportion table for 2023 bcs scores by month
 bcs_table <- table(data_2023$condition_score, data_2023$month, data_2023$site)
 names(dimnames(bcs_table)) <- c("Body Condition Score", "Month", "Site")
 bcs_table <- addmargins(bcs_table)
 bcs_table
 
-rftm_proportion_table <- prop.table(rftm_table)
-rftm_proportion_table <- addmargins(rftm_proportion_table)
-rftm_proportion_table
 ```
 
 

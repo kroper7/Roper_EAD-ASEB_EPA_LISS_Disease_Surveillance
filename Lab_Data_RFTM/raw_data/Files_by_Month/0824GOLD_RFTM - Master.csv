@@ -1,0 +1,31 @@
+lab_id,date_collected,site,lab_sample,date_rftmread1,rftm_reader1,rftm_intensity_read1,duplicate_read,date_rftmread2,rftm_reader2,rftm_intensity_read2,rftm_notes,rftm_final
+0824GOLD_01,2024-08-14,GOLD,1,2024-08-22,Kyra Lenderman,0.5,,,,,,0.5
+0824GOLD_02,2024-08-14,GOLD,2,2024-08-22,Kyra Lenderman,1,,,,,,1
+0824GOLD_03,2024-08-14,GOLD,3,2024-08-22,Mariah Kachmar,0,,,,,,0
+0824GOLD_04,2024-08-14,GOLD,4,2024-08-22,Mariah Kachmar,0.5,,,,,,0.5
+0824GOLD_05,2024-08-14,GOLD,5,2024-08-22,Kelly Roper,1,TRUE,,Mariah Kachmar,1,,1
+0824GOLD_06,2024-08-14,GOLD,6,2024-08-22,Kelly Roper,0.5,TRUE,,Mariah Kachmar,0.5,,0.5
+0824GOLD_07,2024-08-14,GOLD,7,2024-08-22,Kyra Lenderman,2,,,,,,2
+0824GOLD_08,2024-08-14,GOLD,8,2024-08-22,Kyra Lenderman,0.5,,,,,,0.5
+0824GOLD_09,2024-08-14,GOLD,9,2024-08-22,Kelly Roper,0.5,,,,,,0.5
+0824GOLD_10,2024-08-14,GOLD,10,2024-08-22,Kelly Roper,0,,,,,,0
+0824GOLD_11,2024-08-14,GOLD,11,2024-08-22,Kyra Lenderman,0.5,,,,,,0.5
+0824GOLD_12,2024-08-14,GOLD,12,2024-08-22,Kyra Lenderman,0.5,,,,,,0.5
+0824GOLD_13,2024-08-14,GOLD,13,2024-08-22,Mariah Kachmar,0.5,,,,,,0.5
+0824GOLD_14,2024-08-14,GOLD,14,2024-08-22,Mariah Kachmar,0,TRUE,,Kyra Lenderman,0,,0
+0824GOLD_15,2024-08-14,GOLD,15,2024-08-22,Kelly Roper,0,,,,,,0
+0824GOLD_16,2024-08-14,GOLD,16,2024-08-22,,,,,,,,
+0824GOLD_17,2024-08-14,GOLD,17,2024-08-22,Mariah Kachmar,2,,,,,,0
+0824GOLD_18,2024-08-14,GOLD,18,2024-08-22,Mariah Kachmar,0.5,,,,,,0.5
+0824GOLD_19,2024-08-14,GOLD,19,2024-08-22,Kelly Roper,0,,,,,,0
+0824GOLD_20,2024-08-14,GOLD,20,2024-08-22,Kelly Roper,1,,,,,,1
+0824GOLD_21,2024-08-14,GOLD,21,2024-08-22,Mariah Kachmar,0,,,,,,0
+0824GOLD_22,2024-08-14,GOLD,22,2024-08-22,Mariah Kachmar,0,,,,,,0
+0824GOLD_23,2024-08-14,GOLD,23,2024-08-22,Mariah Kachmar,0,,,,,,0
+0824GOLD_24,2024-08-14,GOLD,24,2024-08-22,Mariah Kachmar,0,,,,,,0
+0824GOLD_25,2024-08-14,GOLD,25,2024-08-22,Kelly Roper,0.5,,,,,,0.5
+0824GOLD_26,2024-08-14,GOLD,26,2024-08-22,Kelly Roper,0,,,,,,0
+0824GOLD_27,2024-08-14,GOLD,27,2024-08-22,Mariah Kachmar,0,,,,,,0
+0824GOLD_28,2024-08-14,GOLD,28,2024-08-22,Mariah Kachmar,0,,,,,,0
+0824GOLD_29,2024-08-14,GOLD,29,2024-08-22,Kyra Lenderman,2,,,,,,2
+0824GOLD_30,2024-08-14,GOLD,30,2024-08-22,Kyra Lenderman,0.5,,,,,,0.5

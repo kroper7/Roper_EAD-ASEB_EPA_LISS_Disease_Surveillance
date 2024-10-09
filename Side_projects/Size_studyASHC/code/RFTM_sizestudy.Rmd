@@ -1,0 +1,586 @@
+---
+title: "RFTM"
+author: ""
+date: "1/22/2024"
+output: html_document
+
+description: This R code is used to import and summarize RFTM (Rays Fluid Thioglycollate Medium) intensity scoring from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. The scale used to score intensity for individuals is the Mackins Scale (citation). This score can be used to calculate prevalence, weighted prevalence and intensity across the population. 
+---
+
+Last updated 1/22/2024 by Kyra Lenderman
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE}
+library("dplyr")                                    
+library("plyr")                                     
+library("readr")             
+library("Rmisc")
+library("ggplot2")
+library("lubridate")
+```
+
+```{r}
+# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+
+```
+
+### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+# reading in .csv files from local folder
+```{r}
+data_all <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM/Files_by_Month",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows                                         # Combine data sets into one data set 
+data_all                                            # Print data to RStudio console
+
+as.data.frame(data_all)                            # Convert tibble to data.frame
+
+tail(data_all)
+
+write.csv(data_all, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\All_RFTM_data.csv", row.names=FALSE)
+```
+
+
+## adding a month column to the data
+
+```{r}
+data_all <- data_all %>%
+  mutate(date_collected= as.Date(date_collected), month = month(date_collected))
+
+data_all
+```
+
+#Filtering NAs 
+```{r}
+data_all <- data_all %>% filter(!is.na(date_collected))
+data_all
+
+```
+
+#This chunk of code is removing 0723LAUR_20 and 0723LAUR_26 from the datasheet as they have been identified as spat on shell to avoid bias in the data. During this sample collection there were animals that were significantly smaller than the single set oysters. 
+```{r}
+data_all <- data_all %>%
+  subset(lab_id != "0723LAUR_20") %>%
+  subset(lab_id != "0723LAUR_26")
+
+
+
+```
+
+# Summary of all data and Completeness Check
+```{r}
+st_rftm_final <- summarySE(data_all, measurevar="rftm_final", groupvars=c("site", "date_collected"))
+st_rftm_final
+
+#Calculate completeness for QC
+st_rftm_final$Completeness <- st_rftm_final$N /30
+
+st_rftm_final
+
+write.csv(st_rftm_final, "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Completeness_RFTM_intensity_data.csv", row.names=FALSE)
+```
+
+# Comparied reader 1 and reader 2
+  --- THis is not currently working properly -- Currently calling everything with two reads to be TRUE
+  
+```{r}
+data_all$results = ifelse(data_all$rftm_intensity_read1 < data_all$rftm_intensity_read2, 'FALSE',
+  ifelse(data_all$rftm_intensity_read1 > data_all$rftm_intensity_read2, 'FALSE',
+  ifelse(data_all$rftm_intensity_read1 == data_all$rftm_intensity_read2, 'TRUE', NA)))
+  
+data_all
+```
+
+
+
+```{r}
+Data_Accuracy = data.frame(data_all$lab_id,data_all$date_collected, data_all$site, data_all$rftm_intensity_read1, data_all$rftm_intensity_read2, data_all$results)
+
+Data_Accuracy <- na.omit(Data_Accuracy)
+Data_Accuracy
+```
+
+# Accuracy Output
+```{r}
+#count TRUE values in vector
+x <- Data_Accuracy %>% 
+  dplyr::group_by(data_all.site, data_all.date_collected, data_all.results) %>% 
+  dplyr::summarise(count = n())
+x2 <- x %>% 
+  dplyr::group_by()
+x
+T <- nrow(Data_Accuracy %>% filter(data_all.results == 'TRUE'))
+F <- nrow(Data_Accuracy %>% filter(data_all.results == 'FALSE'))
+
+Accuracy <- T/(T+F)
+Accuracy
+
+#write.csv(Data_Accuracy, "C:/Users/katherine.mcfarland/Documents/4. GitHub/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_RFTM\\Accuracy_RFTM_intenisty_data.csv", row.names=FALSE)
+```
+
+#Graphing Weighted prevalence(= Sum of individual intensity scores / total number of oyster sampled)
+
+```{r, echo=FALSE}
+ggplot(data=data_all, aes(x=month, y=rftm_final, fill=site)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Weighted prevalence of Dermo infection", x ="Date", y = "Weighted prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+  facet_wrap(~site)
+
+```
+```{r}
+#Graphing mean weighted prevalence over time
+df_wp_summary <- data_all %>%
+  dplyr::group_by(site, month) %>% 
+  dplyr::summarize( Weighted_prevalence = mean(rftm_final))
+df_wp_summary
+
+ggplot(data=df_wp_summary, aes(x=month, y=Weighted_prevalence, color=site)) +
+  geom_point()+  
+  geom_line(aes(group = site))+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Weighted Prevalence of Dermo infection", x ="Month", y = "Weighted Prevalence Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+
+# Prevalence calculations for all sites
+# Prevalence = # infected/ total # sampled
+```{r}
+## Prevalence T/F
+
+data_all<-data_all%>% filter(!is.na(rftm_final))
+data_all
+
+data_all$prevalent = ifelse(data_all$rftm_final == 0, '0',
+  ifelse(data_all$rftm_final > 0, '1', NA))
+  
+data_all
+
+# YEARLY PREVALENCE %
+present <- nrow(data_all %>% filter(prevalent == '1'))
+absent <- nrow(data_all %>% filter(prevalent == '0'))
+
+prevalence_all <- present/(present+absent)
+prevalence_all
+# 67.9%
+
+str(data_all$prevalent)
+data_all$prevalent <- as.numeric(data_all$prevalent)
+
+df_prevalence_summary <- data_all %>%
+  dplyr::group_by(site, month) %>% 
+  dplyr::summarize( prevalence_precentage= mean(prevalent)* 100)
+df_prevalence_summary
+
+```
+#Graphing mean prevalence 
+```{r}
+
+ggplot(data=df_prevalence_summary, aes(x=month, y=prevalence_precentage, color=site)) +
+  geom_point()+  
+  geom_line(aes(group = site))+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence of Dermo infection", x ="Month", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+```
+```{r}
+
+ggplot(data=df_prevalence_summary, aes(x=site, y=prevalence_precentage, fill = site)) +
+ geom_boxplot()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence of Dermo infection", x ="Site", y = "Dermo Prevaence %")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+```
+
+# Intensity all sites (Sum of intensity scores/# of infected oysters)
+# intensity calculation for august gold star needs to be fixed. 
+```{r}
+data_all
+
+data_all$rftm_final<-as.numeric(as.character(data_all$rftm_final))
+
+df_intensity_summary <- data_all %>%
+  dplyr::group_by(site, month) %>% 
+  dplyr::summarize( intensity = sum(rftm_final, na.rm= TRUE)/sum(prevalent, na.rm = TRUE))
+df_intensity_summary
+
+# Need to fix 0823GOLD? Looked at the raw data sheet and the scores were all 0. 
+```
+```{r}
+
+ggplot(data=df_intensity_summary, aes(x=month, y=intensity, color=site)) +
+  geom_point()+  
+  geom_line(aes(group = site))+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Month", y = "Intensity score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12)) + scale_y_continuous(limits = c(0, 3))
+
+```
+```{r}
+
+## Stacked bar graph showing proportions per month of intensity scores
+
+## Not letting be add a 5 category - need to figure out why
+## Also gold star is missing data? 
+
+
+df_intensity_proportions<- data_all %>%
+  mutate(rftm_final_numeric = as.numeric(rftm_final),intensity_bin = case_when(rftm_final == 0 ~ "0", rftm_final == 0.5 ~"0.5",rftm_final == 1 ~ "1", rftm_final == 2 ~"2",rftm_final == 3 ~ "3", rftm_final == 4 ~"4",rftm_final == 5 ~ "5", TRUE ~ as.character(rftm_final))) %>%
+  group_by(site, month, intensity_bin) %>%
+  summarise(Count= n()) %>%
+  ungroup() %>%
+  mutate(Proportion = Count/sum(Count))
+
+df_intensity_proportions<- na.omit(df_intensity_proportions)
+
+df_intensity_proportions
+
+ggplot(data=df_intensity_proportions, aes(x=month, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores of Dermo infection", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+ scale_fill_brewer() +
+  facet_wrap(~ site)
+
+```
+
+# Ash Creek Summary
+```{r}
+df_ASHC <- data_all%>%
+  filter(site=="ASHC")
+df_ASHC 
+
+#Weighted prevalence 
+st_intensity_ASHC <- summarySE(df_ASHC, measurevar="rftm_final", groupvars=c("month"))
+st_intensity_ASHC
+
+#Prevalence
+df_ASHC_prevalence <- df_prevalence_summary %>% 
+  filter(site == "ASHC")
+df_ASHC_prevalence
+
+#Intensity Index
+df_ASHC_intensity <- df_intensity_summary %>%
+  filter(site == "ASHC")
+df_ASHC_intensity
+
+
+```
+
+
+```{r, echo=FALSE}
+#Graphing weighted prevalence ASHC
+
+ggplot(data=df_ASHC, aes(x=month, y=rftm_final, group= month)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Ash Creek Weighted Prevalence Dermo infection", x ="Month", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+
+#Weighted prevalence
+ggplot(data=st_intensity_ASHC, aes(x=month, y=rftm_final)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Weighted Prevalence of Dermo infection", x ="Month", y = "Weighted Prevalence Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+##Prevalence
+ggplot(data=df_ASHC_prevalence, aes(x=month, y=prevalence_precentage)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence", x ="Month", y = "Prevalence precent")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Intensity index
+ggplot(data=df_ASHC_intensity, aes(x=month, y=intensity)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Ash Creek Intensity Index", x ="Month", y = "Intensity Index")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+```
+
+
+
+# Fence Creek Summary
+```{r}
+df_FENC <- data_all%>%
+  filter(site=="FENC")
+df_FENC 
+
+#Weighted prevalence
+
+st_intensity_FENC <- summarySE(df_FENC, measurevar="rftm_final", groupvars=c("month"))
+st_intensity_FENC
+
+#Prevalence
+df_FENC_prevalence <- df_prevalence_summary %>% 
+  filter(site == "FENC")
+df_FENC_prevalence
+
+#Intensity Index
+df_FENC_intensity <- df_intensity_summary %>%
+  filter(site == "FENC")
+df_FENC_intensity
+
+```
+
+```{r, echo=FALSE}
+#Graphing weighted prevalence FENC
+
+ggplot(data=df_FENC, aes(x=date_collected, y=rftm_final, group= date_collected)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Fence Creek Weighted prevalence Dermo infection", x ="Date", y = "Weighted prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+
+#Weighted prevalence
+ggplot(data=st_intensity_FENC, aes(x=month, y=rftm_final)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Weighted Prevalence of Dermo infection", x ="Month", y = "Weighted Prevalence Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+##Prevalence
+ggplot(data=df_FENC_prevalence, aes(x=month, y=prevalence_precentage)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence", x ="Month", y = "Prevalence precent")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Intensity index
+ggplot(data=df_FENC_intensity, aes(x=month, y=intensity)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Fence Creek Intensity Index", x ="Month", y = "Intensity Index")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+# Laurel Hollow summary
+```{r}
+df_LAUR <- data_all%>%
+  filter(site=="LAUR")
+df_LAUR 
+
+#weighted prevalence
+st_intensity_LAUR <- summarySE(df_LAUR, measurevar="rftm_final", groupvars=c("date_collected"))
+st_intensity_LAUR
+
+```
+
+```{r, echo=FALSE}
+
+#Graphing weighted prevalence LAUR
+
+ggplot(data=df_LAUR, aes(x=date_collected, y=rftm_final, group= date_collected)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Laurel Hollow Weighted prevalence of Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+
+# Gold Star summary
+```{r}
+df_GOLD <- data_all%>%
+  filter(site=="GOLD")
+df_GOLD 
+
+df_GOLD <- df_GOLD %>% filter(!is.na(rftm_final))
+
+#Weighted prevalence
+st_intensity_GOLD <- summarySE(df_GOLD, measurevar="rftm_final", groupvars=c("month"))
+st_intensity_GOLD
+
+#Prevalence
+df_GOLD_prevalence <- df_prevalence_summary %>% 
+  filter(site == "GOLD")
+df_GOLD_prevalence
+
+#Intensity Index
+df_GOLD_intensity <- df_intensity_summary %>%
+  filter(site == "GOLD")
+df_GOLD_intensity
+
+
+df_GOLD_proportions<-df_intensity_proportions %>%
+  filter(site =="GOLD")
+
+df_GOLD_proportions
+```
+
+```{r, echo=FALSE}
+
+#Graphing weighted prevalence GOLD
+
+ggplot(data=df_GOLD, aes(x=month, y=rftm_final, group= date_collected)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Gold Star Beach Weighted prevalence of Dermo infection", x ="Date", y = "Weighted Prevalence")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Weighted prevalence
+ggplot(data=st_intensity_GOLD, aes(x=month, y=rftm_final)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Weighted Prevalence of Dermo infection", x ="Month", y = "Weighted Prevalence Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+##Prevalence
+ggplot(data=df_GOLD_prevalence, aes(x=month, y=prevalence_precentage)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Prevalence", x ="Month", y = "Prevalence precent")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Intensity index
+ggplot(data=df_GOLD_intensity, aes(x=month, y=intensity)) +
+  geom_point()+  
+  geom_line()+
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Goldstar Beach Intensity Index", x ="Month", y = "Intensity Index")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Proportions
+
+ggplot(data=df_GOLD_proportions, aes(x=month, y= Proportion, fill=intensity_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill", colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Proportion of Intensity scores of Dermo infection", x ="month", y = "Proportion", fill = "Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+   scale_fill_brewer() +
+   scale_x_continuous( breaks = seq(5,12, by =1) )
+#+facet_wrap(~ site)
+
+```
+# This chunk of data combines tissue processing and RFTM data into one sheet to observe disease across zones and light regimes for ASHC and FENC
+# We want to determine whether or not to continue using zone and light regime for collections - are there differences between them? 
+```{r}
+#Tissue processing data
+data_all_tissue <- list.files(path = "C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Lab_Data_TissueProcessing/Files_by_Month",                           # Identify all CSV files
+  pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_csv) %>%                              # Store all files in list
+  bind_rows                                         # Combine data sets into one data set 
+data_all_tissue      
+
+data_all_tissue <- data_all_tissue %>%
+  mutate(date_collected= as.Date(date_collected), month = month(date_collected))
+
+data_all_tissue<- data_all_tissue %>%
+  mutate(condition_score = recode(condition, 
+                                     "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
+                                     "8_poor"= 8, "9_very_poor"= 9))
+head(data_all_tissue)
+
+# Print data to RStudio console
+
+as.data.frame(data_all_tissue)                            # Convert tibble to data.frame
+
+# Subset CT sites using zone and light regime 
+df_tissue_CT<- data_all_tissue%>%
+  filter(site %in% c("ASHC", "FENC"))
+df_tissue_CT
+
+#merging tissue processing and RFTM 
+df_combined <- merge(data_all, df_tissue_CT, by= c("lab_id", "date_collected", "site", "lab_sample"))
+df_combined
+
+df_combined2 <- merge(data_all, data_all_tissue, by= c("lab_id", "date_collected", "site", "lab_sample"))
+df_combined2
+
+#subset by site
+df_combined_ASHC<- df_combined%>%
+  filter(site == "ASHC")
+df_combined_ASHC
+
+df_combined_FENC<- df_combined%>%
+  filter(site == "FENC")
+df_combined_FENC
+```
+```{r}
+#graphing intensity scores by body condition to see if there is a relationship across all sites
+ggplot(data=df_combined2, aes(x=rftm_final, y=condition_score)) +
+  geom_point()+   
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection vs body condition score", x ="Intensity Dermo Score", y = "Body Condition Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+
+```{r, echo=FALSE}
+# ASHC 
+ggplot(data=df_combined_ASHC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone, fill = oyster_zone)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Zone", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+```
+```{r, echo=FALSE}
+# FENC 
+#Zone
+ggplot(data=df_combined_FENC, aes(x=oyster_zone, y=rftm_final, group= oyster_zone, fill = oyster_zone)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Zone", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+#Light regime
+ggplot(data=df_combined_FENC, aes(x=light_regime, y=rftm_final, group= light_regime, fill = light_regime)) +
+  geom_boxplot()+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(title="Intensity of Dermo infection", x ="Light Regime", y = "Dermo Intensity Score")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))
+
+
+```
+
+Version
+```{r}
+sessionInfo()
+```
+

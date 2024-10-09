@@ -1,0 +1,52 @@
+---
+title: "Merge_Clean_Files"
+author: "Samuel Gurr"
+date: "2024-06-03"
+output: html_document
+---
+
+# Objective:
+
+* super breif script to simply merge the generated master files from Cleanup_2023, Cleanup_2024, etc. into one
+
+
+## Setup: 
+
+* call your root directory, using opts_knit assigns for the entire script so your paths will alwyas be from this start point!
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      cache = TRUE)
+
+#knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+#knitr::opts_knit$set(root.dir = "C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+knitr::opts_knit$set(root.dir = "C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance/Sonde_Data")
+
+```
+
+
+## Load data:
+
+```{r load data}
+
+Sonde_2023 <- read.csv("output/Sonde_master_2023.csv", check.names = F) %>% dplyr::select(-1)
+Sonde_2024 <- read.csv("output/Sonde_master_2024.csv", check.names = F) %>% dplyr::select(-1)
+
+```
+## Merge 
+
+* 'Rbind' is a base call, meaning no packages are required, you load R, you got it!
+
+* *NOTE* rbind is dependent on all columns being the same, we made a diligent effor in our Cleanup files so that these are exact replications, just with different data!
+
+```{r merge and output}
+
+?rbind # 
+
+Sonde_master  <- rbind(Sonde_2023, Sonde_2024)
+
+
+write.csv(Sonde_master, "output/Sonde_master.csv")
+```

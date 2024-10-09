@@ -1,0 +1,304 @@
+---
+title: "Juvenile Growth"
+author: Kyra Lenderman + Mariah Kachmar
+date: "6/20/2024"
+output: html_document
+
+description: This code is for the Juvenille Growth Study looking at growth rates and survival of ~1 year old spat produced from the natural oyster bed at Ash Creek. The spat were divided into replicates of 3 spat bags with 100 individuals per bag and placed at Ash Creek, Fairfield CT and Fence Creek, Madison CT. The goal is to compare growth and survival at each site and determine if and what environmental factors may influence the population. 
+
+Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
+
+---
+Last updated 09/25/24 by M.Kachmar
+  -updated September for ASHC & FENC
+
+  
+ 
+
+```{r setup, include=FALSE}
+#make sure that your path is not commented (#) out and all others are
+#this shows the path that R will take to find the data within your files on your computer
+
+knitr::opts_chunk$set(echo = TRUE) 
+#knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+#knitr::opts_knit$set(root.dir = 'C:/Users/katherine.mcfarland/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Katie's
+```
+
+
+```{r,echo = FALSE}
+#this code loads all packages that the code will need
+#make sure all packages are installed before running this code
+library("ggplot2")
+library("ggpubr")
+library("readxl")
+library("plyr")                                     
+library("dplyr")
+library("Rmisc")
+library("readr")  
+library("lubridate")
+library("purrr")
+library("tidyr")
+library("survminer")
+library("survival")
+library("ggpubr")
+```
+
+### This code chunk merges all .csv files within the Tissue processing folder into one data fram and outputs the full dataset into a .csv master file. This allows us to download the raw data as a .csv, add it to the repository folder, and create the master data file without copying and pasting data in excel.
+# reading in .csv files from local folder
+```{r}
+#Collecting and merging all raw data
+
+file_paths <- list.files(path = "Side_projects/Juvenile_growth/raw_data",
+                          pattern = "*.csv", full.names = TRUE)
+
+
+data_all <- lapply(file_paths, function(file_path) {
+  read_csv(file_path) %>%
+    mutate(
+      Date = as.Date(Date,format = "%m/%d/%Y"))
+}) %>%
+  bind_rows
+
+as.data.frame(data_all)  # Convert tibble to data.frame
+
+View(data_all)
+
+data_all <- data_all %>% filter(!is.na(Date))  #filtering NAs only in column "Date"
+
+data_all <- data_all %>% select(where(~ !all(is.na(.)))) #removing excess columns with NA
+
+#View(data_all)
+
+write.csv(data_all, "Master_files\\juv_growth_all_data.csv", row.names=FALSE)  #creating/printing csv file of all raw data merged together
+```
+
+#This code chunk with specify to R the order in which you want month presented. When not using a data and grouping by month, the default is to put in alphabetical order, this chuck will correct that. 
+
+#This code chunk is not working. it is reading the format as dd/mm/yy instead of mm/dd/yy and giving a month associated with the date. 
+```{r}
+#The dates in the data files are reading as a character "chr" so we need to change them to date format
+
+data_all <- data_all %>% dplyr::mutate(Month = month(Date,label = TRUE, abbr = FALSE))
+
+
+
+#changing numeric month to month name
+#data_all$Month <- factor(data_all$Month, levels = c("1","2","3","4","5","6","7", "8", "9", "10", "11", "12"),
+    #    labels=c("Jan","Feb", "March","April","May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"))
+
+#data_all
+
+```
+
+
+```{r}
+# Summary of all height data
+
+st_height <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date", "Month"))
+
+st_height 
+
+
+#Summary of all height data per bag
+
+st_height_bag <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date", "Bag_number", "Month"))
+
+st_height_bag 
+```
+#Let's take a look at the data - Shell length! 
+
+```{r}
+#Average shell height per month per site
+
+ggplot(data=data_all, aes(x=Site, y=Shell_length, fill=Site)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="Site", y = "Mean Shell Height (mm)") +
+  facet_wrap(~Month, ncol = 4)
+```
+
+```{r}
+# size class distribution graph per site per month
+
+ASHC<- data_all %>% filter(Site == "ASHC")
+FENC<- data_all %>% filter(Site == "FENC")
+
+ggplot(data=ASHC, aes(x=Shell_length)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Juvenile Shell Height - Ash Creek", x ="Height (mm)")+ scale_x_continuous(limits= c(0,80), breaks = seq(0,80, by =5) )+
+  scale_y_continuous(limits = c(0,70), breaks = seq(0,70, by = 5))+
+ facet_wrap(~ Month, scales = "free", ncol = 1)
+# add date to facet wrap after July collection
+
+ggplot(data=FENC, aes(x=Shell_length)) +
+  geom_histogram()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Juvenile Shell Height - Fence Creek", x ="Height (mm)")+ scale_x_continuous(limits= c(0,80), breaks = seq(0,80, by =5) )+
+  scale_y_continuous(limits = c(0,70), breaks = seq(0,70, by = 5))+
+ facet_wrap(~ Month, scales = "free", ncol = 1)
+```
+
+#Survival calculations
+```{r}
+#Lets great some summaries to see numbers and calculate the survival %
+#Create a summary of counts across all bags
+Survival_counts_all <- data_all %>% 
+  dplyr::group_by(Site, Date, Survival) %>% 
+  dplyr::summarise(count = n())
+Survival_counts_all
+
+#Create a summary of counts per bag
+Survival_counts_bag <- data_all %>% 
+  dplyr::group_by(Site, Date, Survival, Bag_number) %>% 
+  dplyr::summarise(count = n())
+Survival_counts_bag
+
+#Survival summary
+survival_sum_all <- summarySE(data_all, "Survival", groupvars=c("Site", "Date")) #creating stats (sd, se, ci) about data
+survival_sum_all
+
+
+```
+#Proportions of survival - graphing survival summary
+```{r}
+#This chunk is creating a ggplot of the data
+prop.survived <- ggplot(data=survival_sum_all, aes(x=Site, y=Survival, fill=Site))+ #describe what data frame to use and the what rows should be on the x and y axis. Fill is the data that color codes the individual bars
+geom_col(color = "black", linewidth =  0.75) + #codes the outline of the bars
+geom_bar(stat="identity")+ #defines the type of graph to be bar
+geom_errorbar(aes(ymin=Survival-se, ymax=Survival+se), width=.2, position=position_dodge(.9))+ #adds error bars previously calculated
+theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ #removing grid lines
+scale_fill_manual(values = c("orange1", "cornflowerblue") )+ #filling bars with specific colors
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ #can adjust angle of axis text
+labs(x ="Site", y = "Propotion Survived") +
+#facet_wrap(~Date)+ # could add a facet_wrap for date but would need to add to data frame first
+theme(axis.title = element_text(size = rel(1.7)), axis.text = element_text(size = rel(1.3)), plot.margin = margin(10, 150, 10, 150), legend.text = element_text(size = 13), legend.title = element_text(size = 19))+
+#changes axis and legend text and title, also plot.margin removes the white space within the graph
+  ylim(0,1) #restrcting y axis limits from 0 to 1
+prop.survived
+
+
+#output of graph
+pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"NEWprop_survived2024.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
+print(prop.survived) #specify the graph
+dev.off()
+```
+
+#Calculating Growth Rate
+#Reading this paper : Osei et al. 2022 - "monthly growth rate = (H2 − H1)/(t/30), where H1 is initial shell height (cm), H2 is final shell height (cm) and t is the number days between sampling" - how to tell R to do this?
+#Is the correct? I am not sure - needs to be checked over and adjusted. I have it a whirl LOL - MK
+```{r}
+
+#Create summary of height per bag per time period per site
+
+st_height_bag <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar="Shell_length", groupvars=c("Site", "Date", "Bag_number", "Month"))
+
+st_height_bag 
+
+#So we need to calculate how many days between each measurement to calculate the growth rate
+# Sort data by site and sampling date (important if dates are not ordered)
+st_height_bag <- st_height_bag %>%
+  arrange(Site, Date, Bag_number)
+
+# Calculate the number of days between sampling dates and the monthly growth rate per site per replicate
+st_height_bag <- st_height_bag %>%
+  group_by(Site, Bag_number) %>%
+  mutate(Days_between = c(NA, diff(Date)), H1 = lag(Shell_length), H2 = Shell_length, monthly_growth_rate = (H2-H1)/(Days_between))
+
+st_height_bag
+
+
+
+```
+
+#graphing growth rate
+#this needs to be fixed/updated
+```{r}
+growth.rate <- ggplot(data=survival_sum_all, aes(x=Site, y=GR_mergedT0, fill=Site)) +
+  geom_boxplot(width = 2)+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+scale_fill_manual(values = c("orange1", "cornflowerblue") )+
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(x ="Site", y = "Growth Rate (mm / month)") +
+# could add a facet_wrap for date
+  theme(axis.title = element_text(size = rel(1.7)), axis.text = element_text(size = rel(1.3)), plot.margin = margin(10, 150, 10, 150))+
+  ylim(0,16)
+  
+
+growth.rate
+```
+
+
+#Kaplan Meier Survival 
+#This needs some work - the counts are not correct
+```{r}
+
+# Create a survival object per bag and plot 
+ASHC$survival <-as.numeric(ASHC$Survival) #need to make sure everything is in numeric format
+ASHC$Month <-as.numeric(ASHC$Month)
+FENC$survival <-as.numeric(FENC$Survival) #need to make sure everything is in numeric format
+FENC$Month <-as.numeric(FENC$Month)
+
+# Ash Creek survival
+
+Surv_ASHC <- Surv(time = ASHC$Month, event = ASHC$Survival)
+fit.surv_ASHC <- survfit(formula = Surv_ASHC ~ Bag_number, data = ASHC)
+
+ASHC_survival_plot<-ggsurvplot(fit.surv_ASHC, data = ASHC, break.x.by = 1,
+           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,9), legend.labs= c("bag 1", "bag 2",
+                                                                 "bag 3"),
+           legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Ash Creek, CT")
+ASHC_survival_plot
+
+#output of graph
+pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"ASHC_Kaplan_Survival.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
+print(ASHC_survival_plot) #specify the graph
+dev.off()
+
+
+
+# Fence Creek survival
+Surv_FENC <- Surv(time = FENC$Month, event = FENC$Survival)
+fit.surv_FENC <- survfit(formula = Surv_FENC ~ Bag_number, data = FENC)
+
+FENC_survival_plot<-ggsurvplot(fit.surv_FENC, data = FENC,break.x.by = 1,
+           linetype= c(1, 2, 3),xlab = "Month", ylab= "Survival", xlim = c(5,9), legend.labs= c("bag 1", "bag 2",
+                                                                 "bag 3"),
+           legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Fence Creek, CT") 
+FENC_survival_plot
+
+#output of graph
+pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"FENC_Kaplan_Survival.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
+print(FENC_survival_plot) #specify the graph
+dev.off()
+
+```
+
+
+#ALL OF THE CODE BELOW IS OLD CODE 
+
+
+Testing assumptions for statistical analysis (Survival and Growth rate)
+
+  #### Code not working - resume edits here (km, 7/14/2024).
+```{r}
+library(rstatix)
+
+leveneTest(Survival ~ Site, data=df)
+shapiro.test(df$Survival)
+
+leveneTest(Growth_rate ~ Site, data=df
+shapiro.test(df$Growth_rate)
+```
+
+
+```{r}
+sessionInfo()
+```
+
+
