@@ -299,6 +299,25 @@ pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"JuvGrowth_Kaplan_Su
 print(CT_survival_plot) #specify the graph
 dev.off()
 
+
+#Statistics
+#Pairwise comparisons using long rank tests
+#H: There is a significant difference in survival between sites
+pc_site <- pairwise_survdiff(Surv(Month, Survival)~ Site, data = data_all)
+pc_site
+
+#Chi sq values
+surv_diff_site<-survdiff(Surv(Month, Survival) ~ Site, data = data_all)
+
+## Survival probability for all of the species by species, virus, and dose
+summary(survfit(Surv(Month, Survival) ~ Site, data = data_all), times = 7)
+
+
+#Cox proportional hazard
+fit.coxph <- coxph(Surv_CT ~ Site, data = data_all)
+fit.coxph
+ggforest(fit.coxph, data = data_all, fontsize = 1.5)
+
 ```
 
 
