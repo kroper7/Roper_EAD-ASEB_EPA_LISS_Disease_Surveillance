@@ -5,9 +5,9 @@ date: "2024-01-22"
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
-knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
+#knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
 ```{r}
@@ -24,38 +24,43 @@ library("AICcmodavg")
 library("rstatix")
 
 
-data_all <- read.csv("Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
-str(data_all)
-head(data_all)
+data_all <- read.csv("Side_projects/Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
+data_all <- as.data.frame(data_all)
+#str(data_all)
+#head(data_all)
 
 #Removing unnecessary columns from data (such as light_regime and oyster_zone)
-g <- select(data_all, -light_regime, -oyster_zone, -X.1:-X.12)
-g
+data_all <- select(data_all, -light_regime, -oyster_zone, -X:-X.12)
+data_all
 
 #Removing NA rows
-data <- g %>%  filter(!row_number() %in% c(61:998))
-data
-summary(data)
+data_all <- data_all %>%  filter(!row_number() %in% c(61:998))
+data_all
 
 #Adding rftm data
-size_rftm <-read.csv("Size_studyASHC/raw_data/SizeASHC_RFTM.csv")
+size_rftm <-read.csv("Side_projects/Size_studyASHC/raw_data/SizeASHC_RFTM.csv")
 size_rftm <- size_rftm %>% filter(!row_number() %in% c(61:999))
-data$X <- size_rftm$rftm_final
-colnames(data)[colnames(data) == "X"] = "rftm_final"
+size_rftm
+
+data_all$rftm_final <- size_rftm$rftm_final
+
+data_all
+
+
 ```
 
 
 
 ```{r}
 #Changing condition to numeric
-data<- data %>%
+data_all<- data_all %>%
   mutate(condition_score = dplyr::recode(condition, 
                                      "1_very_good" = 1, "2_good" = 2, "3_good_minus"= 3, "4_fair_plus"= 4, "5_fair"= 5,"6_fair_minus"= 6, "7_poor_plus"=7,
                                      "8_poor"= 8, "9_very_poor"= 9))
-head(data)
+#head(data)
 
 #Creating size_class column
-newdf <- data %>%
+newdf <- data_all %>%
   mutate(sizeclass = case_when(height_mm < 81 ~ 'small',
                            height_mm < 121 ~ 'medium',
                            height_mm > 120 ~ 'large'))
@@ -128,25 +133,25 @@ head(data)
 
 ```{r}
 #Scatter Plot weight vs. height with condition fill
-p <- ggplot(data=data, aes(color=condition, x=height_mm, y=ww_total_g ), add = "reg.line") + geom_point()
+p <- ggplot(data=data_all, aes(color=condition, x=height_mm, y=ww_total_g ), add = "reg.line") + geom_point()
 p+ scale_color_brewer(palette="Accent")
 
 #Scatter plot with R and p-value height vs. ww
-sp<- ggscatter(data, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(method = "pearson", p.accuracy = 0.001, r.accuracy = 0.01)
+sp<- ggscatter(data_all, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(method = "pearson", p.accuracy = 0.001, r.accuracy = 0.01)
 sp
 
 #Scatter plot with R^2 and p-value height vs. ww
-sp.r <- ggscatter(data, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~`,`~")))
+sp.r <- ggscatter(data_all, x="height_mm", y="ww_total_g", add = "reg.line")+stat_cor(aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~`,`~")))
 sp.r
 
 #Scatter plot with height vs. weight and condition scores colored. R^2 mentioned for each condition
-sp.f <- ggscatter(data, x = "height_mm", y = "ww_total_g",
+sp.f <- ggscatter(data_all, x = "height_mm", y = "ww_total_g",
    color = "condition", palette = "jco",
    add = "reg.line")
 sp.f + stat_cor(aes(color = condition, label = paste(after_stat(rr.label))), label.x = 3)
 
 #Box and whisker plot for height vs. condition
-b <- ggplot(data, aes(x=height_mm, y=condition, fill=condition)) + geom_boxplot()
+b <- ggplot(data_all, aes(x=height_mm, y=condition, fill=condition)) + geom_boxplot()
 b+scale_fill_brewer(palette="Dark2")+coord_flip()
 
 #Scatter plot rftm vs. condition scores with regression line for size classes
