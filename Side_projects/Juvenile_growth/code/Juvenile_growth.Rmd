@@ -9,8 +9,8 @@ description: This code is for the Juvenille Growth Study looking at growth rates
 Important Notes: Fence Creek 06/10/24 measurements for height after individual 50 were deleted/lost due to tablet glitch. Total counts should be based on the survival metric taken to determine live counts. 
 
 ---
-Last updated 09/25/24 by M.Kachmar
-  -updated September for ASHC & FENC
+Last updated 10/9/24 by M.Kachmar
+  -incorporated Kaplan Meier survival statistics and curves
 
   
  
@@ -145,7 +145,7 @@ ggplot(data=FENC, aes(x=Shell_length)) +
  facet_wrap(~ Month, scales = "free", ncol = 1)
 ```
 
-#Survival calculations
+#Mortality calculations
 ```{r}
 #Lets great some summaries to see numbers and calculate the survival %
 #Create a summary of counts across all bags
@@ -234,17 +234,19 @@ growth.rate
 ```
 
 
-#Kaplan Meier Survival 
-#This needs some work - the counts are not correct
+#Kaplan Meier Survival Statistics
 ```{r}
 
+#View(ASHC)
+#View(FENC)
+
 # Create a survival object per bag and plot 
-ASHC$survival <-as.numeric(ASHC$Survival) #need to make sure everything is in numeric format
+ASHC$Survival <-as.numeric(ASHC$Survival) #need to make sure everything is in numeric format
 ASHC$Month <-as.numeric(ASHC$Month)
-FENC$survival <-as.numeric(FENC$Survival) #need to make sure everything is in numeric format
+FENC$Survival <-as.numeric(FENC$Survival) #need to make sure everything is in numeric format
 FENC$Month <-as.numeric(FENC$Month)
 
-# Ash Creek survival
+# Ash Creek survival by bag
 
 Surv_ASHC <- Surv(time = ASHC$Month, event = ASHC$Survival)
 fit.surv_ASHC <- survfit(formula = Surv_ASHC ~ Bag_number, data = ASHC)
@@ -276,6 +278,46 @@ FENC_survival_plot
 pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"FENC_Kaplan_Survival.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
 print(FENC_survival_plot) #specify the graph
 dev.off()
+
+
+#Survival comparing sites
+
+data_all$Month<-as.numeric(data_all$Month)
+data_all$Survival<-as.numeric(data_all$Survival)
+
+Surv_CT <- Surv(time = data_all$Month, event = data_all$Survival)
+fit.surv_CT <- survfit(formula = Surv_CT ~ Site, data = data_all)
+
+CT_survival_plot<-ggsurvplot(fit.surv_CT, data = data_all, break.x.by = 1,
+           linetype= c(1, 2),xlab = "Month", ylab= "Survival", xlim = c(5,9), legend.labs= c("Ash Creek", "Fence Creek"),
+           legend.title = "Replicate:", legend = "top", risk.table =FALSE )+ theme_survminer(base_size = 20,font.legend = c(15))+ggtitle("Survival between Ash Creek, CT and Fence Creek, CT")
+CT_survival_plot
+
+#output of graph
+pdf(paste0(path = "Side_projects/Juvenile_growth/outputs/" ,"JuvGrowth_Kaplan_Survival.pdf"), height = 7, width = 11) #printing a PDF within the path of the code, with specific dimensions of PDF
+print(CT_survival_plot) #specify the graph
+dev.off()
+
+
+#Statistics
+#Pairwise comparisons using long rank tests
+#H: There is a significant difference in survival between sites
+pc_site <- pairwise_survdiff(Surv(Month, Survival)~ Site, data = data_all)
+pc_site
+
+#Chi sq values
+surv_diff_site<-survdiff(Surv(Month, Survival) ~ Site, data = data_all)
+surv_diff_site
+
+## Survival probability for all of sites & bags
+summary(survfit(Surv(Month, Survival) ~ Site, data = data_all))
+summary(survfit(Surv(Month, Survival) ~ Site + Bag_number, data = data_all))
+
+
+#Cox proportional hazard
+fit.coxph <- coxph(Surv_CT ~ Site, data = data_all)
+fit.coxph
+ggforest(fit.coxph, data = data_all, fontsize = 1.5)
 
 ```
 
