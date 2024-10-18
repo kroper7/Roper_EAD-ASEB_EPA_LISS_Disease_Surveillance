@@ -25,9 +25,16 @@ library("rstatix")
 
 
 data_all <- read.csv("Side_projects/Size_studyASHC/raw_data/SizeASHC_TissueProcessing.csv")
+<<<<<<< Updated upstream
 data_all <- as.data.frame(data_all)
 #str(data_all)
 #head(data_all)
+=======
+
+
+str(data_all)
+head(data_all)
+>>>>>>> Stashed changes
 
 #Removing unnecessary columns from data (such as light_regime and oyster_zone)
 data_all <- select(data_all, -light_regime, -oyster_zone, -X:-X.12)
