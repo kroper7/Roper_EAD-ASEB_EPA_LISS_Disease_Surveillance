@@ -5,9 +5,9 @@ Authot : Mariah Kachmar
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 10/17/24 by K. Lenderman
+Updated 10/21/24 by K. Lenderman
 - all code up to date & graphs generated
-- added facet grid of 2023 and 2024
+
 
  
 
