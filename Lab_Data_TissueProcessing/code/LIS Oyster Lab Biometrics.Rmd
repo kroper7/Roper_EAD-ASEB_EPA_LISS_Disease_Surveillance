@@ -5,9 +5,9 @@ Authot : Mariah Kachmar
 description: This R code is used to import and summarize tissue processing data (body condition, height/length/width, weight, sample collection) from the LISS Oyster Health Project's monthly sampling at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. 
 ---
 
-Updated 09/27/24 by K. Lenderman
+Updated 10/23/24 by K. Lenderman
 - all code up to date & graphs generated
-- 0924FENC QAQC
+
 
  
 
@@ -15,8 +15,8 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 ```{r setup, include=FALSE}
 #knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
 ```
 
@@ -255,6 +255,25 @@ pdf(paste0(path = "Lab_Data_TissueProcessing/output" ,"/all_BCS_proportion_2024.
 print(BCS_proportion_all_2024)
 dev.off()
 ```
+```{r}
+# Proportion per month of intensity scores at three sites during 2023 & 2024
+df_bcs_proportions_new <- rbind(df_BCS_proportions2023, df_BCS_proportions2024)
+
+df_bcs_proportions_new<- df_bcs_proportions_new %>% filter(!site=="LAUR")
+
+ggplot(data=df_bcs_proportions_new, aes(x=month, y= Proportion, fill=condition_score_bin)) +
+  geom_bar(width = .5, stat="identity", position = "fill",colour = "black")+  
+   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+  labs(fill ="Body condition scores")+
+  labs(title="Proportion of body condition scores", x ="month", y = "Proportion")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  theme(axis.text=element_text(size=12))+
+scale_fill_brewer(palette = "Blues")+
+   #scale_x_continuous("Month", breaks = c(3,4,5,6,7,8,9,10))+ 
+  facet_grid(year ~site)
+```
+
+
 
 #Shell Pathology - all data
 #Includes 2023 data and all data that is in the 2024 format

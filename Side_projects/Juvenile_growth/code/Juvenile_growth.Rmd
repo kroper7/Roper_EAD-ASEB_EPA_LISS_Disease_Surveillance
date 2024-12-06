@@ -21,10 +21,10 @@ Last updated 10/9/24 by M.Kachmar
 
 knitr::opts_chunk$set(echo = TRUE) 
 #knitr::opts_knit$set(root.dir = 'C:/Users/kennedy.mcgrath/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kennedy's
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 #knitr::opts_knit$set(root.dir = 'C:/Users/kelly.roper/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kelly's
-#knitr::opts_knit$set(root.dir = 'C:/Users/katherine.mcfarland/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Katie's
+knitr::opts_knit$set(root.dir = 'C:/Users/katherine.mcfarland/Documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Katie's
 ```
 
 
@@ -109,6 +109,28 @@ st_height_bag <- summarySE(data_all%>% filter(!is.na(Shell_length)), measurevar=
 st_height_bag 
 ```
 #Let's take a look at the data - Shell length! 
+```{r}
+
+st_height$Site< - as.factor(st_height$Site) 
+str(st_height)
+
+ggplot(data=st_height, aes(x=Month, y=Shell_length, fill=Site)) +
+                 geom_point()
+```
+
+```{r}
+#Average shell height per month per site
+  ### Why is the color and the lin plot not working????)
+
+ggplot(data=st_height, aes(x=Month, y=Shell_length, fill=Site)) +
+                 geom_point()+geom_line()+
+        geom_errorbar(aes(ymin=Shell_length-se, ymax=Shell_length+se), width=.2,
+          position=position_dodge(0)) +  
+  # scale_color_manual(values=c("green4", "darkorange1"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs( x ="Month", y = "Mean Shell Height (mm)") 
+```
 
 ```{r}
 #Average shell height per month per site
@@ -119,6 +141,15 @@ ggplot(data=data_all, aes(x=Site, y=Shell_length, fill=Site)) +
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Mean Shell Height ", x ="Site", y = "Mean Shell Height (mm)") +
   facet_wrap(~Month, ncol = 4)
+```
+```{r}
+#Average shell height per month per site
+
+ggplot(data=data_all, aes(x=Month, y=Shell_length, fill=Site)) +
+  geom_boxplot()+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Mean Shell Height ", x ="Site", y = "Mean Shell Height (mm)")
 ```
 
 ```{r}

@@ -8,13 +8,15 @@ output: html_document
 description: This R code is used to important and summarize shell height data from the LISS Oyster Health Project's 2023 oyster population surveys at Ash Creek and Fence Creek intertidal sites in Connecticut and Goldstar beach and Laurel Hollow subtidal sites on Long Island, NY. June 2023 data was originally input into the Access database (LISS_Database_FieldCollectionData_2023-07-18.accb) and files needed to be converted and standardize to the new collection method. All original or raw data can be accessed in the GitHub repository. 
 ---
 
-Last updated 9/25/24 M. Kachmar
+Last updated 10/18/24 K. Lenderman
+
+
 
 
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
-#knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
+#knitr::opts_knit$set(root.dir = 'C:/Users/mariah.kachmar/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Mariah's
+knitr::opts_knit$set(root.dir = 'C:/Users/kyra.lenderman/documents/Github/EAD-ASEB_EPA_LISS_Disease_Surveillance') #Kyra's
 ```
 
 
@@ -30,6 +32,7 @@ library(lubridate)
 library(Rmisc)
 library(ggplot2)
 library(readr)
+library(ggpubr)
 
 ```
 
@@ -203,12 +206,16 @@ write_csv(Height_master, path= "Master_files/height_all_data.csv") #row.names=FA
 #Oyster density metrics
 ```{r}
 
-
+#Merge all quadrates data from surveys 
 #Sum total number of oyster counter per quadrat
-quadratdensity_all<- Height_master %>%
-  dplyr::group_by(Quadrat, Season, Year, Survival_status, Site, Date_collected, State) %>%
-  dplyr::summarize(Count = n())
-quadratdensity_all
+
+#This code does not include the oysters above 100 (which are not included in the height_master)
+#quadratdensity_all_old<- Height_master %>%
+#  dplyr::group_by(Quadrat, Season, Year, Survival_status, Site, Date_collected, State) %>%
+#  dplyr::summarize(Count = n())
+#quadratdensity_all_old
+
+quadratdensity_all <- read.csv("Field_Data_Biological//raw_data//Population_survey_density.csv") 
 
 #summary of each oyster type by site. output = Site, N, Mean, stnd dev, stnd error, and confidence interval
 all_density_SE <-summarySE(data = quadratdensity_all, measurevar = "Count", groupvars=c("Site", "Survival_status", "Season", "Date_collected"))
@@ -226,6 +233,10 @@ densitysummary
 write_csv(densitysummary, "Field_Data_Biological/Output/populationdensity_summary.csv") #, row.names=FALSE)
 
 ```
+```{r}
+#changing density master. Create new master with "all quadrat" data and do not use data from height master
+```
+
 #oyster size distribution
 ```{r}
 
@@ -375,38 +386,68 @@ dev.off()
 
 
 df_quadrat_ASHC <- quadratdensity_all%>%
-  filter(Site == "ASHC")
+  filter(Site == "ASHC") %>% filter(!Count == "0")
 df_quadrat_ASHC
 
 #Quadrat size is 25 x25cm (.0625 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 16
 
 df_density_ASHC <- df_quadrat_ASHC %>%
-  dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
+  dplyr::group_by(Site, Season, Quadrat, Survival_status, Year) %>% 
   dplyr::summarize(Density = sum(Count)*16)
 df_density_ASHC
 
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_ASHC <- df_density_ASHC %>%
- dplyr:: group_by(Site, Season, Survival_status) %>%
+ dplyr:: group_by(Site, Season, Survival_status, Year, Quadrat) %>%
  dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_ASHC
+
+survival_sum_ASHC <- summarySE(mean_total_oysters_ASHC, "Total_Density", groupvars=c( "Season", "Survival_status", "Year")) #creating stats (sd, se, ci) about data
  
 
-#Density per quadrat totals
-ggplot(data=df_quadrat_ASHC, aes(x= Survival_status, y = Count, fill = Survival_status)) +
-  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+#Density per quadrat totals - 2023
+df_quadrat_ASHC_2023 <- df_quadrat_ASHC %>% filter(Year == "2023")
+d.2023 <- ggplot(data=df_quadrat_ASHC_2023, aes(x= Survival_status, y = Count, fill = Survival_status)) +
+  geom_bar( stat="identity", show.legend = FALSE)+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Count ", x ="Survival status", y= "Density")+
-  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
+  labs(title="Ash Creek Count - 2023 ", x ="Survival status", y= "Density")+
+  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")+
+  scale_color_brewer("Accent")
+#+geom_text(aes(label=Count ), vjust=-0.3, size = 3.5)
 
-#Density of oysters per meter squared
-ggplot(data=mean_total_oysters_ASHC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
+#Density per quadrat totals - 2024
+df_quadrat_ASHC_2024 <- df_quadrat_ASHC %>% filter(Year == "2024")
+d.2024<- ggplot(data=df_quadrat_ASHC_2024, aes(x= Survival_status, y = Count, fill = Survival_status)) +
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title="Ash Creek Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  labs(title="Ash Creek Count - 2024 ", x ="Survival status", y= "Density")+
   facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
+#+geom_text(aes(label=Count ), vjust=-0.3, size = 3.5)
+ggarrange(d.2023, d.2024)
+
+d.2024
+#Density of oysters per meter squared - 2023
+mean_total_oysters_ASHC_2023 <- mean_total_oysters_ASHC %>% filter(Year == "2023")
+ggplot(data=survival_sum_ASHC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
+  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Ash Creek Density", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  facet_grid(Season ~Year)+
+  geom_errorbar(aes(ymin=Total_Density-se, ymax=Total_Density+se), width=.2, position=position_dodge(.9))
+
+
+#Density of oysters per meter squared - 2024
+mean_total_oysters_ASHC_2024 <- mean_total_oysters_ASHC %>% filter(Year == "2024")
+ggplot(data=mean_total_oysters_ASHC_2024, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
+  geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
+  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title="Ash Creek Density - 2024 ", x ="Survival status", y= "Density (# oyster / meter squared)")+
+  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")+
+ geom_text(aes(label=Total_Density), vjust=-0.3, size = 3.5)
 
 ```
 #FENC
@@ -452,9 +493,9 @@ ggplot(height_FENC, aes(x=factor(Season, levels = c("Spring", "Fall")), y=Height
   geom_boxplot()+  
    theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  labs(title="Shell Height", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
+  labs(title="Shell Height Fence Creek", x ="Season", y = "Height (mm)")+ theme(axis.title.y = element_text(size = rel(1.3), angle =90), axis.title.x = element_text(size = rel(1.3), angle = 0))+
   theme(axis.text=element_text(size=12))+
- facet_wrap(~ Year, scales = "free", ncol = 1)
+ facet_grid(~ Year)
 
 #Distribution Live
 FENC_Distribution_Live<-ggplot(data=height_FENC_Live, aes(x= Height)) +
@@ -503,32 +544,38 @@ df_quadrat_FENC
 #Quadrat size is 25 x25cm (.0625 m^2). To calculate density (oysters per m^2) multiply number of oysters counted X 16
 
 df_density_FENC <- df_quadrat_FENC %>%
-  dplyr::group_by(Site, Season, Quadrat, Survival_status) %>% 
+  dplyr::group_by(Site, Season, Quadrat, Survival_status, Year) %>% 
   dplyr::summarize(Density = sum(Count)*16)
 df_density_FENC
 
+
+
+
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_FENC <- df_density_FENC %>%
-  dplyr::group_by(Site, Season, Survival_status) %>%
+  dplyr::group_by(Site, Season, Survival_status, Year, Quadrat) %>%
   dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_FENC
 
+survival_sum_FENC <- summarySE(mean_total_oysters_FENC, "Total_Density", groupvars=c( "Season", "Survival_status", "Year")) #creating stats (sd, se, ci) about data
 
 #Density per quadrat totals
-ggplot(data=df_quadrat_FENC, aes(x= Survival_status, y = Count, fill = Survival_status)) +
+ggplot(data=survival_sum_FENC, aes(x= Survival_status, y = Density, fill = Survival_status)) +
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  geom_errorbar(aes(ymin=Density-se, ymax=Density+se), width=.2, position=position_dodge(.9))+
   labs(title="Fence Creek Count ", x ="Survival status", y= "Density")+
-  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
+  facet_wrap(Year ~ Season)
 
 #Density of oysters per meter squared
-ggplot(data=mean_total_oysters_FENC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
+ggplot(data=survival_sum_FENC, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
+    geom_errorbar(aes(ymin=Total_Density-se, ymax=Total_Density+se), width=.2, position=position_dodge(.9))+
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Fence Creek Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
-  facet_wrap(~ factor(Season, levels = c("Spring", "Fall")), scales = "free")
+  facet_grid(Year ~ Season)
 
 
 ```
@@ -623,10 +670,12 @@ df_density_GOLD
 
 #Mean of Oysters per m^2 across all quadrats
 mean_total_oysters_GOLD <- df_density_GOLD %>%
-  dplyr::group_by(Site, Season, Year, Date_collected, Survival_status) %>%
+  dplyr::group_by(Site, Season, Year, Date_collected, Survival_status, Quadrat) %>%
   dplyr::summarize(Total_Density = mean(Density))
 mean_total_oysters_GOLD
  
+survival_sum_GOLD <- summarySE(mean_total_oysters_GOLD, "Total_Density", groupvars=c( "Season", "Survival_status", "Year")) #creating stats (sd, se, ci) about data
+survival_sum_GOLD <- survival_sum_GOLD[-c(3,4),]
 
 #Density per quadrat totals
 ggplot(data=df_quadrat_GOLD, aes(x= Survival_status, y = Count, fill = Survival_status)) +
@@ -637,12 +686,13 @@ ggplot(data=df_quadrat_GOLD, aes(x= Survival_status, y = Count, fill = Survival_
   facet_wrap(~ Year, scales = "free")
 
 #Density of oysters per meter squared
-ggplot(data=mean_total_oysters_GOLD, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
+ggplot(data=survival_sum_GOLD, aes(x= Survival_status, y = Total_Density, fill = Survival_status)) +
   geom_bar( stat="identity")+  #scale_fill_manual(values=c("forestgreen","orange", "purple"))+
   theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ 
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title="Gold Star Density ", x ="Survival status", y= "Density (# oyster / meter squared)")+
-  facet_wrap(~ Year, scales = "free")
+  geom_errorbar(aes(ymin=Total_Density-se, ymax=Total_Density+se), width=.2, position=position_dodge(.9))+
+  facet_grid(~ Year)
 ```
 
 
